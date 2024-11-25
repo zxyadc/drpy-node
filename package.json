@@ -1,0 +1,17 @@
+{
+  "name": "drpy-node",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node index.js"
+  },
+  "repository": "https://github.com/hjdhnx/drpy-node.git",
+  "author": "晚风拂柳颜 <434857005@qq.com>",
+  "license": "MIT",
+  "dependencies": {
+    "fastify": "^4.15.0",
+    "lodash": "^4.17.21",
+    "pino-pretty": "^13.0.0"
+  }
+}
