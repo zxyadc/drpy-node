@@ -1,44 +1,63 @@
-import Fastify from 'fastify';  // 使用命名导入 Fastify
-import path from 'path';  // 使用 Node.js 的 path 模块来处理文件路径
-
-// 使用 pino-pretty 来格式化日志输出
-import pino from 'pino';
-import pinoPretty from 'pino-pretty';
-
-// 创建 pino-pretty 配置
-const prettyPrintOptions = {
-    colorize: true,  // 启用颜色输出
-    translateTime: 'SYS:standard',  // 显示标准时间
-    ignore: 'pid,hostname'  // 忽略 pid 和 hostname
-};
-
-// 创建 Fastify 实例
-const fastify = Fastify({
-    logger: pino({
-        level: 'info',  // 设置日志级别
-        prettyPrint: false  // 禁用内置 prettyPrint
-    }).child({}, {stream: pinoPretty(prettyPrintOptions)})  // 使用 pino-pretty 进行日志格式化
-});
-
-// 引入封装好的库
+import Fastify from 'fastify';
 import * as drpy from './libs/drpy.js';
+import path from 'path';
+import {fileURLToPath} from 'url';
 
-// API 接口: 根据模块名加载相应的 js 文件，并调用 drpy 的方法
+const fastify = Fastify({logger: true});
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+console.log('__dirname:', __dirname);
+
+// 动态加载模块并根据 query 执行不同逻辑
 fastify.get('/api/:module', async (request, reply) => {
-    const moduleName = request.params.module;  // 获取模块名，例如 '360'
-    const modulePath = new URL(`./js/${moduleName}.js`, import.meta.url).pathname;  // 获取模块路径
+    const moduleName = request.params.module;
+    const query = request.query; // 获取 query 参数
+    const modulePath = path.join(__dirname, 'js', `${moduleName}.js`);
 
     try {
-        // 动态加载 js 文件
-        const module = await import(modulePath);  // 使用动态导入加载模块
-        console.log(module)
+        // 根据 query 参数决定执行逻辑
+        if ('play' in query) {
+            // 处理播放逻辑
+            const result = await drpy.play(modulePath);
+            return reply.send(result);
+        }
 
-        // 由于 `360.js` 使用的是全局的 `rule` 变量，我们通过 `module.default` 获取
-        const result = await drpy.init(module.rule);  // 使用 `module.rule` 直接调用
-        // 返回结果
-        return reply.send(result);
+        if ('ac' in query && 't' in query) {
+            // 分类逻辑
+            const result = await drpy.cate(modulePath);
+            return reply.send(result);
+        }
+
+        if ('ac' in query && 'ids' in query) {
+            // 详情逻辑
+            const result = await drpy.detail(modulePath);
+            return reply.send(result);
+        }
+
+        if ('wd' in query) {
+            // 搜索逻辑
+            const result = await drpy.search(modulePath);
+            return reply.send(result);
+        }
+
+        if ('refresh' in query) {
+            // 强制刷新初始化逻辑
+            const refreshedObject = await drpy.init(modulePath, true);
+            return reply.send(refreshedObject);
+        }
+
+        // 默认逻辑，返回 home + homeVod 接口
+        const result_home = await drpy.home(modulePath);
+        const result_homeVod = await drpy.homeVod(modulePath);
+        const result = {
+            class: result_home,
+            list: result_homeVod
+        }
+        reply.send(result);
+
     } catch (error) {
-        reply.status(500).send({error: `Failed to load module ${moduleName}: ${error.message}`});
+        console.error('Error processing request:', error);
+        reply.status(500).send({error: `Failed to process request for module ${moduleName}: ${error.message}`});
     }
 });
 
