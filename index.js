@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import * as drpy from './libs/drpy.js';
 import path from 'path';
 import {fileURLToPath} from 'url';
+import {base64Encode, base64Decode, atob, btoa} from "./libs_drpy/crypto-util.js";
 
 const fastify = Fastify({logger: true});
 
@@ -18,25 +19,36 @@ fastify.get('/api/:module', async (request, reply) => {
         // 根据 query 参数决定执行逻辑
         if ('play' in query) {
             // 处理播放逻辑
-            const result = await drpy.play(modulePath);
+            const result = await drpy.play(modulePath, query.flag, query.play);
             return reply.send(result);
         }
 
         if ('ac' in query && 't' in query) {
+            let ext = query.ext;
+            let extend = {};
+            if (ext) {
+                try {
+                    extend = JSON.parse(base64Decode(ext))
+                } catch (e) {
+                }
+            }
             // 分类逻辑
-            const result = await drpy.cate(modulePath);
+            const result = await drpy.cate(modulePath, query.t, query.pg || 1, extend);
             return reply.send(result);
         }
 
         if ('ac' in query && 'ids' in query) {
             // 详情逻辑
-            const result = await drpy.detail(modulePath);
+            const result = await drpy.detail(modulePath, query.ids);
             return reply.send(result);
         }
 
         if ('wd' in query) {
             // 搜索逻辑
-            const result = await drpy.search(modulePath);
+            if (!('quick' in query)) {
+                query.quick = 0
+            }
+            const result = await drpy.search(modulePath, query.wd, query.quick, query.pg || 1);
             return reply.send(result);
         }
 
@@ -45,9 +57,11 @@ fastify.get('/api/:module', async (request, reply) => {
             const refreshedObject = await drpy.init(modulePath, true);
             return reply.send(refreshedObject);
         }
-
+        if (!('filter' in query)) {
+            query.filter = 1
+        }
         // 默认逻辑，返回 home + homeVod 接口
-        const result_home = await drpy.home(modulePath);
+        const result_home = await drpy.home(modulePath, query.filter);
         const result_homeVod = await drpy.homeVod(modulePath);
         const result = {
             class: result_home,

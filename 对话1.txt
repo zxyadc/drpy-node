@@ -1,7 +1,6 @@
 我基于你的代码做了一些调整，接下来请更新记忆:
 1. index.js
 import Fastify from 'fastify';
-// 引入封装好的库
 import * as drpy from './libs/drpy.js';
 import path from 'path';
 import {fileURLToPath} from 'url';
@@ -9,18 +8,58 @@ import {fileURLToPath} from 'url';
 const fastify = Fastify({logger: true});
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-console.log('__dirname:', __dirname)
-// 动态加载模块并初始化
+console.log('__dirname:', __dirname);
+
+// 动态加载模块并根据 query 执行不同逻辑
 fastify.get('/api/:module', async (request, reply) => {
     const moduleName = request.params.module;
+    const query = request.query; // 获取 query 参数
     const modulePath = path.join(__dirname, 'js', `${moduleName}.js`);
 
     try {
-        const result = await drpy.init(modulePath); // 初始化模块
+        // 根据 query 参数决定执行逻辑
+        if ('play' in query) {
+            // 处理播放逻辑
+            const result = await drpy.play(modulePath);
+            return reply.send(result);
+        }
+
+        if ('ac' in query && 't' in query) {
+            // 分类逻辑
+            const result = await drpy.cate(modulePath);
+            return reply.send(result);
+        }
+
+        if ('ac' in query && 'ids' in query) {
+            // 详情逻辑
+            const result = await drpy.detail(modulePath);
+            return reply.send(result);
+        }
+
+        if ('wd' in query) {
+            // 搜索逻辑
+            const result = await drpy.search(modulePath);
+            return reply.send(result);
+        }
+
+        if ('refresh' in query) {
+            // 强制刷新初始化逻辑
+            const refreshedObject = await drpy.init(modulePath, true);
+            return reply.send(refreshedObject);
+        }
+
+        // 默认逻辑，返回 home + homeVod 接口
+        const result_home = await drpy.home(modulePath);
+        const result_homeVod = await drpy.homeVod(modulePath);
+        const result = {
+            class: result_home,
+            list: result_homeVod
+        }
         reply.send(result);
+
     } catch (error) {
-        console.error('Error loading module:', error);
-        reply.status(500).send({error: `Failed to load module ${moduleName}: ${error.message}`});
+        console.error('Error processing request:', error);
+        reply.status(500).send({error: `Failed to process request for module ${moduleName}: ${error.message}`});
     }
 });
 
@@ -30,13 +69,13 @@ const start = async () => {
         await fastify.listen(5757);
         console.log('Server listening at http://localhost:5757');
     } catch (err) {
-        // console.error(err);
         fastify.log.error(err);
         process.exit(1);
     }
 };
 
 start();
+
 
 2. libs/drpy.js
 import * as utils from '../utils/utils.js'; // 使用 import 引入工具类
@@ -148,6 +187,7 @@ export async function play(filePath) {
 }
 
 
+
 3.utils/req.js
 export async function req(param) {
     // 模拟异步请求
@@ -157,6 +197,7 @@ export async function req(param) {
         }, 1000);
     });
 }
+
 
 4.utils/utils.js
 // utils.js: 存放工具类方法
@@ -189,6 +230,7 @@ export function sleepSync(ms) {
 }
 
 export const deepCopy = cloneDeep
+
 
 5. js/360.js
 // js/360.js
@@ -237,4 +279,5 @@ var rule = {
         return '这是播放:' + rule.title
     },
 };
+
 
