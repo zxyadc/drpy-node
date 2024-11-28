@@ -39,7 +39,7 @@ function localSet(storage, key, value) {
     fs.writeFileSync('local/js_' + storage, JSON.stringify(confs[storage]));
 }
 
-async function request(url, opt) {
+async function request(url, opt={}) {
     try {
         var data = opt ? opt.data || null : null;
         var postType = opt ? opt.postType || null : null;
@@ -48,17 +48,17 @@ async function request(url, opt) {
         var redirect = (opt ? opt.redirect || 1 : 1) == 1;
 
         var headers = opt ? opt.headers || {} : {};
-        if (postType == 'form') {
+        if (postType === 'form') {
             headers['Content-Type'] = 'application/x-www-form-urlencoded';
 
             if (data != null) {
                 data = qs.stringify(data, {encode: false});
             }
-        } else if (postType == 'form-data') {
+        } else if (postType === 'form-data') {
             headers['Content-Type'] = 'multipart/form-data';
             data = toFormData(data);
         }
-        let respType = returnBuffer == 1 || returnBuffer == 2 ? 'arraybuffer' : undefined;
+        let respType = returnBuffer === 1 || returnBuffer === 2 ? 'arraybuffer' : undefined;
         // const agent = tunnel.httpsOverHttp({
         //     proxy: {
         //         host: '127.0.0.1', port: 7890,

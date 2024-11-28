@@ -1,5 +1,6 @@
 // utils.js: 存放工具类方法
 import pkg from 'lodash';
+import crypto from 'crypto';
 
 const {cloneDeep} = pkg;
 
@@ -25,6 +26,15 @@ export function sleepSync(ms) {
     while (Date.now() < end) {
         // 阻塞式等待，直到时间到达
     }
+}
+
+/**
+ * 计算文件内容的 hash 值
+ * @param {string} content - 文件内容
+ * @returns {string} - 文件内容的 hash 值
+ */
+export function computeHash(content) {
+    return crypto.createHash('sha256').update(content, 'utf8').digest('hex');
 }
 
 export const deepCopy = cloneDeep

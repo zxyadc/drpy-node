@@ -15,6 +15,7 @@ fastify.get('/api/:module', async (request, reply) => {
     const query = request.query; // 获取 query 参数
     const modulePath = path.join(__dirname, 'js', `${moduleName}.js`);
 
+    const pg = Number(query.pg) || 1;
     try {
         // 根据 query 参数决定执行逻辑
         if ('play' in query) {
@@ -33,7 +34,7 @@ fastify.get('/api/:module', async (request, reply) => {
                 }
             }
             // 分类逻辑
-            const result = await drpy.cate(modulePath, query.t, query.pg || 1, extend);
+            const result = await drpy.cate(modulePath, query.t, pg, extend);
             return reply.send(result);
         }
 
@@ -48,7 +49,7 @@ fastify.get('/api/:module', async (request, reply) => {
             if (!('quick' in query)) {
                 query.quick = 0
             }
-            const result = await drpy.search(modulePath, query.wd, query.quick, query.pg || 1);
+            const result = await drpy.search(modulePath, query.wd, query.quick, pg);
             return reply.send(result);
         }
 
@@ -64,7 +65,7 @@ fastify.get('/api/:module', async (request, reply) => {
         const result_home = await drpy.home(modulePath, query.filter);
         const result_homeVod = await drpy.homeVod(modulePath);
         const result = {
-            class: result_home,
+            ...result_home,
             list: result_homeVod
         }
         reply.send(result);
