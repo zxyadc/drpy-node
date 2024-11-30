@@ -1,5 +1,5 @@
 import Fastify from 'fastify';
-import * as drpy from './libs/drpy.js';
+import * as drpy from './libs/drpyS.js';
 import path from 'path';
 import {fileURLToPath} from 'url';
 import {base64Encode, base64Decode, atob, btoa} from "./libs_drpy/crypto-util.js";
@@ -40,7 +40,7 @@ fastify.get('/api/:module', async (request, reply) => {
 
         if ('ac' in query && 'ids' in query) {
             // 详情逻辑
-            const result = await drpy.detail(modulePath, query.ids);
+            const result = await drpy.detail(modulePath, query.ids.split(','));
             return reply.send(result);
         }
 

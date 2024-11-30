@@ -1,4 +1,5 @@
-import axios, {toFormData} from 'axios';
+// import axios, {toFormData} from 'axios';
+import axios, {toFormData} from './axios.min.js';
 import crypto from 'crypto';
 import https from 'https';
 import fs from 'node:fs';
@@ -7,7 +8,7 @@ import _ from './underscore-esm.min.js'
 // import _ from './underscore-esm.js'
 // import _ from 'underscore'
 import tunnel from "tunnel";
-import jsoup from './htmlParser.js';
+import {jsonpath, jsoup} from './htmlParser.js';
 
 const confs = {};
 
@@ -39,7 +40,7 @@ function localSet(storage, key, value) {
     fs.writeFileSync('local/js_' + storage, JSON.stringify(confs[storage]));
 }
 
-async function request(url, opt={}) {
+async function request(url, opt = {}) {
     try {
         var data = opt ? opt.data || null : null;
         var postType = opt ? opt.postType || null : null;
@@ -275,9 +276,6 @@ function randStr(len, withNum) {
     }
     return _str;
 }
-
-globalThis.base64Encode = base64Encode;
-globalThis.base64Decode = base64Decode;
 
 globalThis.local = {
     get: async function (storage, key) {
@@ -543,5 +541,9 @@ globalThis.pjfa = (html, parse) => {
     const jsp = new jsoup();
     return jsp.pjfa(html, parse);
 };
+
+globalThis.log = console.log;
+globalThis.print = console.log;
+globalThis.jsonpath = jsonpath;
 
 export default {};

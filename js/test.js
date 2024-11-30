@@ -43,13 +43,17 @@ var rule = {
             {vod_name: '测试电影2', vod_pic: '2.png', vod_remarks: '测试描述2', vod_id: 'http://www.2.com'},
         ]
     },
-    一级: async () => {
-        // await sleep(200);
-        sleepSync(200);
-        let html = await req('123');
-        console.log('title:', rule.title);
-        console.log('html:' + html);
-        return html + '\n' + '这是一级:' + rule.title
+    一级: async function(tid, pg, filter, extend) {
+        let {input,MY_URL} = this;
+        console.log({tid,pg,filter,extend});
+        console.log(`input:${input},MY_URL:${MY_URL}`);
+        console.log(rule.host);
+        console.log(rule.host.rstrip('/'));
+        // log(typeof jsonpath)
+        // log(jsonpath({path:'$.title',json:rule}))
+        log(MOBILE_UA);
+        log(jsonpath.query(rule,'$.title'));
+        return `input:${input},MY_URL:${MY_URL},host:${rule.host.rstrip('/')}`
     },
     二级: async () => {
         return '这是二级:' + rule.title

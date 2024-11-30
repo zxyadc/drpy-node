@@ -1,4 +1,4 @@
-import * as drpy from '../libs/drpy.js';
+import * as drpy from '../libs/drpyS.js';
 import path from 'path';
 import {fileURLToPath} from 'url';
 

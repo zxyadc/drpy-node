@@ -38,3 +38,27 @@ export function computeHash(content) {
 }
 
 export const deepCopy = cloneDeep
+
+const resolve = (from, to) => {
+    const resolvedUrl = new URL(to, new URL(from, 'resolve://'));
+    if (resolvedUrl.protocol === 'resolve:') {
+        const {pathname, search, hash} = resolvedUrl;
+        return pathname + search + hash;
+    }
+    return resolvedUrl.href;
+};
+
+/**
+ *  url拼接
+ * @param fromPath 初始当前页面url
+ * @param nowPath 相对当前页面url
+ * @returns {*}
+ */
+export const urljoin = (fromPath, nowPath) => {
+    fromPath = fromPath || '';
+    nowPath = nowPath || '';
+    return resolve(fromPath, nowPath);
+};
+
+export const urljoin2 = urljoin
+export const joinUrl = urljoin
