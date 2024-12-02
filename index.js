@@ -1,13 +1,58 @@
 import Fastify from 'fastify';
 import * as drpy from './libs/drpyS.js';
 import path from 'path';
+import os from "os";
 import {fileURLToPath} from 'url';
+import {readdirSync,readFileSync} from 'fs';
 import {base64Decode} from "./libs_drpy/crypto-util.js";
+import {marked}  from './utils/marked.esm.min.js';
 
 const fastify = Fastify({logger: true});
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 console.log('__dirname:', __dirname);
+
+// 添加 / 接口
+fastify.get('/', async (request, reply) => {
+    const rootDir = path.resolve('.'); // 当前根目录
+    let readmePath = null;
+
+    // 查找根目录下的 README.md 文件（不区分大小写）
+    const files = readdirSync(rootDir);
+    for (const file of files) {
+        if (/^readme\.md$/i.test(file)) {
+            readmePath = path.join(rootDir, file);
+            break;
+        }
+    }
+
+    // 如果未找到 README.md 文件
+    if (!readmePath) {
+        reply.code(404).send('<h1>README.md not found</h1>');
+        return;
+    }
+
+    // 读取 README.md 文件内容
+    const markdownContent = readFileSync(readmePath, 'utf-8');
+
+    // 将 Markdown 转换为 HTML
+    const htmlContent = marked(markdownContent);
+
+    // 返回 HTML 内容
+    reply.type('text/html').send(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>README</title>
+                </head>
+                <body>
+                    ${htmlContent}
+                </body>
+                </html>
+            `);
+});
 
 // 动态加载模块并根据 query 执行不同逻辑
 fastify.get('/api/:module', async (request, reply) => {
@@ -34,7 +79,7 @@ fastify.get('/api/:module', async (request, reply) => {
                 }
             }
             // 分类逻辑
-            const result = await drpy.cate(modulePath, query.t, pg, extend);
+            const result = await drpy.cate(modulePath, query.t, pg, 1,extend);
             return reply.send(result);
         }
 
@@ -79,8 +124,29 @@ fastify.get('/api/:module', async (request, reply) => {
 // 启动服务
 const start = async () => {
     try {
-        await fastify.listen(5757);
-        console.log('Server listening at http://localhost:5757');
+        // 监听 0.0.0.0
+        await fastify.listen({ port: 5757, host: '0.0.0.0' });
+
+        // 获取本地地址
+        const localAddress = `http://localhost:5757`;
+
+        // 获取局域网地址
+        const interfaces = os.networkInterfaces();
+        let lanAddress = 'Not available';
+        for (const iface of Object.values(interfaces)) {
+            if (!iface) continue;
+            for (const config of iface) {
+                if (config.family === 'IPv4' && !config.internal) {
+                    lanAddress = `http://${config.address}:5757`;
+                    break;
+                }
+            }
+        }
+
+        // 打印服务地址
+        console.log(`Server listening at:`);
+        console.log(`- Local: ${localAddress}`);
+        console.log(`- LAN:   ${lanAddress}`);
     } catch (err) {
         fastify.log.error(err);
         process.exit(1);

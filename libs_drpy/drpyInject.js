@@ -75,6 +75,7 @@ async function request(url, opt = {}) {
         } else {
             agent = https.Agent({rejectUnauthorized: false,})
         }
+        console.log(`request:${url} headers:${JSON.stringify(headers)}`);
         var resp = await axios(url, {
             responseType: respType,
             method: opt ? opt.method || 'get' : 'get',

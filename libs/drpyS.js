@@ -51,7 +51,7 @@ export async function init(filePath, refresh) {
         if (moduleCache.has(filePath) && !refresh) {
             const cached = moduleCache.get(filePath);
             if (cached.hash === fileHash) {
-                log(`Module ${filePath} already initialized and unchanged, returning cached instance.`);
+                // log(`Module ${filePath} already initialized and unchanged, returning cached instance.`);
                 return cached.moduleObject;
             }
         }
@@ -485,7 +485,7 @@ async function searchParseAfter(d, pg) {
 
 async function playParse(rule, flag, id, flags) {
     let url = id;
-    log('playParse:', url)
+    // log('playParse:', url)
     if (!/http/.test(url)) {
         try {
             url = base64Decode(url);
@@ -494,7 +494,7 @@ async function playParse(rule, flag, id, flags) {
         }
     }
     url = decodeURIComponent(url);
-    log('playParse:', url)
+    // log('playParse:', url)
     return {
         TYPE: 'play',
         MY_FLAG: flag,

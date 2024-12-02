@@ -2,6 +2,9 @@
 // http://localhost:5757/api/番茄小说[书]?ac=detail&ids=https://fanqienovel.com/page/7431786294105099289
 // http://localhost:5757/api/番茄小说[书]?wd=斩神&pg=2
 // http://localhost:5757/api/番茄小说[书]?play=7432172914662720025&flag=番茄小说
+
+const {getRandomFromList} = $.require('./_lib.random.js');
+
 var rule = {
     类型: '小说',
     title: '番茄小说[书]',
@@ -218,15 +221,6 @@ function decodeText(text, _type) {
 
     // return _decodeText(text);
     return _decodeText2(text);
-}
-
-function getRandomFromList(list) {
-    // 将列表转换为数组
-    const array = Array.isArray(list) ? list : Array.from(list);
-    // 获取随机索引
-    const randomIndex = Math.floor(Math.random() * array.length);
-    // 返回随机选取的元素
-    return array[randomIndex];
 }
 
 function getFqCookie() {
