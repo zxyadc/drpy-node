@@ -32,3 +32,4 @@ todo:
 2. jsonpath
 3. underscore
 4. pino-pretty
+5. deasync

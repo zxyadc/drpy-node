@@ -3,9 +3,9 @@ import * as drpy from './libs/drpyS.js';
 import path from 'path';
 import os from "os";
 import {fileURLToPath} from 'url';
-import {readdirSync,readFileSync} from 'fs';
+import {readdirSync, readFileSync} from 'fs';
 import {base64Decode} from "./libs_drpy/crypto-util.js";
-import {marked}  from './utils/marked.esm.min.js';
+import './utils/marked.min.js';
 
 const fastify = Fastify({logger: true});
 
@@ -14,14 +14,13 @@ console.log('__dirname:', __dirname);
 
 // 添加 / 接口
 fastify.get('/', async (request, reply) => {
-    const rootDir = path.resolve('.'); // 当前根目录
     let readmePath = null;
 
     // 查找根目录下的 README.md 文件（不区分大小写）
-    const files = readdirSync(rootDir);
+    const files = readdirSync(__dirname);
     for (const file of files) {
         if (/^readme\.md$/i.test(file)) {
-            readmePath = path.join(rootDir, file);
+            readmePath = path.join(__dirname, file);
             break;
         }
     }
@@ -36,7 +35,7 @@ fastify.get('/', async (request, reply) => {
     const markdownContent = readFileSync(readmePath, 'utf-8');
 
     // 将 Markdown 转换为 HTML
-    const htmlContent = marked(markdownContent);
+    const htmlContent = marked.parse(markdownContent);
 
     // 返回 HTML 内容
     reply.type('text/html').send(`
@@ -79,7 +78,7 @@ fastify.get('/api/:module', async (request, reply) => {
                 }
             }
             // 分类逻辑
-            const result = await drpy.cate(modulePath, query.t, pg, 1,extend);
+            const result = await drpy.cate(modulePath, query.t, pg, 1, extend);
             return reply.send(result);
         }
 
@@ -125,7 +124,7 @@ fastify.get('/api/:module', async (request, reply) => {
 const start = async () => {
     try {
         // 监听 0.0.0.0
-        await fastify.listen({ port: 5757, host: '0.0.0.0' });
+        await fastify.listen({port: 5757, host: '0.0.0.0'});
 
         // 获取本地地址
         const localAddress = `http://localhost:5757`;

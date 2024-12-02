@@ -1,10 +1,50 @@
-import { readFileSync, existsSync } from 'fs';
+import {readFileSync, existsSync} from 'fs';
 import path from "path";
-import { fileURLToPath } from "url";
+import {fileURLToPath} from "url";
 import axios from "./axios.min.js"; // 引入 axios
-import deasync from "deasync"; // 使用 deasync 实现同步行为
+// import deasync from "deasync"; // 使用 deasync 实现同步行为
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// 创建一个函数，接受一个回调来模拟同步行为
+function fetchModuleCodeSync(jsm_path) {
+    let result = null;
+    let error = null;
+
+    // 返回一个 Promise，用于等待异步请求完成
+    return new Promise((resolve, reject) => {
+        axios.get(jsm_path)
+            .then((response) => {
+                result = response.data;  // 保存结果
+                resolve(result);  // 成功时 resolve
+            })
+            .catch((err) => {
+                error = new Error(`Error fetching module from URL: ${err.message}`);  // 错误信息
+                reject(error);  // 失败时 reject
+            });
+    });
+}
+
+// 模拟同步的处理方法
+function requireModule(jsm_path) {
+    let result = null;
+    let error = null;
+
+    // 阻塞直到 Promise 完成
+    try {
+        result = fetchModuleCodeSync(jsm_path);  // 等待异步请求完成
+        result.then(data => {
+            console.log("Module Code:", data);
+        }).catch(err => {
+            throw err;
+        });
+    } catch (err) {
+        error = err;
+        console.error(error.message);
+    }
+
+    return result;  // 返回模块内容
+}
 
 globalThis.$ = {
     /**
@@ -21,6 +61,7 @@ globalThis.$ = {
 
         if (isURL) {
             // 从网络同步获取模块代码
+            /*
             let error = null;
             let result = null;
 
@@ -38,6 +79,8 @@ globalThis.$ = {
             if (error) throw error;
 
             js_code = result;
+            */
+            js_code = requireModule(jsm_path);
         } else {
             // 本地路径处理
             jsm_path = path.join(__dirname, '../js', jsm_path);
@@ -62,7 +105,7 @@ globalThis.$ = {
             console,
             $,
             exports: {},
-            module: { exports: {} }
+            module: {exports: {}}
         };
 
         try {
