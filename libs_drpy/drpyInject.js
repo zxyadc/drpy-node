@@ -527,6 +527,11 @@ globalThis.pdfl = (html, parse, list_text, list_url, url_key) => {
     return jsp.pdfl(html, parse, list_text, list_url, url_key);
 };
 
+globalThis.pq = (html) => {
+    const jsp = new jsoup();
+    return jsp.pq(html);
+};
+
 globalThis.pjfh = (html, parse, addUrl = false) => {
     const jsp = new jsoup();
     return jsp.pjfh(html, parse, addUrl);

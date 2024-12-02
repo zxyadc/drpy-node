@@ -2,7 +2,7 @@ import Fastify from 'fastify';
 import * as drpy from './libs/drpyS.js';
 import path from 'path';
 import {fileURLToPath} from 'url';
-import {base64Encode, base64Decode, atob, btoa} from "./libs_drpy/crypto-util.js";
+import {base64Decode} from "./libs_drpy/crypto-util.js";
 
 const fastify = Fastify({logger: true});
 

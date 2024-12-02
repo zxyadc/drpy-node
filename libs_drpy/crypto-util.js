@@ -75,7 +75,7 @@ function window_b64() {
     }
 }
 
-export const {atob, btoa} = window_b64();
+// export const {atob, btoa} = window_b64();
 
 export function base64Encode(text) {
     return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(text));

@@ -1,6 +1,15 @@
-# drpy-node
+# drpyS(drpy-node)
 
 nodejs作为服务端的drpy实现。全面升级异步写法
+
+## 更新记录
+
+20241203
+1. 新增misc工具类
+2. 新增utils工具类
+3. 更新atob、btoa函数逻辑
+4. 导出pq函数
+5. 增加模块系统,$.require和$.exports
 
 ## 基础框架
 

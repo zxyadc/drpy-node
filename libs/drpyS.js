@@ -5,10 +5,13 @@ import path from "path";
 import vm from 'vm';
 import '../libs_drpy/es6-extend.js'
 import * as utils from '../utils/utils.js';
+import * as misc from '../utils/misc.js';
 // const { req } = await import('../utils/req.js');
 import {gbkTool} from '../libs_drpy/gbk.js'
-import {atob, btoa, base64Encode, base64Decode, md5} from "../libs_drpy/crypto-util.js";
+// import {atob, btoa, base64Encode, base64Decode, md5} from "../libs_drpy/crypto-util.js";
+import { base64Encode, base64Decode, md5} from "../libs_drpy/crypto-util.js";
 import template from '../libs_drpy/template.js'
+import '../libs_drpy/abba.js'
 import '../libs_drpy/drpyInject.js'
 import '../libs_drpy/crypto-js.js';
 import '../libs_drpy/jsencrypt.js';
@@ -18,9 +21,11 @@ import '../libs_drpy/json5.js'
 import '../libs_drpy/jinja.js'
 // import '../libs_drpy/jsonpathplus.min.js'
 import '../libs_drpy/drpyCustom.js'
+import '../libs_drpy/moduleLoader.js'
 
+globalThis.misc = misc
+globalThis.utils = utils
 const {sleep, sleepSync, computeHash, deepCopy, urljoin, urljoin2, joinUrl} = utils;
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const es6JsPath = path.join(__dirname, '../libs_drpy/es6-extend.js');
 // 读取扩展代码
@@ -57,6 +62,7 @@ export async function init(filePath, refresh) {
             sleep,
             sleepSync,
             utils,
+            misc,
             computeHash,
             deepCopy,
             urljoin,
@@ -64,6 +70,7 @@ export async function init(filePath, refresh) {
             joinUrl,
             MOBILE_UA, PC_UA, UA, UC_UA, IOS_UA, nodata,
             setResult,
+            $,
         };
         const drpySanbox = {
             jsp,
