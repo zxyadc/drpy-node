@@ -9,6 +9,14 @@
       "ext": ""
     },
     {
+      "key": "drpyS_星芽短剧",
+      "name": "星芽短剧(drpyS)",
+      "type": 4,
+      "api": "http://127.0.0.1:5757/api/星芽短剧",
+      "searchable": 1,
+      "ext": ""
+    },
+    {
       "key": "drpyS_番茄小说[书]",
       "name": "番茄小说[书](drpyS)",
       "type": 4,
