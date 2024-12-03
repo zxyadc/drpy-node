@@ -81,6 +81,7 @@ export async function init(filePath, refresh) {
             pjfh,
             pj,
             pjfa,
+            pq,
             local,
             md5X,
             rsaX,
@@ -179,6 +180,9 @@ async function invokeWithInjectVars(rule, method, injectVars, args) {
     // 这样每次调用时，方法内部的 `this` 会指向 `injectVars`，避免了共享状态，确保数据的隔离性。
     let result = await method.apply(injectVars, args);  // 使用 apply 临时注入 injectVars 作为上下文，并执行方法
     switch (injectVars['method']) {
+        case 'class_parse':
+            result = await homeParseAfter(result,rule.类型);
+            break;
         case '一级':
             result = await cateParseAfter(result, args[1]);
             break;
@@ -326,6 +330,11 @@ async function initParse(rule) {
         rule.headers = {}
     }
     return rule
+}
+
+async function homeParseAfter(d, _type) {
+    d.type = _type||'影视';
+    return d
 }
 
 async function cateParse(rule, tid, pg, filter, extend) {

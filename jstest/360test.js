@@ -8,7 +8,7 @@ console.log('__dirname:', __dirname);
 
 (async () => {
     // 使用 __dirname 来确保正确的相对路径，避免路径出错
-    const modulePath = path.join(__dirname, '../js/360.js');
+    const modulePath = path.join(__dirname, '../js/_360.js');
 
     try {
         console.log('Initializing module...');

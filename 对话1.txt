@@ -232,8 +232,8 @@ export function sleepSync(ms) {
 export const deepCopy = cloneDeep
 
 
-5. js/360.js
-// js/360.js
+5. js/_360.js
+// js/_360.js
 
 var rule = {
     title: '标题1',

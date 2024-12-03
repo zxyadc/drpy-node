@@ -9,8 +9,13 @@ import './utils/marked.min.js';
 
 const fastify = Fastify({logger: true});
 
+const PORT = 5757;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 console.log('__dirname:', __dirname);
+// 配置目标目录
+const jsDir = path.join(__dirname, 'js');
+console.log('jsDir:', jsDir);
+
 
 // 添加 / 接口
 fastify.get('/', async (request, reply) => {
@@ -51,6 +56,38 @@ fastify.get('/', async (request, reply) => {
                 </body>
                 </html>
             `);
+});
+
+// 工具函数：生成 JSON 数据
+function generateSiteJSON() {
+    const files = readdirSync(jsDir);
+    const sites = files
+        .filter((file) => file.endsWith('.js') && !file.startsWith('_')) // 筛选出不是 "_" 开头的 .js 文件
+        .map((file) => {
+            const baseName = path.basename(file, '.js'); // 去掉文件扩展名
+            const key = `drpyS_${baseName}`;
+            const name = `${baseName}(drpyS)`;
+            const api = `http://127.0.0.1:${PORT}/api/${baseName}`;
+            return {
+                key,
+                name,
+                type: 4, // 固定值
+                api,
+                searchable: 1, // 固定值
+                ext: "", // 固定为空字符串
+            };
+        });
+    return { sites };
+}
+
+// 定义接口
+fastify.get('/config', async (request, reply) => {
+    try {
+        const siteJSON = generateSiteJSON();
+        reply.send(siteJSON);
+    } catch (error) {
+        reply.status(500).send({ error: 'Failed to generate site JSON', details: error.message });
+    }
 });
 
 // 动态加载模块并根据 query 执行不同逻辑
@@ -124,10 +161,10 @@ fastify.get('/api/:module', async (request, reply) => {
 const start = async () => {
     try {
         // 监听 0.0.0.0
-        await fastify.listen({port: 5757, host: '0.0.0.0'});
+        await fastify.listen({port: PORT, host: '0.0.0.0'});
 
         // 获取本地地址
-        const localAddress = `http://localhost:5757`;
+        const localAddress = `http://localhost:${PORT}`;
 
         // 获取局域网地址
         const interfaces = os.networkInterfaces();
@@ -136,7 +173,7 @@ const start = async () => {
             if (!iface) continue;
             for (const config of iface) {
                 if (config.family === 'IPv4' && !config.internal) {
-                    lanAddress = `http://${config.address}:5757`;
+                    lanAddress = `http://${config.address}:${PORT}`;
                     break;
                 }
             }

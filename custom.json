@@ -1,0 +1,20 @@
+{
+  "sites": [
+    {
+      "key": "drpyS_番茄小说",
+      "name": "番茄小说(drpyS)",
+      "type": 4,
+      "api": "http://127.0.0.1:5757/api/番茄小说[书]",
+      "searchable": 1,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_金牌影视",
+      "name": "金牌影视(drpyS)",
+      "type": 4,
+      "api": "http://127.0.0.1:5757/api/金牌影视",
+      "searchable": 1,
+      "ext": ""
+    }
+  ]
+}
