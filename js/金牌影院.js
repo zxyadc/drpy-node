@@ -6,8 +6,8 @@ var rule = {
     类型: '影视',
     title: '金牌影院',
     desc: '金牌影院纯js版本',
-    host: 'https://m.cfkj86.com/',
-    homeUrl:'https://www.cfkj86.com',
+    host: 'https://www.cfkj86.com/',
+    homeUrl:'',
     url: 'https://m.cfkj86.com/api/mw-movie/anonymous/video/list?pageNum=fypage&pageSize=30&sort=1&sortBy=1&type1=fyclass',
     searchUrl: '/api/mw-movie/anonymous/video/searchByWordPageable?keyword=**&pageNum=fypage&pageSize=12&type=false',
     searchable: 2,
@@ -97,7 +97,7 @@ var rule = {
         //keyword=你&pageNum=1&pageSize=12&type=false&key=cb808529bae6b6be45ecfab29a4889bc&t=1722904806016
         const signkey = 'keyword='+wd+'&pageNum='+pg+'&pageSize=12&type=false&key=cb808529bae6b6be45ecfab29a4889bc&t='+t
         const key = CryptoJS.SHA1(CryptoJS.MD5(signkey).toString()).toString()
-        let html = JSON.parse((await req(`${rule.homeUrl}${input}`,
+        let html = JSON.parse((await req(input,
             {
                 headers:{
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
@@ -126,7 +126,7 @@ var rule = {
         const t = new Date().getTime()
         const signkey = 'id='+pid+'&nid='+nid+'&key=cb808529bae6b6be45ecfab29a4889bc&t='+t
         const key = CryptoJS.SHA1(CryptoJS.MD5(signkey).toString()).toString()
-        const relurl = rule.homeUrl+'/api/mw-movie/anonymous/v1/video/episode/url?id='+pid+'&nid='+nid
+        const relurl = rule.host+'/api/mw-movie/anonymous/v1/video/episode/url?id='+pid+'&nid='+nid
         const html = JSON.parse((await req(relurl,
             {
                 headers:{
