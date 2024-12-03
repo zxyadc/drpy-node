@@ -3,7 +3,7 @@ import * as drpy from './libs/drpyS.js';
 import path from 'path';
 import os from "os";
 import {fileURLToPath} from 'url';
-import {readdirSync, readFileSync} from 'fs';
+import {readdirSync, readFileSync,writeFileSync,existsSync} from 'fs';
 import {base64Decode} from "./libs_drpy/crypto-util.js";
 import './utils/marked.min.js';
 
@@ -15,7 +15,8 @@ console.log('__dirname:', __dirname);
 // 配置目标目录
 const jsDir = path.join(__dirname, 'js');
 console.log('jsDir:', jsDir);
-
+const indexFilePath = path.join(__dirname, 'index.json'); // index.json 文件路径
+console.log('indexFilePath:', indexFilePath);
 
 // 添加 / 接口
 fastify.get('/', async (request, reply) => {
@@ -80,13 +81,37 @@ function generateSiteJSON() {
     return { sites };
 }
 
-// 定义接口
+// // 定义接口
+// fastify.get('/config', async (request, reply) => {
+//     try {
+//         const siteJSON = generateSiteJSON();
+//         reply.send(siteJSON);
+//     } catch (error) {
+//         reply.status(500).send({ error: 'Failed to generate site JSON', details: error.message });
+//     }
+// });
+
+// 接口：返回配置 JSON，同时写入 index.json
 fastify.get('/config', async (request, reply) => {
     try {
         const siteJSON = generateSiteJSON();
+        writeFileSync(indexFilePath, JSON.stringify(siteJSON, null, 2), 'utf8'); // 写入 index.json
         reply.send(siteJSON);
     } catch (error) {
         reply.status(500).send({ error: 'Failed to generate site JSON', details: error.message });
+    }
+});
+
+// 接口：返回 index.json 内容
+fastify.get('/index', async (request, reply) => {
+    try {
+        if (!existsSync(indexFilePath)) {
+            return reply.status(404).send({ error: 'index.json file not found' });
+        }
+        const indexContent = readFileSync(indexFilePath, 'utf8');
+        reply.type('application/json').send(JSON.parse(indexContent));
+    } catch (error) {
+        reply.status(500).send({ error: 'Failed to read index.json', details: error.message });
     }
 });
 
