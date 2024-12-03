@@ -56,11 +56,12 @@ var rule = {
         })).content);
         let d = [];
         const list = html.data.list
+        log(list)
         list.forEach((it)=>{
             d.push({
                 title: it.vodName,
                 url: '/detail/'+it.vodId,
-                desc: it.vodRemarks || '暂无更新',
+                desc: it.vodRemarks || it.vodVersion,
                 pic_url: it.vodPic,
             })
         })

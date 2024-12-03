@@ -1,6 +1,14 @@
 {
   "sites": [
     {
+      "key": "drpyS_人人视频",
+      "name": "人人视频(drpyS)",
+      "type": 4,
+      "api": "http://127.0.0.1:5757/api/人人视频",
+      "searchable": 1,
+      "ext": ""
+    },
+    {
       "key": "drpyS_番茄小说[书]",
       "name": "番茄小说[书](drpyS)",
       "type": 4,
