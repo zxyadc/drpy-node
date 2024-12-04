@@ -8,10 +8,9 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 
 ## 更新记录
 
-### 20241204
+### 20241205
 
-1. 引入crypto-js-wasm.js和使用文档
-2. 增加docs接口可以查看文档md文件的html页面
+1. 完善本地代理功能
 
 [点此查看完整更新记录](docs/updateRecord.md)
 

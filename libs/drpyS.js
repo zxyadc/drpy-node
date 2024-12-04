@@ -51,8 +51,11 @@ try {
     // console.error('Failed to import puppeteerHelper:', error);
     console.error(`Failed to import CryptoJSWasm:${error.message}`);
     globalThis.CryptoJSW = {
-        loadAllWasm: async function () {},
-        MD5: async function (str) {return md5(str)},
+        loadAllWasm: async function () {
+        },
+        MD5: async function (str) {
+            return md5(str)
+        },
     };
 }
 
@@ -61,10 +64,11 @@ try {
  * 初始化模块：加载并执行模块文件，存储初始化后的 rule 对象
  * 如果存在 `预处理` 属性且为函数，会在缓存前执行
  * @param {string} filePath - 模块文件路径
+ * @param env
  * @param refresh 强制清除缓存
  * @returns {Promise<object>} - 返回初始化后的模块对象
  */
-export async function init(filePath, refresh) {
+export async function init(filePath, env, refresh) {
     try {
         // 读取文件内容
         const fileContent = await readFile(filePath, 'utf-8');
@@ -79,6 +83,9 @@ export async function init(filePath, refresh) {
                 return cached.moduleObject;
             }
         }
+        const {getProxyUrl} = env;
+        // console.log('env:',env);
+        // console.log('getProxyUrl:',getProxyUrl);
         // (可选) 加载所有 wasm 文件
         await CryptoJSW.loadAllWasm();
 
@@ -98,6 +105,7 @@ export async function init(filePath, refresh) {
             setResult,
             $,
             puppeteerHelper,
+            getProxyUrl,
         };
         const drpySanbox = {
             jsp,
@@ -230,13 +238,14 @@ async function invokeWithInjectVars(rule, method, injectVars, args) {
 /**
  * 调用模块的指定方法
  * @param {string} filePath - 模块文件路径
+ * @param env 全局的环境变量-针对本规则，如代理地址
  * @param {string} method - 要调用的属性方法名称
  * @param args - 传递给方法的普通参数
  * @param {object} injectVars - 需要注入的变量（如 input 和 MY_URL）
  * @returns {Promise<any>} - 方法调用的返回值
  */
-async function invokeMethod(filePath, method, args = [], injectVars = {}) {
-    const moduleObject = await init(filePath); // 确保模块已初始化
+async function invokeMethod(filePath, env, method, args = [], injectVars = {}) {
+    const moduleObject = await init(filePath, env); // 确保模块已初始化
     switch (method) {
         case '一级':
             injectVars = await cateParse(moduleObject, ...args);
@@ -262,9 +271,18 @@ async function invokeMethod(filePath, method, args = [], injectVars = {}) {
                 return {}
             }
             break;
+        case 'proxy_rule':
+            injectVars = await proxyParse(moduleObject, ...args);
+            if (!injectVars) {
+                return {}
+            }
+            break;
     }
     injectVars['method'] = method;
+    // 环境变量扩展进入this区域
+    Object.assign(injectVars, env);
     if (moduleObject[method] && typeof moduleObject[method] === 'function') {
+        // console.log('injectVars:', injectVars);
         return await invokeWithInjectVars(moduleObject, moduleObject[method], injectVars, args);
     } else {
         throw new Error(`Method ${method} not found in module ${filePath}`);
@@ -592,47 +610,68 @@ async function playParseAfter(rule, obj, playUrl, flag) {
     return lazy_play
 }
 
-export async function home(filePath, filter = 1) {
-    return await invokeMethod(filePath, 'class_parse', [filter], {
+async function proxyParse(rule, params) {
+    // log('proxyParse:', params);
+    return {
+        TYPE: 'proxy',
+        input: params.url || '',
+        MY_URL: params.url || '',
+    }
+}
+
+export async function home(filePath, env, filter = 1) {
+    return await invokeMethod(filePath, env, 'class_parse', [filter], {
         input: '$.homeUrl',
         MY_URL: '$.homeUrl'
     });
 }
 
-export async function homeVod(filePath) {
-    return await invokeMethod(filePath, '推荐', [], {
+export async function homeVod(filePath, env) {
+    return await invokeMethod(filePath, env, '推荐', [], {
         input: '$.homeUrl',
         MY_URL: '$.homeUrl'
     });
 }
 
-export async function cate(filePath, tid, pg = 1, filter = 1, extend = {}) {
-    return await invokeMethod(filePath, '一级', [tid, pg, filter, extend], {
+export async function cate(filePath, env, tid, pg = 1, filter = 1, extend = {}) {
+    return await invokeMethod(filePath, env, '一级', [tid, pg, filter, extend], {
         input: '$.url',
         MY_URL: '$.url'
     });
 }
 
-export async function detail(filePath, ids) {
+export async function detail(filePath, env, ids) {
     if (!Array.isArray(ids)) throw new Error('Parameter "ids" must be an array');
-    return await invokeMethod(filePath, '二级', [ids], {
+    return await invokeMethod(filePath, env, '二级', [ids], {
         input: `${ids[0]}`,
         MY_URL: `${ids[0]}`
     });
 }
 
-export async function search(filePath, wd, quick = 0, pg = 1) {
-    return await invokeMethod(filePath, '搜索', [wd, quick, pg], {
+export async function search(filePath, env, wd, quick = 0, pg = 1) {
+    return await invokeMethod(filePath, env, '搜索', [wd, quick, pg], {
         input: '$.searchUrl',
         MY_URL: '$.searchUrl'
     });
 }
 
-export async function play(filePath, flag, id, flags) {
+export async function play(filePath, env, flag, id, flags) {
     flags = flags || [];
     if (!Array.isArray(flags)) throw new Error('Parameter "flags" must be an array');
-    return await invokeMethod(filePath, 'lazy', [flag, id, flags], {
+    return await invokeMethod(filePath, env, 'lazy', [flag, id, flags], {
         input: `${id}`,
         MY_URL: `${id}`,
     });
+}
+
+export async function proxy(filePath, env, params) {
+    params = params || {};
+    try {
+        return await invokeMethod(filePath, env, 'proxy_rule', [deepCopy(params)], {
+            input: `${params.url}`,
+            MY_URL: `${params.url}`,
+        });
+    } catch (e) {
+        return [500, 'text/plain', '代理规则错误:' + e.message]
+    }
 }
