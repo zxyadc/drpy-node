@@ -9,7 +9,7 @@ import * as misc from '../utils/misc.js';
 // const { req } = await import('../utils/req.js');
 import {gbkTool} from '../libs_drpy/gbk.js'
 // import {atob, btoa, base64Encode, base64Decode, md5} from "../libs_drpy/crypto-util.js";
-import { base64Encode, base64Decode, md5} from "../libs_drpy/crypto-util.js";
+import {base64Encode, base64Decode, md5} from "../libs_drpy/crypto-util.js";
 import template from '../libs_drpy/template.js'
 import '../libs_drpy/abba.js'
 import '../libs_drpy/drpyInject.js'
@@ -22,9 +22,10 @@ import '../libs_drpy/jinja.js'
 // import '../libs_drpy/jsonpathplus.min.js'
 import '../libs_drpy/drpyCustom.js'
 import '../libs_drpy/moduleLoader.js'
+// import '../libs_drpy/crypto-js-wasm.js'
 
-globalThis.misc = misc
-globalThis.utils = utils
+globalThis.misc = misc;
+globalThis.utils = utils;
 const {sleep, sleepSync, computeHash, deepCopy, urljoin, urljoin2, joinUrl} = utils;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const es6JsPath = path.join(__dirname, '../libs_drpy/es6-extend.js');
@@ -32,6 +33,29 @@ const es6JsPath = path.join(__dirname, '../libs_drpy/es6-extend.js');
 const es6_extend_code = readFileSync(es6JsPath, 'utf8');
 // 缓存已初始化的模块和文件 hash 值
 const moduleCache = new Map();
+let puppeteerHelper = null;
+if (typeof fetchByHiker === 'undefined') { // 判断是海阔直接放弃导入puppeteer
+    try {
+        // 尝试动态导入模块puppeteerHelper
+        puppeteerHelper = await import('../utils/headless-util');  // 使用动态 import
+        console.log('puppeteerHelper imported successfully');
+    } catch (error) {
+        // console.error('Failed to import puppeteerHelper:', error);
+        console.error(`Failed to import puppeteerHelper:${error.message}`);
+    }
+}
+try {
+    await import('../libs_drpy/crypto-js-wasm.js'); // 使用动态 import规避海阔报错无法运行问题
+    globalThis.CryptoJSW = CryptoJSWasm;
+} catch (error) {
+    // console.error('Failed to import puppeteerHelper:', error);
+    console.error(`Failed to import CryptoJSWasm:${error.message}`);
+    globalThis.CryptoJSW = {
+        loadAllWasm: async function () {},
+        MD5: async function (str) {return md5(str)},
+    };
+}
+
 
 /**
  * 初始化模块：加载并执行模块文件，存储初始化后的 rule 对象
@@ -55,6 +79,8 @@ export async function init(filePath, refresh) {
                 return cached.moduleObject;
             }
         }
+        // (可选) 加载所有 wasm 文件
+        await CryptoJSW.loadAllWasm();
 
         log(`Loading module: ${filePath}`);
         let t1 = utils.getNowTime();
@@ -71,6 +97,7 @@ export async function init(filePath, refresh) {
             MOBILE_UA, PC_UA, UA, UC_UA, IOS_UA, nodata,
             setResult,
             $,
+            puppeteerHelper,
         };
         const drpySanbox = {
             jsp,
@@ -100,6 +127,7 @@ export async function init(filePath, refresh) {
             cut,
             gbkTool,
             CryptoJS,
+            CryptoJSW,
             JSEncrypt,
             NODERSA,
             pako,
@@ -181,7 +209,7 @@ async function invokeWithInjectVars(rule, method, injectVars, args) {
     let result = await method.apply(injectVars, args);  // 使用 apply 临时注入 injectVars 作为上下文，并执行方法
     switch (injectVars['method']) {
         case 'class_parse':
-            result = await homeParseAfter(result,rule.类型);
+            result = await homeParseAfter(result, rule.类型);
             break;
         case '一级':
             result = await cateParseAfter(result, args[1]);
@@ -333,7 +361,7 @@ async function initParse(rule) {
 }
 
 async function homeParseAfter(d, _type) {
-    d.type = _type||'影视';
+    d.type = _type || '影视';
     return d
 }
 

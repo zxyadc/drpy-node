@@ -1,9 +1,12 @@
 # drpyS更新记录
 
 ### 20241204
-
+更新至V1.0.1
 1. 引入crypto-js-wasm.js和使用文档
 2. 增加docs接口可以查看文档md文件的html页面
+3. 完成index.js接口剥离，保持主文件的干净。同时导出start和stop方法
+4. 改进本地配置接口，增加外网可用配置。
+5. 支持puppeteer,仅pc可用。如需使用请手动安装puppeteer库，然后drpyS的源里支持使用puppeteerHelper对象。
 
 ### 20241203
 

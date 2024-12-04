@@ -3,6 +3,9 @@ var rule = {
     description: '这是描述',
     category: '视频',
     class_parse: async () => {
+        // await CryptoJSW.MD5.loadWasm();
+        const rstMD5 = CryptoJSW.MD5('message').toString();
+        console.log('rstMD5:',rstMD5);
         console.log('执行了分类获取')
         return [
             {type_id: '1', type_name: '电影'},
