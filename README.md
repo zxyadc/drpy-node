@@ -7,20 +7,12 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 
 ## 更新记录
 
-20241203
+### 20241204
 
-1. 新增misc工具类
-2. 新增utils工具类
-3. 更新atob、btoa函数逻辑
-4. 导出pq函数
-5. 增加模块系统,$.require和$.exports
-6. 修复drpyS源筛选不生效问题
-7. 增加局域网可访问接口
-8. 打印所有req发出的请求
-9. 增加主页的html
-10. 番茄小说示例源增加导入模块的用法
-11. 更新自动生成配置的接口，自动读取js目录下非_开头的文件视为源
-12. 修正金牌影院js
+1. 引入crypto-js-wasm.js和使用文档
+2. 增加docs接口可以查看文档md文件的html页面
+
+[点此查看完整更新记录](docs/updateRecord.md)
 
 ## 基础框架
 
@@ -39,3 +31,8 @@ todo:
 3. underscore
 4. pino-pretty
 5. deasync
+
+
+## 参考资料
+
+* [crypto-js-wasm使用教程](docs/crypto-js-wasm/readme-CN.md)

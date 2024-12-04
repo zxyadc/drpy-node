@@ -12,6 +12,7 @@
   "dependencies": {
     "cheerio": "^1.0.0",
     "fastify": "^4.15.0",
+    "@fastify/static": "7.0.4",
     "lodash": "^4.17.21",
     "qs": "^6.13.1",
     "tunnel": "^0.0.6"

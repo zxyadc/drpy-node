@@ -1,5 +1,5 @@
 我基于你的代码做了一些调整，接下来请更新记忆:
-1. index.js
+1. index2.js
 import Fastify from 'fastify';
 import * as drpy from './libs/drpy.js';
 import path from 'path';
