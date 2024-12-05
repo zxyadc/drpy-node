@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>drpyS源加密工具</title>
+    <title>drpyS源加解密工具</title>
     <script src="/public/jquery.min.js"></script>
     <style>
         /* 通用样式 */
@@ -114,7 +114,7 @@
 <body>
 
 <div class="container">
-    <h2>drpyS源加密工具</h2>
+    <h2>drpyS源加解密工具</h2>
 
     <!-- 输入框 -->
     <textarea class="input-box" id="input-code" placeholder="在此输入待加密的文本..."></textarea>
@@ -135,6 +135,7 @@
         <button class="clear-btn" id="clear-input-btn">清空输入</button>
         <button class="clear-btn" id="clear-output-btn">清空输出</button>
         <button class="copy-btn" id="copy-result-btn">复制加密结果</button>
+        <button class="copy-btn" id="decrypt-btn">解密</button>
     </div>
 
     <!-- 加密结果 -->
@@ -142,9 +143,9 @@
 </div>
 
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         // 加密按钮点击事件
-        $('#encrypt-btn').click(function() {
+        $('#encrypt-btn').click(function () {
             // 获取输入的内容和加密类型
             const code = $('#input-code').val();
             const type = $('#encryption-type').val();
@@ -159,8 +160,8 @@
                 url: '/encoder',
                 method: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({ code, type }),
-                success: function(response) {
+                data: JSON.stringify({code, type}),
+                success: function (response) {
                     // 显示加密后的结果
                     if (response.success) {
                         $('#result-code').val(response.result);
@@ -168,24 +169,24 @@
                         alert('加密失败：' + response.error);
                     }
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert('请求失败，请稍后再试。');
                 }
             });
         });
 
         // 清空输入框按钮点击事件
-        $('#clear-input-btn').click(function() {
+        $('#clear-input-btn').click(function () {
             $('#input-code').val('');
         });
 
         // 清空输出框按钮点击事件
-        $('#clear-output-btn').click(function() {
+        $('#clear-output-btn').click(function () {
             $('#result-code').val('');
         });
 
         // 复制加密结果按钮点击事件
-        $('#copy-result-btn').click(function() {
+        $('#copy-result-btn').click(function () {
             const resultText = $('#result-code').val();
             if (resultText) {
                 // 创建临时文本框来复制文本
@@ -200,6 +201,41 @@
                 alert('没有加密结果可以复制');
             }
         });
+
+        // 解密按钮点击事件
+        $('#decrypt-btn').click(function () {
+            const code = $('#result-code').val();
+            if (!code) {
+                alert("请填写密文！");
+                return;
+            }
+            // 弹窗提示用户支付凭证
+            if (confirm("此功能仅限会员使用，V我50开启，是否继续？")) {
+                const authCode = prompt("请输入您的支付凭证：");
+
+                if (authCode) {
+                    // 发送解密请求
+                    $.ajax({
+                        url: '/decoder',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({auth_code: authCode, code}),
+                        success: function (response) {
+                            if (response.success) {
+                                // 解密成功，将结果放入待加密框
+                                $('#input-code').val(response.result);
+                            } else {
+                                alert("解密失败：" + response.error);
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            alert("解密请求失败，请稍后再试。" + error);
+                        }
+                    });
+                }
+            }
+        });
+
     });
 </script>
 

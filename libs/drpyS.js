@@ -37,7 +37,7 @@ let pupWebview = null;
 if (typeof fetchByHiker === 'undefined') { // 判断是海阔直接放弃导入puppeteer
     try {
         // 尝试动态导入模块puppeteerHelper
-        const {puppeteerHelper} = await import('../utils/headless-util');  // 使用动态 import
+        const {puppeteerHelper} = await import('../utils/headless-util.js');  // 使用动态 import
         pupWebview = new puppeteerHelper();
         console.log('puppeteerHelper imported successfully');
     } catch (error) {
