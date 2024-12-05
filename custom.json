@@ -25,10 +25,34 @@
       "ext": ""
     },
     {
+      "key": "drpyS_色花堂[密+]",
+      "name": "色花堂[密+](drpyS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/色花堂[密+]",
+      "searchable": 1,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_草榴社区[密]",
+      "name": "草榴社区[密](drpyS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/草榴社区[密]",
+      "searchable": 1,
+      "ext": ""
+    },
+    {
       "key": "drpyS_金牌影院",
       "name": "金牌影院(drpyS)",
       "type": 4,
       "api": "http://localhost:5757/api/金牌影院",
+      "searchable": 1,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_黑料不打烊[密]",
+      "name": "黑料不打烊[密](drpyS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/黑料不打烊[密]",
       "searchable": 1,
       "ext": ""
     }

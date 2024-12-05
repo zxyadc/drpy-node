@@ -5843,7 +5843,7 @@
 
   const cachedTextDecoder = new TextDecoder('utf-8', {
     ignoreBOM: true,
-    fatal: true
+    //fatal: true
   });
   cachedTextDecoder.decode();
   let cachedUint8Memory0 = new Uint8Array();
