@@ -5,7 +5,7 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 * [本地配置接口-动态本地](/config)
 * [本地配置接口-动态外网/局域网](/config/1)
 * [本地配置接口-静态](/index)
-* [代码加密工具](/admin/encoder)
+* [代码加解密工具](/admin/encoder)
 
 ## 更新记录
 
@@ -37,3 +37,4 @@ todo:
 ## 参考资料
 
 * [crypto-js-wasm使用教程](docs/crypto-js-wasm/readme-CN.md)
+* [puppeteer使用教程](docs/pupInstall.md)
