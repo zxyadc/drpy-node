@@ -33,19 +33,25 @@ const es6JsPath = path.join(__dirname, '../libs_drpy/es6-extend.js');
 const es6_extend_code = readFileSync(es6JsPath, 'utf8');
 // 缓存已初始化的模块和文件 hash 值
 const moduleCache = new Map();
-let puppeteerHelper = null;
+let pupWebview = null;
 if (typeof fetchByHiker === 'undefined') { // 判断是海阔直接放弃导入puppeteer
     try {
         // 尝试动态导入模块puppeteerHelper
-        puppeteerHelper = await import('../utils/headless-util');  // 使用动态 import
+        const {puppeteerHelper} = await import('../utils/headless-util');  // 使用动态 import
+        pupWebview = new puppeteerHelper();
         console.log('puppeteerHelper imported successfully');
     } catch (error) {
         // console.error('Failed to import puppeteerHelper:', error);
         console.error(`Failed to import puppeteerHelper:${error.message}`);
     }
 }
+globalThis.pupWebview = pupWebview;
 try {
-    await import('../libs_drpy/crypto-js-wasm.js'); // 使用动态 import规避海阔报错无法运行问题
+    if (typeof fetchByHiker === 'undefined') {
+        await import('../libs_drpy/crypto-js-wasm.js'); // 使用动态 import规避海阔报错无法运行问题
+    } else {
+        await globalThis.import('../libs_drpy/crypto-js-wasm.js'); // 海阔放在globalThis里去动态引入
+    }
     globalThis.CryptoJSW = CryptoJSWasm;
 } catch (error) {
     // console.error('Failed to import puppeteerHelper:', error);
@@ -104,7 +110,7 @@ export async function init(filePath, env, refresh) {
             MOBILE_UA, PC_UA, UA, UC_UA, IOS_UA, nodata,
             setResult,
             $,
-            puppeteerHelper,
+            pupWebview,
             getProxyUrl,
         };
         const drpySanbox = {
@@ -173,7 +179,8 @@ export async function init(filePath, env, refresh) {
         polyfillsScript.runInContext(context);
 
         // 执行文件内容，将其放入沙箱中
-        const script = new vm.Script(fileContent);
+        const js_code = getOriginalJs(fileContent);
+        const script = new vm.Script(js_code);
         script.runInContext(context);
 
         // 访问沙箱中的 rule 对象
@@ -194,7 +201,7 @@ export async function init(filePath, env, refresh) {
         return moduleObject;
     } catch (error) {
         console.error('Error in drpy.init:', error);
-        throw new Error('Failed to initialize module');
+        throw new Error(`Failed to initialize module:${error.message}`);
     }
 }
 
@@ -675,3 +682,106 @@ export async function proxy(filePath, env, params) {
         return [500, 'text/plain', '代理规则错误:' + e.message]
     }
 }
+
+/**
+ * 获取加密前的原始的js源文本
+ * @param js_code
+ */
+export function getOriginalJs(js_code) {
+    let current_match = /var rule|[\u4E00-\u9FA5]+|function|let |var |const |\(|\)|"|'/;
+    if (current_match.test(js_code)) {
+        return js_code
+    }
+    let rsa_private_key = 'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCqin/jUpqM6+fgYP/oMqj9zcdHMM0mEZXLeTyixIJWP53lzJV2N2E3OP6BBpUmq2O1a9aLnTIbADBaTulTNiOnVGoNG58umBnupnbmmF8iARbDp2mTzdMMeEgLdrfXS6Y3VvazKYALP8EhEQykQVarexR78vRq7ltY3quXx7cgI0ROfZz5Sw3UOLQJ+VoWmwIxu9AMEZLVzFDQN93hzuzs3tNyHK6xspBGB7zGbwCg+TKi0JeqPDrXxYUpAz1cQ/MO+Da0WgvkXnvrry8NQROHejdLVOAslgr6vYthH9bKbsGyNY3H+P12kcxo9RAcVveONnZbcMyxjtF5dWblaernAgMBAAECggEAGdEHlSEPFmAr5PKqKrtoi6tYDHXdyHKHC5tZy4YV+Pp+a6gxxAiUJejx1hRqBcWSPYeKne35BM9dgn5JofgjI5SKzVsuGL6bxl3ayAOu+xXRHWM9f0t8NHoM5fdd0zC3g88dX3fb01geY2QSVtcxSJpEOpNH3twgZe6naT2pgiq1S4okpkpldJPo5GYWGKMCHSLnKGyhwS76gF8bTPLoay9Jxk70uv6BDUMlA4ICENjmsYtd3oirWwLwYMEJbSFMlyJvB7hjOjR/4RpT4FPnlSsIpuRtkCYXD4jdhxGlvpXREw97UF2wwnEUnfgiZJ2FT/MWmvGGoaV/CfboLsLZuQKBgQDTNZdJrs8dbijynHZuuRwvXvwC03GDpEJO6c1tbZ1s9wjRyOZjBbQFRjDgFeWs9/T1aNBLUrgsQL9c9nzgUziXjr1Nmu52I0Mwxi13Km/q3mT+aQfdgNdu6ojsI5apQQHnN/9yMhF6sNHg63YOpH+b+1bGRCtr1XubuLlumKKscwKBgQDOtQ2lQjMtwsqJmyiyRLiUOChtvQ5XI7B2mhKCGi8kZ+WEAbNQcmThPesVzW+puER6D4Ar4hgsh9gCeuTaOzbRfZ+RLn3Aksu2WJEzfs6UrGvm6DU1INn0z/tPYRAwPX7sxoZZGxqML/z+/yQdf2DREoPdClcDa2Lmf1KpHdB+vQKBgBXFCVHz7a8n4pqXG/HvrIMJdEpKRwH9lUQS/zSPPtGzaLpOzchZFyQQBwuh1imM6Te+VPHeldMh3VeUpGxux39/m+160adlnRBS7O7CdgSsZZZ/dusS06HAFNraFDZf1/VgJTk9BeYygX+AZYu+0tReBKSs9BjKSVJUqPBIVUQXAoGBAJcZ7J6oVMcXxHxwqoAeEhtvLcaCU9BJK36XQ/5M67ceJ72mjJC6/plUbNukMAMNyyi62gO6I9exearecRpB/OGIhjNXm99Ar59dAM9228X8gGfryLFMkWcO/fNZzb6lxXmJ6b2LPY3KqpMwqRLTAU/zy+ax30eFoWdDHYa4X6e1AoGAfa8asVGOJ8GL9dlWufEeFkDEDKO9ww5GdnpN+wqLwePWqeJhWCHad7bge6SnlylJp5aZXl1+YaBTtOskC4Whq9TP2J+dNIgxsaF5EFZQJr8Xv+lY9lu0CruYOh9nTNF9x3nubxJgaSid/7yRPfAGnsJRiknB5bsrCvgsFQFjJVs=';
+    let decode_content = '';
+
+    function aes_decrypt(data) {
+        let key = CryptoJS.enc.Hex.parse("686A64686E780A0A0A0A0A0A0A0A0A0A");
+        let iv = CryptoJS.enc.Hex.parse("647A797964730A0A0A0A0A0A0A0A0A0A");
+        let encrypted = CryptoJS.AES.decrypt({
+            ciphertext: CryptoJS.enc.Base64.parse(data)
+        }, key, {
+            iv: iv,
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        }).toString(CryptoJS.enc.Utf8);
+        return encrypted;
+    }
+
+    let error_log = false;
+
+    function logger(text) {
+        if (error_log) {
+            log(text);
+        }
+    }
+
+    let decode_funcs = [
+        (text) => {
+            try {
+                return ungzip(text)
+            } catch (e) {
+                logger('非gzip加密');
+                return ''
+            }
+        },
+        (text) => {
+            try {
+                return base64Decode(text)
+            } catch (e) {
+                logger('非b64加密');
+                return ''
+            }
+        },
+        (text) => {
+            try {
+                return aes_decrypt(text)
+            } catch (e) {
+                logger('非aes加密');
+                return ''
+            }
+        },
+        (text) => {
+            try {
+                return RSA.decode(text, rsa_private_key, null)
+            } catch (e) {
+                logger('非rsa加密');
+                return ''
+            }
+        },
+        // (text)=>{try {return NODERSA.decryptRSAWithPrivateKey(text, RSA.getPrivateKey(rsa_private_key).replace(/RSA /g,''), {options: {environment: "browser", encryptionScheme: 'pkcs1',b:'1024'}});} catch (e) {log(e.message);return ''}},
+    ]
+    let func_index = 0
+    while (!current_match.test(decode_content)) {
+        decode_content = decode_funcs[func_index](js_code);
+        func_index++;
+        if (func_index >= decode_funcs.length) {
+            break;
+        }
+    }
+    return decode_content
+}
+
+export const jsEncoder = {
+    base64Encode,
+    gzip,
+    aes_encrypt: function (data) {
+        // 定义密钥和初始向量，必须与解密时一致
+        let key = CryptoJS.enc.Hex.parse("686A64686E780A0A0A0A0A0A0A0A0A0A");
+        let iv = CryptoJS.enc.Hex.parse("647A797964730A0A0A0A0A0A0A0A0A0A");
+
+        // 使用AES加密
+        let encrypted = CryptoJS.AES.encrypt(data, key, {
+            iv: iv,
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        });
+
+        // 返回Base64编码的加密结果
+        return encrypted.ciphertext.toString(CryptoJS.enc.Base64);
+    },
+    rsa_encode: function (text) {
+        let rsa_private_key = 'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCqin/jUpqM6+fgYP/oMqj9zcdHMM0mEZXLeTyixIJWP53lzJV2N2E3OP6BBpUmq2O1a9aLnTIbADBaTulTNiOnVGoNG58umBnupnbmmF8iARbDp2mTzdMMeEgLdrfXS6Y3VvazKYALP8EhEQykQVarexR78vRq7ltY3quXx7cgI0ROfZz5Sw3UOLQJ+VoWmwIxu9AMEZLVzFDQN93hzuzs3tNyHK6xspBGB7zGbwCg+TKi0JeqPDrXxYUpAz1cQ/MO+Da0WgvkXnvrry8NQROHejdLVOAslgr6vYthH9bKbsGyNY3H+P12kcxo9RAcVveONnZbcMyxjtF5dWblaernAgMBAAECggEAGdEHlSEPFmAr5PKqKrtoi6tYDHXdyHKHC5tZy4YV+Pp+a6gxxAiUJejx1hRqBcWSPYeKne35BM9dgn5JofgjI5SKzVsuGL6bxl3ayAOu+xXRHWM9f0t8NHoM5fdd0zC3g88dX3fb01geY2QSVtcxSJpEOpNH3twgZe6naT2pgiq1S4okpkpldJPo5GYWGKMCHSLnKGyhwS76gF8bTPLoay9Jxk70uv6BDUMlA4ICENjmsYtd3oirWwLwYMEJbSFMlyJvB7hjOjR/4RpT4FPnlSsIpuRtkCYXD4jdhxGlvpXREw97UF2wwnEUnfgiZJ2FT/MWmvGGoaV/CfboLsLZuQKBgQDTNZdJrs8dbijynHZuuRwvXvwC03GDpEJO6c1tbZ1s9wjRyOZjBbQFRjDgFeWs9/T1aNBLUrgsQL9c9nzgUziXjr1Nmu52I0Mwxi13Km/q3mT+aQfdgNdu6ojsI5apQQHnN/9yMhF6sNHg63YOpH+b+1bGRCtr1XubuLlumKKscwKBgQDOtQ2lQjMtwsqJmyiyRLiUOChtvQ5XI7B2mhKCGi8kZ+WEAbNQcmThPesVzW+puER6D4Ar4hgsh9gCeuTaOzbRfZ+RLn3Aksu2WJEzfs6UrGvm6DU1INn0z/tPYRAwPX7sxoZZGxqML/z+/yQdf2DREoPdClcDa2Lmf1KpHdB+vQKBgBXFCVHz7a8n4pqXG/HvrIMJdEpKRwH9lUQS/zSPPtGzaLpOzchZFyQQBwuh1imM6Te+VPHeldMh3VeUpGxux39/m+160adlnRBS7O7CdgSsZZZ/dusS06HAFNraFDZf1/VgJTk9BeYygX+AZYu+0tReBKSs9BjKSVJUqPBIVUQXAoGBAJcZ7J6oVMcXxHxwqoAeEhtvLcaCU9BJK36XQ/5M67ceJ72mjJC6/plUbNukMAMNyyi62gO6I9exearecRpB/OGIhjNXm99Ar59dAM9228X8gGfryLFMkWcO/fNZzb6lxXmJ6b2LPY3KqpMwqRLTAU/zy+ax30eFoWdDHYa4X6e1AoGAfa8asVGOJ8GL9dlWufEeFkDEDKO9ww5GdnpN+wqLwePWqeJhWCHad7bge6SnlylJp5aZXl1+YaBTtOskC4Whq9TP2J+dNIgxsaF5EFZQJr8Xv+lY9lu0CruYOh9nTNF9x3nubxJgaSid/7yRPfAGnsJRiknB5bsrCvgsFQFjJVs=';
+        return RSA.encode(text, rsa_private_key, null);
+    }
+};

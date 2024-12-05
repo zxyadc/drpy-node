@@ -24,6 +24,7 @@ registerRoutes(fastify, {
     rootDir: __dirname,
     docsDir: path.join(__dirname, 'docs'),
     jsDir: path.join(__dirname, 'js'),
+    viewsDir: path.join(__dirname, 'views'),
     PORT,
     indexFilePath: path.join(__dirname, 'index.json'),
     customFilePath: path.join(__dirname, 'custom.json'),

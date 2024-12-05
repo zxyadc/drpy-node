@@ -4,8 +4,8 @@ globalThis.UA = 'Mozilla/5.0';
 globalThis.UC_UA = 'Mozilla/5.0 (Linux; U; Android 9; zh-CN; MI 9 Build/PKQ1.181121.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/57.0.2987.108 UCBrowser/12.5.5.1035 Mobile Safari/537.36';
 globalThis.IOS_UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1';
 
-const RULE_CK = 'cookie'; // 源cookie的key值
-var RKEY = ''; // 源的唯一标识
+globalThis.RULE_CK = 'cookie'; // 源cookie的key值
+globalThis.RKEY = ''; // 源的唯一标识
 globalThis.CATE_EXCLUDE = '首页|留言|APP|下载|资讯|新闻|动态';
 globalThis.TAB_EXCLUDE = '猜你|喜欢|下载|剧情|榜|评论';
 globalThis.OCR_RETRY = 3;//ocr验证重试次数
@@ -22,12 +22,12 @@ globalThis.nodata = {
 globalThis.SPECIAL_URL = /^(ftp|magnet|thunder|ws):/;
 
 
-function 是否正版(vipUrl) {
+globalThis.是否正版 = function (vipUrl) {
     let flag = new RegExp('qq\.com|iqiyi\.com|youku\.com|mgtv\.com|bilibili\.com|sohu\.com|ixigua\.com|pptv\.com|miguvideo\.com|le\.com|1905\.com|fun\.tv');
     return flag.test(vipUrl);
 }
 
-function urlDeal(vipUrl) {
+globalThis.urlDeal = function (vipUrl) {
     if (!vipUrl) {
         return ''
     }
@@ -95,11 +95,11 @@ globalThis.setResult = function (d) {
     return vods
 }
 
-function setResult2(res) {
+globalThis.setResult2 = function (res) {
     return res.list || []
 }
 
-function setHomeResult(res) {
+globalThis.setHomeResult = function (res) {
     if (!res || typeof (res) !== 'object') {
         return []
     }
@@ -111,7 +111,7 @@ function setHomeResult(res) {
  * @param str
  * @returns {string}
  */
-function urlencode(str) {
+globalThis.urlencode = function (str) {
     str = (str + '').toString();
     return encodeURIComponent(str).replace(/!/g, '%21').replace(/'/g, '%27').replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/\*/g, '%2A').replace(/%20/g, '+');
 }
@@ -121,7 +121,7 @@ function urlencode(str) {
  * @param str
  * @returns {string}
  */
-function encodeUrl(str) {
+globalThis.encodeUrl = function (str) {
     if (typeof (encodeURI) == 'function') {
         return encodeURI(str)
     } else {
@@ -130,12 +130,12 @@ function encodeUrl(str) {
     }
 }
 
-function uint8ArrayToBase64(uint8Array) {
+globalThis.uint8ArrayToBase64 = function (uint8Array) {
     let binaryString = String.fromCharCode.apply(null, Array.from(uint8Array));
     return btoa(binaryString);
 }
 
-function Utf8ArrayToStr(array) {
+globalThis.Utf8ArrayToStr = function (array) {
     var out, i, len, c;
     var char2, char3;
     out = "";
@@ -176,7 +176,7 @@ function Utf8ArrayToStr(array) {
  * @param str
  * @returns {string}
  */
-function gzip(str) {
+globalThis.gzip = function (str) {
     let arr = pako.gzip(str, {
         // to: 'string'
     });
@@ -188,7 +188,7 @@ function gzip(str) {
  * @param b64Data
  * @returns {string}
  */
-function ungzip(b64Data) {
+globalThis.ungzip = function (b64Data) {
     let strData = atob(b64Data);
     const charData = strData.split('').map(function (x) {
         return x.charCodeAt(0);
@@ -204,7 +204,7 @@ function ungzip(b64Data) {
  * @param encoding
  * @returns {*}
  */
-function encodeStr(input, encoding) {
+globalThis.encodeStr = function (input, encoding) {
     encoding = encoding || 'gbk';
     if (encoding.startsWith('gb')) {
         const strTool = gbkTool();
@@ -219,7 +219,7 @@ function encodeStr(input, encoding) {
  * @param encoding
  * @returns {*}
  */
-function decodeStr(input, encoding) {
+globalThis.decodeStr = function (input, encoding) {
     encoding = encoding || 'gbk';
     if (encoding.startsWith('gb')) {
         const strTool = gbkTool();
@@ -228,13 +228,13 @@ function decodeStr(input, encoding) {
     return input
 }
 
-function getCryptoJS() {
+globalThis.getCryptoJS = function () {
     // return request('https://ghproxy.net/https://raw.githubusercontent.com/hjdhnx/dr_py/main/libs/crypto-hiker.js');
     return 'console.log("CryptoJS已装载");'
 }
 
 // 封装的RSA加解密类
-const RSA = {
+globalThis.RSA = {
     decode: function (data, key, option) {
         option = option || {};
         if (typeof (JSEncrypt) === 'function') {
@@ -295,24 +295,12 @@ const RSA = {
 };
 
 /**
- * 获取壳子返回的代理地址
- * @returns {string|*}
- */
-function getProxyUrl() {
-    if (typeof (getProxy) === 'function') {//判断壳子里有getProxy函数就执行取返回结果。否则取默认的本地
-        return getProxy(true)
-    } else {
-        return 'http://127.0.0.1:9978/proxy?do=js'
-    }
-}
-
-/**
  *  智能对比去除广告。支持嵌套m3u8。只需要传入播放地址
  * @param m3u8_url m3u8播放地址
  * @param headers 自定义访问m3u8的请求头,可以不传
  * @returns {string}
  */
-function fixAdM3u8Ai(m3u8_url, headers) {
+globalThis.fixAdM3u8Ai = async function (m3u8_url, headers) {
     let ts = (new Date).getTime();
     let option = headers ? {
         headers: headers
@@ -333,7 +321,7 @@ function fixAdM3u8Ai(m3u8_url, headers) {
         return str.split("").reverse().join("")
     }
 
-    let m3u8 = request(m3u8_url, option);
+    let m3u8 = (await req(m3u8_url, option)).content;
     m3u8 = m3u8.trim().split("\n").map(it => it.startsWith("#") ? it : urljoin(m3u8_url, it)).join("\n");
     m3u8 = m3u8.replace(/\n\n/gi, "\n");
     let last_url = m3u8.split("\n").slice(-1)[0];
@@ -343,7 +331,7 @@ function fixAdM3u8Ai(m3u8_url, headers) {
     if (last_url.includes(".m3u8") && last_url !== m3u8_url) {
         m3u8_url = urljoin2(m3u8_url, last_url);
         log("嵌套的m3u8_url:" + m3u8_url);
-        m3u8 = request(m3u8_url, option)
+        m3u8 = (await req(m3u8_url, option)).content;
     }
     let s = m3u8.trim().split("\n").filter(it => it.trim()).join("\n");
     let ss = s.split("\n");
@@ -417,7 +405,7 @@ function fixAdM3u8Ai(m3u8_url, headers) {
  * @param option 单个元素处理函数
  * @returns {*}
  */
-function forceOrder(lists, key, option) {
+globalThis.forceOrder = function (lists, key, option) {
     let start = Math.floor(lists.length / 2);
     let end = Math.min(lists.length - 1, start + 1);
     if (start >= end) {
@@ -457,7 +445,7 @@ function forceOrder(lists, key, option) {
  * @param url
  * @returns {{}}
  */
-function getQuery(url) {
+globalThis.getQuery = function (url) {
     try {
         if (url.indexOf('?') > -1) {
             url = url.slice(url.indexOf('?') + 1);
@@ -596,7 +584,7 @@ const jq = parseTags.jq;
  * @param html
  * @returns {*}
  */
-function dealJson(html) {
+globalThis.dealJson = function (html) {
     try {
         // html = html.match(/[\w|\W|\s|\S]*?(\{[\w|\W|\s|\S]*\})/).group[1];
         html = html.trim();
@@ -618,9 +606,9 @@ function dealJson(html) {
  * 验证码识别逻辑,需要java实现(js没有bytes类型,无法调用后端的传递图片二进制获取验证码文本的接口)
  * @type {{api: string, classification: (function(*=): string)}}
  */
-var OcrApi = {
+globalThis.OcrApi = {
     api: OCR_API,
-    classification: function (img) { // img是byte类型,这里不方便搞啊
+    classification: async function (img) { // img是byte类型,这里不方便搞啊
         let code = '';
         try {
             // let html = request(this.api,{data:{img:img},headers:{'User-Agent':PC_UA},'method':'POST'},true);
@@ -629,9 +617,13 @@ var OcrApi = {
             log('通过drpy_ocr验证码接口过验证...');
             let html = '';
             if (this.api.endsWith('drpy/text')) {
-                html = request(this.api, {data: {img: img}, headers: {'User-Agent': PC_UA}, 'method': 'POST'}, true);
+                html = (await req(this.api, {
+                    data: {img: img},
+                    headers: {'User-Agent': PC_UA},
+                    'method': 'POST'
+                })).content;
             } else {
-                html = post(this.api, {body: img});
+                html = (await req(this.api, {body: img, headers: {'User-Agent': PC_UA}, 'method': 'POST'})).content;
             }
             code = html || '';
         } catch (e) {
@@ -646,7 +638,7 @@ var OcrApi = {
  * @param url 任意一个正常完整的Url,自动提取根
  * @returns {string}
  */
-function getHome(url) {
+globalThis.getHome = function (url) {
     if (!url) {
         return ''
     }
@@ -743,7 +735,7 @@ function clearItem(k) {
  * @param obj 参数字典
  * @returns {*}
  */
-function buildUrl(url, obj) {
+globalThis.buildUrl = function (url, obj) {
     obj = obj || {};
     if (url.indexOf('?') < 0) {
         url += '?'
@@ -773,7 +765,7 @@ function $require(url) {
  * 将obj所有key变小写
  * @param obj
  */
-function keysToLowerCase(obj) {
+globalThis.keysToLowerCase = function (obj) {
     return Object.keys(obj).reduce((result, key) => {
         const newKey = key.toLowerCase();
         result[newKey] = obj[key]; // 如果值也是对象，可以递归调用本函数
@@ -782,7 +774,7 @@ function keysToLowerCase(obj) {
 }
 
 //字符串To对象
-function parseQueryString(query) {
+globalThis.parseQueryString = function (query) {
     const params = {};
     query.split('&').forEach(function (part) {
         // 使用正则表达式匹配键和值，直到遇到第一个等号为止
@@ -798,7 +790,7 @@ function parseQueryString(query) {
 }
 
 //URL需要转码字符串
-function encodeIfContainsSpecialChars(value) {
+globalThis.encodeIfContainsSpecialChars = function (value) {
     // 定义在URL中需要编码的特殊字符
     const specialChars = ":/?#[]@!$'()*+,;=%";
     // 检查值中是否包含特殊字符
@@ -811,7 +803,7 @@ function encodeIfContainsSpecialChars(value) {
 }
 
 //对象To字符串
-function objectToQueryString(obj) {
+globalThis.objectToQueryString = function (obj) {
     const encoded = [];
     for (let key in obj) {
         if (obj.hasOwnProperty(key)) {

@@ -101,7 +101,7 @@ async function request(url, opt = {}) {
         } else if (returnBuffer == 1) {
             return {code: resp.status, headers: resHeader, content: data};
         } else if (returnBuffer == 2) {
-            return {code: resp.status, headers: resHeader, content: data.toString('base64')};
+            return {code: resp.status, headers: resHeader, content: Buffer.from(data).toString('base64')};
         } else if (returnBuffer == 3) {
             var stream = opt.stream;
             if (stream['onResp']) await stream['onResp']({code: resp.status, headers: resHeader});
@@ -143,6 +143,11 @@ function base64DecodeBuf(text) {
 
 function base64Decode(text) {
     return base64DecodeBuf(text).toString('utf8');
+}
+
+function responseBase64(data) {
+    const buffer = Buffer.from(data, 'binary');
+    return buffer.toString('base64');
 }
 
 function md5(text) {
@@ -292,6 +297,7 @@ globalThis.aesX = aes;
 globalThis.desX = des;
 
 globalThis.req = request;
+globalThis.responseBase64 = responseBase64;
 
 
 /**
