@@ -183,8 +183,9 @@ export async function init(filePath, env, refresh) {
         const script = new vm.Script(js_code);
         script.runInContext(context);
 
-        // 访问沙箱中的 rule 对象
-        const moduleObject = utils.deepCopy(sandbox.rule);
+        // 访问沙箱中的 rule 对象。不进行deepCopy了,避免初始化或者预处理对rule.xxx进行修改后，在其他函数里使用却没生效问题
+        // const moduleObject = utils.deepCopy(sandbox.rule);
+        const moduleObject = sandbox.rule;
         await initParse(moduleObject);
 
         // 检查并执行 `预处理` 方法
@@ -195,6 +196,7 @@ export async function init(filePath, env, refresh) {
 
         let t2 = utils.getNowTime();
         moduleObject.cost = t2 - t1;
+        // console.log(`${filePath} headers:`, moduleObject.headers);
 
         // 缓存模块和文件的 hash 值
         moduleCache.set(filePath, {moduleObject, hash: fileHash});
@@ -361,6 +363,7 @@ async function initParse(rule) {
                     console.log(v);
                     if (['MOBILE_UA', 'PC_UA', 'UC_UA', 'IOS_UA', 'UA'].includes(v)) {
                         rule.headers[k] = eval(v);
+                        log(rule.headers[k])
                     }
                 } else if (k.toLowerCase() === 'cookie') {
                     let v = rule.headers[k];

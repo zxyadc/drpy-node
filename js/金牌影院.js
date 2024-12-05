@@ -14,6 +14,9 @@ var rule = {
     quickSearch: 0,
     timeout: 5000,
     play_parse: true,
+    headers: {
+        'User-Agent': 'MOBILE_UA',
+    },
     class_parse: async () => {
          let classes = [{
                 type_id: '1',
@@ -140,12 +143,14 @@ var rule = {
                     'authorization': '',
                 }
         })).content)
-        return {parse: 0, url: getProxyUrl()+'&url='+html.data.playUrl, js: ''}
+        return {parse: 0, url: getProxyUrl()+'&url='+encodeURIComponent(html.data.playUrl), js: ''}
     },
     proxy_rule: async function()  {
         let {input} = this
         if (input) {
-            let m3u8 = (await req(input)).content;
+            input = decodeURIComponent(input);
+            log(`${rule.title}代理播放:${input}`);
+            let m3u8 = (await req(input,{headers:rule.headers})).content;
             const lines = m3u8.split('\n');
             const tsUrls = [];
             let link_start = ''
