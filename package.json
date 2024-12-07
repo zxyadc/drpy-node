@@ -1,20 +1,21 @@
 {
   "name": "drpy-node",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "node index.js"
+    "dev": "chcp 65001 && node index.js"
   },
   "repository": "https://github.com/hjdhnx/drpy-node.git",
   "author": "晚风拂柳颜 <434857005@qq.com>",
   "license": "MIT",
   "dependencies": {
+    "@fastify/static": "7.0.4",
     "cheerio": "^1.0.0",
     "fastify": "^4.15.0",
-    "@fastify/static": "7.0.4",
     "lodash": "^4.17.21",
     "qs": "^6.13.1",
+    "rotating-file-stream": "^3.2.5",
     "tunnel": "^0.0.6"
   }
 }

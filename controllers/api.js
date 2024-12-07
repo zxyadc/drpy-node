@@ -81,7 +81,7 @@ export default (fastify, options, done) => {
             // console.error('Error processing request:', error);
             // reply.status(500).send({error: `Failed to process request for module ${moduleName}: ${error.message}`});
 
-            fastify.log.error(`Error processing module ${moduleName}:`, error);
+            fastify.log.error(`Error proxy module ${moduleName}:${error.message}`);
             reply.status(500).send({error: `Failed to process module ${moduleName}: ${error.message}`});
         }
     });
@@ -95,7 +95,7 @@ export default (fastify, options, done) => {
             return;
         }
         const proxy_url = request.params['*']; // 捕获整个路径
-        fastify.log.info(`try proxy for ${moduleName} -> ${proxy_url}:`);
+        fastify.log.info(`try proxy for ${moduleName} -> ${proxy_url}: ${JSON.stringify(query)}`);
         const protocol = request.protocol;
         const hostname = request.hostname;
         const proxyUrl = `${protocol}://${hostname}${request.url}`.split('?')[0].replace(proxy_url, '') + '?do=js';
@@ -152,7 +152,7 @@ export default (fastify, options, done) => {
             }
 
         } catch (error) {
-            fastify.log.error(`Error proxy module ${moduleName}:`, error);
+            fastify.log.error(`Error proxy module ${moduleName}:${error.message}`);
             reply.status(500).send({error: `Failed to proxy module ${moduleName}: ${error.message}`});
         }
     });

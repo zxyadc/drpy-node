@@ -1,5 +1,32 @@
 # drpyS更新记录
 
+### 20241207
+
+更新至V1.0.4
+
+1. 添加源【动漫巴士】
+2. 修改headless-util.js
+3. 增加hostJs异步函数，使用示例:
+4. 优化会员解密功能
+5. 优化访问日志输出到本地文件并自动轮转
+6. 黑料源使用CryptoJSW提高图片解密速度
+7. 优化yarn dev解决控制台日志乱码问题
+8. 移植原drpy2的request、post、fetch、reqCookie、getCode、checkHtml、verifyCode等方法并改为异步
+9. 增加原drpy2的同步函数 setItem、getItem、clearItem
+10. 增加_lib.request.js依赖库，实现了 `requestHtml`和`requestJson`简单封装
+11. 在常用一级、二级、搜索等函数里的this里增加jsp、pd、pdfa、pdfh确保指向的链接为当前this的MY_URL
+12. 修复pd系列函数取不到属性的问题。新增xvideos源,重写黑料里不正确的pd用法,修复黑料的搜索
+
+```javascript
+var rule = {
+    hostJs: async function () {
+        let {HOST} = this;
+        log('HOST:', HOST);
+        return 'https://www.baidu.com';
+    }
+}
+```
+
 ### 20241206
 
 更新至V1.0.3
@@ -41,7 +68,7 @@ let vod_url = getProxyUrl() + '&url=' + 'https://hls09.cntv.myhwcdn.cn/asp/hls/2
 8. 增加本地代理功能，示例(跳转百度):
 
 ```javascript
-{
+var rule = {
     proxy_rule: async function (params) {
         // log(this);
         let {input, MY_URL} = this;

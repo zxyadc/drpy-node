@@ -31,6 +31,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const es6JsPath = path.join(__dirname, '../libs_drpy/es6-extend.js');
 // 读取扩展代码
 const es6_extend_code = readFileSync(es6JsPath, 'utf8');
+const reqJsPath = path.join(__dirname, '../libs_drpy/req-extend.js');
+// 读取网络请求扩展代码
+const req_extend_code = readFileSync(reqJsPath, 'utf8');
 // 缓存已初始化的模块和文件 hash 值
 const moduleCache = new Map();
 let pupWebview = null;
@@ -107,8 +110,6 @@ export async function init(filePath, env, refresh) {
             urljoin,
             urljoin2,
             joinUrl,
-            MOBILE_UA, PC_UA, UA, UC_UA, IOS_UA, nodata,
-            setResult,
             $,
             pupWebview,
             getProxyUrl,
@@ -118,6 +119,7 @@ export async function init(filePath, env, refresh) {
             pdfh,
             pd,
             pdfa,
+            jsoup,
             pdfl,
             pjfh,
             pj,
@@ -134,6 +136,47 @@ export async function init(filePath, env, refresh) {
             js2Proxy,
             log,
             print,
+        };
+        const drpyCustomSanbox = {
+            MOBILE_UA,
+            PC_UA,
+            UA,
+            UC_UA,
+            IOS_UA,
+            RULE_CK,
+            CATE_EXCLUDE,
+            TAB_EXCLUDE,
+            OCR_RETRY,
+            OCR_API,
+            nodata,
+            SPECIAL_URL,
+            setResult,
+            setHomeResult,
+            setResult2,
+            urlDeal,
+            tellIsJx,
+            urlencode,
+            encodeUrl,
+            uint8ArrayToBase64,
+            Utf8ArrayToStr,
+            gzip,
+            ungzip,
+            encodeStr,
+            decodeStr,
+            getCryptoJS,
+            RSA,
+            fixAdM3u8Ai,
+            forceOrder,
+            getQuery,
+            stringify,
+            dealJson,
+            OcrApi,
+            getHome,
+            buildUrl,
+            keysToLowerCase,
+            parseQueryString,
+            encodeIfContainsSpecialChars,
+            objectToQueryString,
         };
 
         const libsSanbox = {
@@ -168,6 +211,7 @@ export async function init(filePath, env, refresh) {
             rule: {}, // 用于存放导出的 rule 对象
             ...utilsSanbox,
             ...drpySanbox,
+            ...drpyCustomSanbox,
             ...libsSanbox,
         };
 
@@ -180,24 +224,30 @@ export async function init(filePath, env, refresh) {
 
         // 执行文件内容，将其放入沙箱中
         const js_code = getOriginalJs(fileContent);
-        const script = new vm.Script(js_code);
-        script.runInContext(context);
+        const ruleScript = new vm.Script(js_code);
+        ruleScript.runInContext(context);
+
+        // rule注入完毕后添加自定义req扩展request方法进入规则,这个代码里可以直接获取rule的任意对象，而且还是独立隔离的
+        const reqExtendScript = new vm.Script(req_extend_code);
+        reqExtendScript.runInContext(context);
 
         // 访问沙箱中的 rule 对象。不进行deepCopy了,避免初始化或者预处理对rule.xxx进行修改后，在其他函数里使用却没生效问题
         // const moduleObject = utils.deepCopy(sandbox.rule);
-        const moduleObject = sandbox.rule;
-        await initParse(moduleObject);
+        const rule = sandbox.rule;
+        await initParse(rule);
 
-        // 检查并执行 `预处理` 方法
-        if (typeof moduleObject.预处理 === 'function') {
-            log('Executing preprocessing...');
-            await moduleObject.预处理();
-        }
-
+        const otherScript = new vm.Script(`
+globalThis.jsp = new jsoup(rule.host||'');
+globalThis.pdfh = pdfh;
+globalThis.pd = pd;
+globalThis.pdfa = pdfa;
+globalThis.HOST = rule.host||'';
+        `);
+        otherScript.runInContext(context);
         let t2 = utils.getNowTime();
+        const moduleObject = utils.deepCopy(rule);
         moduleObject.cost = t2 - t1;
         // console.log(`${filePath} headers:`, moduleObject.headers);
-
         // 缓存模块和文件的 hash 值
         moduleCache.set(filePath, {moduleObject, hash: fileHash});
         return moduleObject;
@@ -300,6 +350,19 @@ async function invokeMethod(filePath, env, method, args = [], injectVars = {}) {
 
 async function initParse(rule) {
     rule.host = (rule.host || '').rstrip('/');
+    // 检查并执行 `hostJs` 方法
+    if (typeof rule.hostJs === 'function') {
+        log('Executing hostJs...');
+        try {
+            let HOST = await rule.hostJs.apply({input: rule.host, MY_URL: rule.host, HOST: rule.host});
+            if (HOST) {
+                rule.host = HOST.rstrip('/');
+                log(`已动态设置规则【${rule.title}】的host为: ${rule.host}`);
+            }
+        } catch (e) {
+            log(`hostJs执行错误:${e.message}`);
+        }
+    }
     let rule_cate_excludes = (rule.cate_exclude || '').split('|').filter(it => it.trim());
     let rule_tab_excludes = (rule.tab_exclude || '').split('|').filter(it => it.trim());
     rule_cate_excludes = rule_cate_excludes.concat(CATE_EXCLUDE.split('|').filter(it => it.trim()));
@@ -385,10 +448,18 @@ async function initParse(rule) {
     } else {
         rule.headers = {}
     }
+    // 检查并执行 `预处理` 方法
+    if (typeof rule.预处理 === 'function') {
+        log('Executing 预处理...');
+        await rule.预处理();
+    }
     return rule
 }
 
 async function homeParseAfter(d, _type) {
+    if (!d) {
+        d = {};
+    }
     d.type = _type || '影视';
     return d
 }
@@ -439,13 +510,18 @@ async function cateParse(rule, tid, pg, filter, extend) {
             url = url.replaceAll('fypage', pg);
         }
     }
+    const jsp = new jsoup(url);
     return {
         MY_CATE: tid,
         MY_FL: extend,
         TYPE: 'cate',
         input: url,
         MY_URL: url,
-        MY_PAGE: pg
+        MY_PAGE: pg,
+        jsp: jsp,
+        pdfh: jsp.pdfh,
+        pd: jsp.pd,
+        pdfa: jsp.pdfa,
     }
 }
 
@@ -478,11 +554,16 @@ async function detailParse(rule, ids) {
     } else {
         url = detailUrl
     }
+    const jsp = new jsoup(url);
     return {
         TYPE: 'detail',
         input: url,
         vid: vid,
         MY_URL: url,
+        jsp: jsp,
+        pdfh: jsp.pdfh,
+        pd: jsp.pd,
+        pdfa: jsp.pdfa,
     }
 }
 
@@ -526,7 +607,7 @@ async function searchParse(rule, wd, quick, pg) {
             url = url.replaceAll('fypage', pg);
         }
     }
-
+    const jsp = new jsoup(url);
     return {
         TYPE: 'search',
         MY_PAGE: pg,
@@ -534,6 +615,10 @@ async function searchParse(rule, wd, quick, pg) {
         input: url,
         MY_URL: url,
         detailUrl: rule.detailUrl || '',
+        jsp: jsp,
+        pdfh: jsp.pdfh,
+        pd: jsp.pd,
+        pdfa: jsp.pdfa,
     }
 
 }
@@ -560,12 +645,17 @@ async function playParse(rule, flag, id, flags) {
     }
     url = decodeURIComponent(url);
     // log('playParse:', url)
+    const jsp = new jsoup(url);
     return {
         TYPE: 'play',
         MY_FLAG: flag,
         flag: flag,
         input: url,
         MY_URL: url,
+        jsp: jsp,
+        pdfh: jsp.pdfh,
+        pd: jsp.pd,
+        pdfa: jsp.pdfa,
     }
 }
 
@@ -787,4 +877,19 @@ export const jsEncoder = {
         let rsa_private_key = 'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCqin/jUpqM6+fgYP/oMqj9zcdHMM0mEZXLeTyixIJWP53lzJV2N2E3OP6BBpUmq2O1a9aLnTIbADBaTulTNiOnVGoNG58umBnupnbmmF8iARbDp2mTzdMMeEgLdrfXS6Y3VvazKYALP8EhEQykQVarexR78vRq7ltY3quXx7cgI0ROfZz5Sw3UOLQJ+VoWmwIxu9AMEZLVzFDQN93hzuzs3tNyHK6xspBGB7zGbwCg+TKi0JeqPDrXxYUpAz1cQ/MO+Da0WgvkXnvrry8NQROHejdLVOAslgr6vYthH9bKbsGyNY3H+P12kcxo9RAcVveONnZbcMyxjtF5dWblaernAgMBAAECggEAGdEHlSEPFmAr5PKqKrtoi6tYDHXdyHKHC5tZy4YV+Pp+a6gxxAiUJejx1hRqBcWSPYeKne35BM9dgn5JofgjI5SKzVsuGL6bxl3ayAOu+xXRHWM9f0t8NHoM5fdd0zC3g88dX3fb01geY2QSVtcxSJpEOpNH3twgZe6naT2pgiq1S4okpkpldJPo5GYWGKMCHSLnKGyhwS76gF8bTPLoay9Jxk70uv6BDUMlA4ICENjmsYtd3oirWwLwYMEJbSFMlyJvB7hjOjR/4RpT4FPnlSsIpuRtkCYXD4jdhxGlvpXREw97UF2wwnEUnfgiZJ2FT/MWmvGGoaV/CfboLsLZuQKBgQDTNZdJrs8dbijynHZuuRwvXvwC03GDpEJO6c1tbZ1s9wjRyOZjBbQFRjDgFeWs9/T1aNBLUrgsQL9c9nzgUziXjr1Nmu52I0Mwxi13Km/q3mT+aQfdgNdu6ojsI5apQQHnN/9yMhF6sNHg63YOpH+b+1bGRCtr1XubuLlumKKscwKBgQDOtQ2lQjMtwsqJmyiyRLiUOChtvQ5XI7B2mhKCGi8kZ+WEAbNQcmThPesVzW+puER6D4Ar4hgsh9gCeuTaOzbRfZ+RLn3Aksu2WJEzfs6UrGvm6DU1INn0z/tPYRAwPX7sxoZZGxqML/z+/yQdf2DREoPdClcDa2Lmf1KpHdB+vQKBgBXFCVHz7a8n4pqXG/HvrIMJdEpKRwH9lUQS/zSPPtGzaLpOzchZFyQQBwuh1imM6Te+VPHeldMh3VeUpGxux39/m+160adlnRBS7O7CdgSsZZZ/dusS06HAFNraFDZf1/VgJTk9BeYygX+AZYu+0tReBKSs9BjKSVJUqPBIVUQXAoGBAJcZ7J6oVMcXxHxwqoAeEhtvLcaCU9BJK36XQ/5M67ceJ72mjJC6/plUbNukMAMNyyi62gO6I9exearecRpB/OGIhjNXm99Ar59dAM9228X8gGfryLFMkWcO/fNZzb6lxXmJ6b2LPY3KqpMwqRLTAU/zy+ax30eFoWdDHYa4X6e1AoGAfa8asVGOJ8GL9dlWufEeFkDEDKO9ww5GdnpN+wqLwePWqeJhWCHad7bge6SnlylJp5aZXl1+YaBTtOskC4Whq9TP2J+dNIgxsaF5EFZQJr8Xv+lY9lu0CruYOh9nTNF9x3nubxJgaSid/7yRPfAGnsJRiknB5bsrCvgsFQFjJVs=';
         return RSA.encode(text, rsa_private_key, null);
     }
+};
+
+export const jsDecoder = {
+    aes_decrypt: function (data) {
+        let key = CryptoJS.enc.Hex.parse("686A64686E780A0A0A0A0A0A0A0A0A0A");
+        let iv = CryptoJS.enc.Hex.parse("647A797964730A0A0A0A0A0A0A0A0A0A");
+        let encrypted = CryptoJS.AES.decrypt({
+            ciphertext: CryptoJS.enc.Base64.parse(data)
+        }, key, {
+            iv: iv,
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        }).toString(CryptoJS.enc.Utf8);
+        return encrypted;
+    },
 };

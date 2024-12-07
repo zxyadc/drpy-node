@@ -6,12 +6,16 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 * [本地配置接口-动态外网/局域网](/config/1)
 * [本地配置接口-静态](/index)
 * [代码加解密工具](/admin/encoder)
+* [V我50支付凭证生成器](/authcoder?len=10&number=1)
+* [接口压测教程](/docs/httpTest.md)
 
 ## 更新记录
 
-### 20241206
+### 20241207
 
-1. 增加源加密功能
+更新至V1.0.4
+
+1. 修复黑料搜索
 
 [点此查看完整更新记录](docs/updateRecord.md)
 
@@ -33,8 +37,11 @@ todo:
 4. pino-pretty
 5. deasync
 
-
 ## 参考资料
 
 * [crypto-js-wasm使用教程](docs/crypto-js-wasm/readme-CN.md)
 * [puppeteer使用教程](docs/pupInstall.md)
+
+## 问题说明
+
+1. windows上直接运行index.js可能会发现运行过程中的日志打印出中文乱码。建议通过yarn dev运行或者在package.json里点击dev脚本运行

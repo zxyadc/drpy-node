@@ -35,7 +35,11 @@ var rule = {
                 method:'GET',
                 url:'http://111.180.203.165:9999/d/115/jiekou.txt'
             }
-            rule.homeUrl = (await req(domain_config)).content
+            let homeUrl = (await req(domain_config.url)).content;
+            log('homeUrl:',homeUrl);
+            if(homeUrl){
+                rule.homeUrl = homeUrl;
+            }
     },
     推荐: async () => {
         return []

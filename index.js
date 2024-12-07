@@ -1,11 +1,10 @@
-import Fastify from 'fastify';
 import fastifyStatic from '@fastify/static';
+import * as fastlogger from './controllers/fastlogger.js'
 import path from 'path';
 import os from 'os';
 import {fileURLToPath} from 'url';
 
-// 初始化 Fastify
-const fastify = Fastify({logger: true});
+const {fastify, fileLogger} = fastlogger;
 
 // 获取当前路径
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -56,6 +55,7 @@ const start = async () => {
         console.log(`- PLATFORM:   ${process.platform}`);
     } catch (err) {
         fastify.log.error(err);
+        fileLogger.error(err);
         process.exit(1);
     }
 };

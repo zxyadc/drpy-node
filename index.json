@@ -1,10 +1,26 @@
 {
   "sites": [
     {
+      "key": "drpyS_xvideos[密]",
+      "name": "xvideos[密](drpyS)",
+      "type": 4,
+      "api": "http://192.168.31.49:5757/api/xvideos[密]",
+      "searchable": 1,
+      "ext": ""
+    },
+    {
       "key": "drpyS_人人视频",
       "name": "人人视频(drpyS)",
       "type": 4,
       "api": "http://192.168.31.49:5757/api/人人视频",
+      "searchable": 1,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_动漫巴士[漫]",
+      "name": "动漫巴士[漫](drpyS)",
+      "type": 4,
+      "api": "http://192.168.31.49:5757/api/动漫巴士[漫]",
       "searchable": 1,
       "ext": ""
     },

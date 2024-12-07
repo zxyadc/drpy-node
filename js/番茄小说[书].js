@@ -4,6 +4,7 @@
 // http://localhost:5757/api/番茄小说[书]?play=7432172914662720025&flag=番茄小说
 
 const {getRandomFromList} = $.require('./_lib.random.js');
+const {requestHtml} = $.require('./_lib.request.js');
 
 var rule = {
     类型: '小说',
@@ -35,7 +36,8 @@ var rule = {
     timeout: 5000,
     play_parse: true,
     class_parse: async () => {
-        let html = (await req(rule.homeUrl)).content;
+        // let html = (await req(rule.homeUrl)).content;
+        let html = await requestHtml(rule.homeUrl);
         let json = JSON.parse(html);
         let data_list = json.data;
         let ret = {};

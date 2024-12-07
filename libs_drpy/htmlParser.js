@@ -208,6 +208,9 @@ class Jsoup {
                 case 'Html':
                     ret = ret?.html() || '';
                     break;
+                default:
+                    ret = ret?.attr(option) || '';
+                    break;
             }
         }
         return ret;

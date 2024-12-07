@@ -1,4 +1,4 @@
-import {getOriginalJs} from '../libs/drpyS.js';
+import {getOriginalJs, jsDecoder} from '../libs/drpyS.js';
 import {readFileSync, existsSync} from 'fs';
 import path from "path";
 
@@ -17,11 +17,16 @@ export default (fastify, options, done) => {
         if (!existsSync(authFilePath)) {
             return reply.status(404).send({error: '.nomedia file not found'});
         }
-        const local_auto_code = readFileSync(authFilePath, 'utf-8').trim();
-        console.log('local_auto_code:',local_auto_code);
-        console.log('auth_code:',auth_code);
-        if (auth_code !== local_auto_code) {
-            return reply.status(200).send({error: 'your auth_code is not correct'});
+        try {
+            const local_auto_code = readFileSync(authFilePath, 'utf-8').trim();
+            const auth_codes = jsDecoder.aes_decrypt(local_auto_code).trim().split('\n');
+            // console.log('auth_codes:',auth_codes);
+            // console.log('auth_code:', auth_code);
+            if (!auth_codes.includes(auth_code)) {
+                return reply.status(200).send({error: 'your auth_code is not correct'});
+            }
+        } catch (error) {
+            return reply.status(200).send({error: error.message});
         }
 
         try {
