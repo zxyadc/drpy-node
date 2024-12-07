@@ -78,7 +78,7 @@ var rule = {
         let html = JSON.parse((await req(`${rule.homeUrl}/api.php/getappapi.index/vodDetail`,{method:'post',headers: {
             'Content-Type': 'application/json',
             'User-Agent': 'okhttp/3.14.9',
-            'Host': `${rule.homeUrl.replace('https://','')}`
+            // 'Host': `${rule.homeUrl.replace('https://','')}`
           },data:data})).content);
         let list = JSON.parse(detail_decrypt(html.data));
         const vod = {
