@@ -1,28 +1,7 @@
 import path from 'path';
 import {existsSync, readFileSync} from 'fs';
+import {getMimeType} from '../utils/mime-type.js';
 import '../utils/marked.min.js';
-
-/**
- * 根据扩展名返回 MIME 类型
- * @param {string} ext 文件扩展名
- * @returns {string} MIME 类型
- */
-function getMimeType(ext) {
-    const mimeTypes = {
-        '.txt': 'text/plain; charset=utf-8',
-        '.html': 'text/html; charset=utf-8',
-        '.css': 'text/css; charset=utf-8',
-        '.js': 'application/javascript; charset=utf-8',
-        '.json': 'application/json; charset=utf-8',
-        '.jpg': 'image/jpeg',
-        '.jpeg': 'image/jpeg',
-        '.png': 'image/png',
-        '.gif': 'image/gif',
-        '.svg': 'image/svg+xml',
-        '.pdf': 'application/pdf',
-    };
-    return mimeTypes[ext] || 'application/octet-stream';
-}
 
 export default (fastify, options, done) => {
     fastify.get('/docs/*', async (request, reply) => {

@@ -1,4 +1,12 @@
 # drpyS更新记录
+### 20241208
+
+更新至V1.0.5
+
+1. 新增函数 getContentType、getMimeType，替代原docs.js里的用法，并注入给drpyS源使用
+2. drpyS支持class_name,class_url,filter等属性了
+3. 星芽短剧新增筛选
+4. 新增源老白故事
 
 ### 20241207
 

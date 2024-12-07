@@ -10,6 +10,7 @@ import * as misc from '../utils/misc.js';
 import {gbkTool} from '../libs_drpy/gbk.js'
 // import {atob, btoa, base64Encode, base64Decode, md5} from "../libs_drpy/crypto-util.js";
 import {base64Encode, base64Decode, md5} from "../libs_drpy/crypto-util.js";
+import {getContentType, getMimeType} from "../utils/mime-type.js";
 import template from '../libs_drpy/template.js'
 import '../libs_drpy/abba.js'
 import '../libs_drpy/drpyInject.js'
@@ -113,6 +114,7 @@ export async function init(filePath, env, refresh) {
             $,
             pupWebview,
             getProxyUrl,
+            getContentType, getMimeType,
         };
         const drpySanbox = {
             jsp,
@@ -276,7 +278,7 @@ async function invokeWithInjectVars(rule, method, injectVars, args) {
     let result = await method.apply(injectVars, args);  // 使用 apply 临时注入 injectVars 作为上下文，并执行方法
     switch (injectVars['method']) {
         case 'class_parse':
-            result = await homeParseAfter(result, rule.类型);
+            result = await homeParseAfter(result, rule.类型, injectVars);
             break;
         case '一级':
             result = await cateParseAfter(result, args[1]);
@@ -306,6 +308,12 @@ async function invokeWithInjectVars(rule, method, injectVars, args) {
 async function invokeMethod(filePath, env, method, args = [], injectVars = {}) {
     const moduleObject = await init(filePath, env); // 确保模块已初始化
     switch (method) {
+        case 'class_parse':
+            injectVars = await homeParse(moduleObject, ...args);
+            if (!injectVars) {
+                return {}
+            }
+            break
         case '一级':
             injectVars = await cateParse(moduleObject, ...args);
             if (!injectVars) {
@@ -344,7 +352,13 @@ async function invokeMethod(filePath, env, method, args = [], injectVars = {}) {
         // console.log('injectVars:', injectVars);
         return await invokeWithInjectVars(moduleObject, moduleObject[method], injectVars, args);
     } else {
-        throw new Error(`Method ${method} not found in module ${filePath}`);
+        if (['推荐', '一级', '搜索'].includes(method)) {
+            return []
+        } else if (['二级', 'lazy'].includes(method)) {
+            return {}
+        } else {  // class_parse一定要有，这样即使不返回数据都能自动取class_name和class_url的内容
+            throw new Error(`Method ${method} not found in module ${filePath}`);
+        }
     }
 }
 
@@ -456,11 +470,61 @@ async function initParse(rule) {
     return rule
 }
 
-async function homeParseAfter(d, _type) {
+async function homeParse(rule) {
+    let url = rule.homeUrl;
+    if (typeof (rule.filter) === 'string' && rule.filter.trim().length > 0) {
+        try {
+            let filter_json = ungzip(rule.filter.trim());
+            rule.filter = JSON.parse(filter_json);
+        } catch (e) {
+            rule.filter = {};
+        }
+    }
+    let classes = [];
+    if (rule.class_name && rule.class_url) {
+        let names = rule.class_name.split('&');
+        let urls = rule.class_url.split('&');
+        let cnt = Math.min(names.length, urls.length);
+        for (let i = 0; i < cnt; i++) {
+            classes.push({
+                'type_id': urls[i],
+                'type_name': names[i]
+            });
+        }
+    }
+    const jsp = new jsoup(url);
+    return {
+        TYPE: 'home',
+        input: url,
+        MY_URL: url,
+        jsp: jsp,
+        pdfh: jsp.pdfh,
+        pd: jsp.pd,
+        pdfa: jsp.pdfa,
+        classes: classes,
+        filters: rule.filter,
+        cate_exclude: rule.cate_exclude,
+    }
+
+}
+
+async function homeParseAfter(d, _type, injectVars) {
     if (!d) {
         d = {};
     }
     d.type = _type || '影视';
+    const {
+        classes,
+        filters,
+        cate_exclude
+    } = injectVars;
+    if (!Array.isArray(d.class)) {
+        d.class = classes;
+    }
+    if (!d.filters) {
+        d.filters = filters
+    }
+    d.class = d.class.filter(it => !cate_exclude || !(new RegExp(cate_exclude).test(it.type_name)));
     return d
 }
 
@@ -559,6 +623,7 @@ async function detailParse(rule, ids) {
         TYPE: 'detail',
         input: url,
         vid: vid,
+        orId: orId,
         MY_URL: url,
         jsp: jsp,
         pdfh: jsp.pdfh,

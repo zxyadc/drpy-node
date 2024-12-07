@@ -33,11 +33,13 @@ export default (fastify, options, done) => {
 
             if ('ac' in query && 't' in query) {
                 let ext = query.ext;
+                // console.log('ext:', ext);
                 let extend = {};
                 if (ext) {
                     try {
                         extend = JSON.parse(base64Decode(ext))
                     } catch (e) {
+                        fastify.log.error(`筛选参数错误:${e.message}`);
                     }
                 }
                 // 分类逻辑
@@ -108,8 +110,8 @@ export default (fastify, options, done) => {
         try {
             const backRespList = await drpy.proxy(modulePath, env, query);
             const statusCode = backRespList[0];
-            const mediaType = backRespList[1];
-            let content = backRespList[2];
+            const mediaType = backRespList[1] || 'application/octet-stream';
+            let content = backRespList[2] || '';
             const headers = backRespList.length > 3 ? backRespList[3] : null;
             const toBytes = backRespList.length > 4 ? backRespList[4] : null;
             // 如果需要转换为字节内容
@@ -127,7 +129,7 @@ export default (fastify, options, done) => {
             // 根据媒体类型来决定如何设置字符编码
             if (typeof content === 'string') {
                 // 如果返回的是文本内容（例如 JSON 或字符串）
-                if (mediaType.includes('text') || mediaType === 'application/json') {
+                if (mediaType && (mediaType.includes('text') || mediaType === 'application/json')) {
                     // 对于文本类型，设置 UTF-8 编码
                     reply
                         .code(statusCode)

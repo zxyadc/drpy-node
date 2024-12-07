@@ -6,6 +6,8 @@
       "type": 4,
       "api": "http://127.0.0.1:5757/api/xvideos[密]",
       "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
       "ext": ""
     },
     {
@@ -14,6 +16,8 @@
       "type": 4,
       "api": "http://127.0.0.1:5757/api/人人视频",
       "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
       "ext": ""
     },
     {
@@ -22,6 +26,8 @@
       "type": 4,
       "api": "http://127.0.0.1:5757/api/动漫巴士[漫]",
       "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
       "ext": ""
     },
     {
@@ -30,6 +36,8 @@
       "type": 4,
       "api": "http://127.0.0.1:5757/api/星芽短剧",
       "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
       "ext": ""
     },
     {
@@ -38,6 +46,18 @@
       "type": 4,
       "api": "http://127.0.0.1:5757/api/番茄小说[书]",
       "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_老白故事[听]",
+      "name": "老白故事[听](drpyS)",
+      "type": 4,
+      "api": "http://127.0.0.1:5757/api/老白故事[听]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
       "ext": ""
     },
     {
@@ -46,6 +66,18 @@
       "type": 4,
       "api": "http://127.0.0.1:5757/api/色花堂[密+]",
       "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_色花堂[密]",
+      "name": "色花堂[密](drpyS)",
+      "type": 4,
+      "api": "http://127.0.0.1:5757/api/色花堂[密]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
       "ext": ""
     },
     {
@@ -54,6 +86,8 @@
       "type": 4,
       "api": "http://127.0.0.1:5757/api/草榴社区[密]",
       "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
       "ext": ""
     },
     {
@@ -62,6 +96,8 @@
       "type": 4,
       "api": "http://127.0.0.1:5757/api/金牌影院",
       "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
       "ext": ""
     },
     {
@@ -70,6 +106,8 @@
       "type": 4,
       "api": "http://127.0.0.1:5757/api/黑料不打烊[密]",
       "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
       "ext": ""
     }
   ]

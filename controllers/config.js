@@ -17,6 +17,8 @@ function generateSiteJSON(jsDir, requestHost) {
                 type: 4, // 固定值
                 api,
                 searchable: 1, // 固定值
+                filterable: 1, // 固定值
+                quickSearch: 0, // 固定值
                 ext: "", // 固定为空字符串
             };
         });
