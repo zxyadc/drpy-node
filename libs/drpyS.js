@@ -314,6 +314,12 @@ async function invokeMethod(filePath, env, method, args = [], injectVars = {}) {
                 return {}
             }
             break
+        case '推荐':
+            injectVars = await homeVodParse(moduleObject, ...args);
+            if (!injectVars) {
+                return {}
+            }
+            break
         case '一级':
             injectVars = await cateParse(moduleObject, ...args);
             if (!injectVars) {
@@ -522,10 +528,29 @@ async function homeParseAfter(d, _type, injectVars) {
         d.class = classes;
     }
     if (!d.filters) {
-        d.filters = filters
+        d.filters = filters;
+    }
+    if (!d.list) {
+        d.list = [];
     }
     d.class = d.class.filter(it => !cate_exclude || !(new RegExp(cate_exclude).test(it.type_name)));
     return d
+}
+
+async function homeVodParse(rule) {
+    let url = rule.homeUrl;
+    const jsp = new jsoup(url);
+    return {
+        TYPE: 'home',
+        input: url,
+        MY_URL: url,
+        HOST: rule.host,
+        double: rule.double,
+        jsp: jsp,
+        pdfh: jsp.pdfh,
+        pd: jsp.pd,
+        pdfa: jsp.pdfa,
+    }
 }
 
 async function cateParse(rule, tid, pg, filter, extend) {

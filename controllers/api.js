@@ -72,10 +72,13 @@ export default (fastify, options, done) => {
             const filter = 'filter' in query ? query.filter : 1;
             const resultHome = await drpy.home(modulePath, env, filter);
             const resultHomeVod = await drpy.homeVod(modulePath, env);
-            const result = {
+            let result = {
                 ...resultHome,
-                list: resultHomeVod,
+                // list: resultHomeVod,
             };
+            if (Array.isArray(resultHomeVod) && resultHomeVod.length > 0) {
+                Object.assign(result, {list: resultHomeVod})
+            }
 
             reply.send(result);
 
