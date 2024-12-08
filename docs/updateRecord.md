@@ -12,6 +12,8 @@
 ```javascript
 QZOutputJson = JSON5.parse(ht.split('QZOutputJson=')[1].slice(0, -1));
 ```
+6. 手写队列，兼容海阔nodejs单任务版不支持queque等三方模块的问题
+7. 修复pdfh不含属性解析的情况下返回结果不是字符串问题与之影响的黑料源
 
 ### 20241208
 

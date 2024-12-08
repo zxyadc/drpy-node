@@ -230,7 +230,8 @@ class Jsoup {
                         if (ret) break;
                     }
             }
-        } else {
+        }
+        else { // 增加返回字符串，禁止直接返回pq对象
             ret = `${ret}`;
         }
 
