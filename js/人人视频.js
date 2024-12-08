@@ -2,13 +2,15 @@
 // http://localhost:5757/api/人人视频?ac=detail&ids=447
 // http://localhost:5757/api/人人视频?wd=&pg=1
 // http://localhost:5757/api/人人视频?play=&flag=人人视频
+const {getPublicIp} = $.require('./_lib.request.js');
+
 var rule = {
     类型: '影视',
     title: '人人视频',
     desc: '人人视频纯js版本',
     homeUrl: '',
-    class_name:'电视剧&电影&动漫',
-    class_url:'2&1&3',
+    class_name: '电视剧&电影&动漫',
+    class_url: '2&1&3',
     url: '/api.php/getappapi.index/typeFilterVodList',
     searchUrl: '/api.php/getappapi.index/searchList',
     searchable: 2,
@@ -42,6 +44,9 @@ var rule = {
         if (homeUrl) {
             rule.homeUrl = homeUrl;
         }
+        let _ip = await getPublicIp();
+        rule.ip = _ip;
+        log('_ip:', _ip);
     },
     推荐: async () => {
         return []
@@ -136,14 +141,17 @@ var rule = {
     lazy: async function (flag, id, flags) {
         let {getProxyUrl, input} = this;
         if (input.indexOf('m3u8') < 0) {
-            let html = JSON.parse((await req(input,{
+            input = input.replace('$ip',rule.ip);
+            let html = JSON.parse((await req(input, {
                 method: 'post',
-                headers: {
-                    'User-Agent': 'Mozilla/9.0 (Macintosh; Intel Mac OS X 10.8; rv:69.0) Gecko/20100101 Firefox/69.0'
-                }
+                // headers: {
+                //     'User-Agent': 'Mozilla/9.0 (Macintosh; Intel Mac OS X 10.8; rv:69.0) Gecko/20100101 Firefox/69.0'
+                // },
+                headers: rule.headers,
             })).content)
             let link = html.url
-            return {parse: 0, url: getProxyUrl() + '&url=' + encodeURIComponent(link), js: ''}
+            return {parse: 0, url: link}
+            // return {parse: 0, url: getProxyUrl() + '&url=' + encodeURIComponent(link), js: ''}
         } else {
             return {parse: 0, url: getProxyUrl() + '&url=' + input, js: ''}
         }
@@ -151,8 +159,8 @@ var rule = {
     proxy_rule: async function (params) {
         let {input} = this;
         input = decodeURIComponent(input);
-        if(input.includes('.mp4')){
-            return [302, getContentType(input), '',{location:input}];
+        if (input.includes('.mp4')) {
+            return [302, getContentType(input), '', {location: input}];
         }
         if (input.indexOf('m3u8') < 0) {
             let m3u8_content = (await req(input)).content

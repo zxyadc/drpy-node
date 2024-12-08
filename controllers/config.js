@@ -9,7 +9,7 @@ function generateSiteJSON(jsDir, requestHost) {
         .map((file) => {
             const baseName = path.basename(file, '.js'); // 去掉文件扩展名
             const key = `drpyS_${baseName}`;
-            const name = `${baseName}(drpyS)`;
+            const name = `${baseName}(DS)`;
             const api = `${requestHost}/api/${baseName}`;  // 使用请求的 host 地址，避免硬编码端口
             return {
                 key,

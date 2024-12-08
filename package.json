@@ -4,7 +4,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "chcp 65001 && node index.js"
+    "dev": "node index.js",
+    "dev-win": "chcp 65001 && node index.js"
   },
   "repository": "https://github.com/hjdhnx/drpy-node.git",
   "author": "晚风拂柳颜 <434857005@qq.com>",

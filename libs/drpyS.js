@@ -51,10 +51,10 @@ if (typeof fetchByHiker === 'undefined') { // 判断是海阔直接放弃导入p
 }
 globalThis.pupWebview = pupWebview;
 try {
-    if (typeof fetchByHiker === 'undefined') {
-        await import('../libs_drpy/crypto-js-wasm.js'); // 使用动态 import规避海阔报错无法运行问题
-    } else {
+    if (typeof fetchByHiker !== 'undefined' && typeof globalThis.import === 'function') {
         await globalThis.import('../libs_drpy/crypto-js-wasm.js'); // 海阔放在globalThis里去动态引入
+    } else {
+        await import('../libs_drpy/crypto-js-wasm.js'); // 使用动态 import规避海阔报错无法运行问题
     }
     globalThis.CryptoJSW = CryptoJSWasm;
 } catch (error) {
@@ -63,9 +63,10 @@ try {
     globalThis.CryptoJSW = {
         loadAllWasm: async function () {
         },
-        MD5: async function (str) {
-            return md5(str)
-        },
+        // MD5: async function (str) {
+        //     return md5(str)
+        // },
+        ...CryptoJS
     };
 }
 
