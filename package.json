@@ -1,6 +1,6 @@
 {
   "name": "drpy-node",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -16,6 +16,7 @@
     "fastify": "^4.15.0",
     "lodash": "^4.17.21",
     "mime-types": "^2.1.35",
+    "p-queue": "^8.0.1",
     "qs": "^6.13.1",
     "rotating-file-stream": "^3.2.5",
     "tunnel": "^0.0.6"

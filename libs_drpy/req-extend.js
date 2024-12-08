@@ -86,7 +86,7 @@ async function request(url, obj, ocr_flag) {
     }
 
     console.log(JSON.stringify(obj.headers));
-    console.log('request:' + url + `|method:${obj.method || 'GET'}|body:${obj.body || ''}`);
+    console.log('request:' + url + `  |method:${obj.method || 'GET'}  |body:${obj.body || ''}`);
     let res = await req(url, obj);
     let html = res.content || '';
     if (obj.withHeaders) {

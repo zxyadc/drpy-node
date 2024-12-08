@@ -11,6 +11,9 @@ var rule = {
         log(btoa('123456'));
         log(misc.randMAC());
         log(getRandomFromList(['drpy','drpyS','hipy']));
+        log('oheaders:',oheaders)
+        log('rule_fetch_params:',rule_fetch_params)
+        log('type of batchFetch:',batchFetch)
         // return {}
     },
     headers:{

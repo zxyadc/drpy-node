@@ -134,6 +134,7 @@ export async function init(filePath, env, refresh) {
             aesX,
             desX,
             req,
+            batchFetch,
             JSProxyStream,
             JSFile,
             js2Proxy,
@@ -237,16 +238,16 @@ export async function init(filePath, env, refresh) {
         // 访问沙箱中的 rule 对象。不进行deepCopy了,避免初始化或者预处理对rule.xxx进行修改后，在其他函数里使用却没生效问题
         // const moduleObject = utils.deepCopy(sandbox.rule);
         const rule = sandbox.rule;
-        await initParse(rule);
-
-        const otherScript = new vm.Script(`
-globalThis.jsp = new jsoup(rule.host||'');
-globalThis.pdfh = pdfh;
-globalThis.pd = pd;
-globalThis.pdfa = pdfa;
-globalThis.HOST = rule.host||'';
-        `);
-        otherScript.runInContext(context);
+        await initParse(rule, vm, context);
+        // otherScript放入到initParse去执行
+//         const otherScript = new vm.Script(`
+// globalThis.jsp = new jsoup(rule.host||'');
+// globalThis.pdfh = pdfh;
+// globalThis.pd = pd;
+// globalThis.pdfa = pdfa;
+// globalThis.HOST = rule.host||'';
+//         `);
+//         otherScript.runInContext(context);
         let t2 = utils.getNowTime();
         const moduleObject = utils.deepCopy(rule);
         moduleObject.cost = t2 - t1;
@@ -283,15 +284,18 @@ async function invokeWithInjectVars(rule, method, injectVars, args) {
             break;
         case '一级':
             result = await cateParseAfter(result, args[1]);
+            console.log(`一级 ${injectVars.input} 执行完毕,结果为:`, JSON.stringify(result.list.slice(0, 2)));
             break;
         case '二级':
             result = await detailParseAfter(result);
             break;
         case '搜索':
             result = await searchParseAfter(result, args[2]);
+            console.log(`搜索 ${injectVars.input} 执行完毕,结果为:`, JSON.stringify(result.list.slice(0, 2)));
             break;
         case 'lazy':
             result = await playParseAfter(rule, result, args[1], args[0]);
+            console.log(`免嗅 ${injectVars.input} 执行完毕,结果为:`, JSON.stringify(result));
             break;
     }
     return result
@@ -358,6 +362,10 @@ async function invokeMethod(filePath, env, method, args = [], injectVars = {}) {
     if (moduleObject[method] && typeof moduleObject[method] === 'function') {
         // console.log('injectVars:', injectVars);
         return await invokeWithInjectVars(moduleObject, moduleObject[method], injectVars, args);
+    } else if (!moduleObject[method] && method === 'class_parse') { // 新增特性，可以不写class_parse属性
+        const tmpClassFunction = async function () {
+        };
+        return await invokeWithInjectVars(moduleObject, tmpClassFunction, injectVars, args);
     } else {
         if (['推荐', '一级', '搜索'].includes(method)) {
             return []
@@ -369,7 +377,7 @@ async function invokeMethod(filePath, env, method, args = [], injectVars = {}) {
     }
 }
 
-async function initParse(rule) {
+async function initParse(rule, vm, context) {
     rule.host = (rule.host || '').rstrip('/');
     // 检查并执行 `hostJs` 方法
     if (typeof rule.hostJs === 'function') {
@@ -469,11 +477,29 @@ async function initParse(rule) {
     } else {
         rule.headers = {}
     }
+    // 新版放入规则内部
+    rule.oheaders = deepCopy(rule.headers);
+    rule.rule_fetch_params = {'headers': rule.headers, 'timeout': rule.timeout, 'encoding': rule.encoding};
+    const originalScript = new vm.Script(`
+globalThis.oheaders = rule.oheaders
+globalThis.rule_fetch_params = rule.rule_fetch_params;
+        `);
+    originalScript.runInContext(context);
+
     // 检查并执行 `预处理` 方法
     if (typeof rule.预处理 === 'function') {
         log('Executing 预处理...');
         await rule.预处理();
     }
+
+    const otherScript = new vm.Script(`
+globalThis.jsp = new jsoup(rule.host||'');
+globalThis.pdfh = pdfh;
+globalThis.pd = pd;
+globalThis.pdfa = pdfa;
+globalThis.HOST = rule.host||'';
+        `);
+    otherScript.runInContext(context);
     return rule
 }
 
@@ -504,13 +530,14 @@ async function homeParse(rule) {
         TYPE: 'home',
         input: url,
         MY_URL: url,
-        jsp: jsp,
-        pdfh: jsp.pdfh,
-        pd: jsp.pd,
-        pdfa: jsp.pdfa,
         classes: classes,
         filters: rule.filter,
         cate_exclude: rule.cate_exclude,
+        fetch_params: deepCopy(rule.rule_fetch_params),
+        jsp: jsp,
+        pdfh: jsp.pdfh.bind(jsp),
+        pdfa: jsp.pdfa.bind(jsp),
+        pd: jsp.pd.bind(jsp),
     }
 
 }
@@ -547,10 +574,11 @@ async function homeVodParse(rule) {
         MY_URL: url,
         HOST: rule.host,
         double: rule.double,
+        fetch_params: deepCopy(rule.rule_fetch_params),
         jsp: jsp,
-        pdfh: jsp.pdfh,
-        pd: jsp.pd,
-        pdfa: jsp.pdfa,
+        pdfh: jsp.pdfh.bind(jsp),
+        pdfa: jsp.pdfa.bind(jsp),
+        pd: jsp.pd.bind(jsp),
     }
 }
 
@@ -608,10 +636,11 @@ async function cateParse(rule, tid, pg, filter, extend) {
         input: url,
         MY_URL: url,
         MY_PAGE: pg,
+        fetch_params: deepCopy(rule.rule_fetch_params),
         jsp: jsp,
-        pdfh: jsp.pdfh,
-        pd: jsp.pd,
-        pdfa: jsp.pdfa,
+        pdfh: jsp.pdfh.bind(jsp),
+        pdfa: jsp.pdfa.bind(jsp),
+        pd: jsp.pd.bind(jsp),
     }
 }
 
@@ -651,10 +680,12 @@ async function detailParse(rule, ids) {
         vid: vid,
         orId: orId,
         MY_URL: url,
+        fetch_params: deepCopy(rule.rule_fetch_params),
         jsp: jsp,
-        pdfh: jsp.pdfh,
-        pd: jsp.pd,
-        pdfa: jsp.pdfa,
+        pdfh: jsp.pdfh.bind(jsp),
+        pdfa: jsp.pdfa.bind(jsp),
+        pd: jsp.pd.bind(jsp),
+        pdfl: jsp.pdfl.bind(jsp), // 二级绑定pdfl函数
     }
 }
 
@@ -706,10 +737,11 @@ async function searchParse(rule, wd, quick, pg) {
         input: url,
         MY_URL: url,
         detailUrl: rule.detailUrl || '',
+        fetch_params: deepCopy(rule.rule_fetch_params),
         jsp: jsp,
-        pdfh: jsp.pdfh,
-        pd: jsp.pd,
-        pdfa: jsp.pdfa,
+        pdfh: jsp.pdfh.bind(jsp),
+        pdfa: jsp.pdfa.bind(jsp),
+        pd: jsp.pd.bind(jsp),
     }
 
 }
@@ -743,10 +775,11 @@ async function playParse(rule, flag, id, flags) {
         flag: flag,
         input: url,
         MY_URL: url,
+        fetch_params: deepCopy(rule.rule_fetch_params),
         jsp: jsp,
-        pdfh: jsp.pdfh,
-        pd: jsp.pd,
-        pdfa: jsp.pdfa,
+        pdfh: jsp.pdfh.bind(jsp),
+        pdfa: jsp.pdfa.bind(jsp),
+        pd: jsp.pd.bind(jsp),
     }
 }
 

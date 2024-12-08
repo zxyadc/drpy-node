@@ -172,10 +172,10 @@ class Jsoup {
         if (!html || !parse) return '';
 
         const doc = cheerio.load(html);
-        if (PARSE_CACHE) {
-            if (this.pdfh_html !== html) {
-                this.pdfh_html = html;
-                this.pdfh_doc = doc;
+        if (typeof PARSE_CACHE !== 'undefined' && PARSE_CACHE) {
+            if (this.pdfa_html !== html) {
+                this.pdfa_html = html;
+                this.pdfa_doc = doc;
             }
         }
 
@@ -188,9 +188,10 @@ class Jsoup {
         let option;
         if (this.contains(parse, '&&')) {
             const parts = parse.split('&&');
-            option = parts[parts.length - 1];
-            parse = parts.slice(0, -1).join('&&');
+            option = parts.pop();
+            parse = parts.join('&&');
         }
+
         parse = this.parseHikerToJq(parse, true);
         const parses = parse.split(' ');
 
@@ -199,20 +200,40 @@ class Jsoup {
             ret = this.parseOneRule(doc, nparse, ret);
             if (!ret) return '';
         }
+
         if (option) {
             switch (option) {
                 case 'Text':
-                    ret = ret?.text() || '';
-                    ret = ret ? this.parseText(ret) : '';
+                    ret = ret ? this.parseText(ret.text()) : '';
                     break;
                 case 'Html':
-                    ret = ret?.html() || '';
+                    ret = ret ? ret.html() : '';
                     break;
                 default:
-                    ret = ret?.attr(option) || '';
-                    break;
+                    const originalRet = ret.clone();
+                    const options = option.split('||');
+                    for (const opt of options) {
+                        ret = originalRet?.attr(opt) || '';
+                        if (this.contains(opt.toLowerCase(), 'style') && this.contains(ret, 'url(')) {
+                            try {
+                                ret = ret.match(/url\((.*?)\)/)[1];
+                                ret = ret.replace(/^['"]|['"]$/g, '');
+                            } catch {
+                            }
+                        }
+                        if (ret && baseUrl) {
+                            const needAdd = this.test(URLJOIN_ATTR, opt) && !this.test(SPECIAL_URL, ret);
+                            if (needAdd) {
+                                ret = ret.includes('http') ? ret.slice(ret.indexOf('http')) : urljoin(baseUrl, ret);
+                            }
+                        }
+                        if (ret) break;
+                    }
             }
+        } else {
+            ret = `${ret}`;
         }
+
         return ret;
     }
 

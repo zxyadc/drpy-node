@@ -1,6 +1,16 @@
 {
   "sites": [
     {
+      "key": "drpyS_PTT[优]",
+      "name": "PTT[优](DS)",
+      "type": 4,
+      "api": "http://192.168.31.49:5757/api/PTT[优]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
       "key": "drpyS_xvideos[密]",
       "name": "xvideos[密](DS)",
       "type": 4,
@@ -55,6 +65,16 @@
       "name": "老白故事[听](DS)",
       "type": 4,
       "api": "http://192.168.31.49:5757/api/老白故事[听]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_腾云驾雾[官]",
+      "name": "腾云驾雾[官](DS)",
+      "type": 4,
+      "api": "http://192.168.31.49:5757/api/腾云驾雾[官]",
       "searchable": 1,
       "filterable": 1,
       "quickSearch": 0,
