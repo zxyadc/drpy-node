@@ -51,7 +51,7 @@ var rule = {
         return setResult(d)
     },
     二级: async function () {
-        let {input, pdfh, pd} = this;
+        let {input, pdfh, pd, fetch_params} = this;
         let d = [];
         let VOD = {};
         let video_list = [];
@@ -124,7 +124,8 @@ var rule = {
                 let htmls = await batchFetch(reqUrls);
                 htmls.forEach((ht) => {
                     if (ht) {
-                        eval(ht);
+                        // eval(ht);
+                        QZOutputJson = JSON5.parse(ht.split('QZOutputJson=')[1].slice(0, -1));
                         // log(QZOutputJson)
                         QZOutputJson.results.forEach(function (it1) {
                             it1 = it1.fields;

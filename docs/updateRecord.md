@@ -8,6 +8,10 @@
 2. 增加腾云驾雾源,修正搜索只能一个结果的问题。
 3. 新增batchFetch批量请求，给drpyS源提速！！！腾云驾雾源的二级请求已提速，几百个播放链接的动漫二级秒加载
 4. 增加ptt[优],同样支持二级batchFetch
+5. 海阔暂不支持源里执行eval,腾云驾雾二级访问不了，现在临时修改为
+```javascript
+QZOutputJson = JSON5.parse(ht.split('QZOutputJson=')[1].slice(0, -1));
+```
 
 ### 20241208
 
