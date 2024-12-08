@@ -1,7 +1,9 @@
 // import axios, {toFormData} from 'axios';
 import axios, {toFormData} from './axios.min.js';
 
-import PQueue from 'p-queue';
+// import PQueue from 'p-queue';
+// import Queue from 'queue';
+import Queue from './queue.js';
 import crypto from 'crypto';
 import https from 'https';
 import fs from 'node:fs';
@@ -138,15 +140,84 @@ async function request(url, opt = {}) {
     return {headers: {}, content: ''};
 }
 
+// globalThis.batchFetch = async (items, maxWorkers = 5, timeoutConfig = 5000) => {
+//     const queue = new PQueue({concurrency: maxWorkers});
+//
+//     // 获取全局 timeout 设置
+//     const timeout = timeoutConfig;
+//
+//     // 遍历 items 并生成任务队列
+//     const promises = items.map((item) => {
+//         return queue.add(async () => {
+//             try {
+//                 const response = await axios(
+//                     Object.assign({}, item?.options, {
+//                         url: item.url,
+//                         method: item?.options?.method || 'GET',
+//                         timeout: item?.options?.timeout || timeout,
+//                         responseType: 'text',
+//                     }),
+//                 );
+//                 return response.data;
+//             } catch (error) {
+//                 console.log(`[batchFetch][error] ${item.url}: ${error}`);
+//                 return null;
+//             }
+//         });
+//     });
+//
+//     // 执行所有任务
+//     return Promise.all(promises);
+// };
+
+// globalThis.batchFetch = async (items, maxWorkers = 5, timeoutConfig = 5000) => {
+//     const queue = new Queue({concurrency: maxWorkers, autostart: true});
+//
+//     // 获取全局 timeout 设置
+//     const timeout = timeoutConfig;
+//
+//     const results = [];
+//     const promises = [];
+//
+//     items.forEach((item, index) => {
+//         promises.push(
+//             new Promise((resolve) => {
+//                 queue.push(async () => {
+//                     try {
+//                         const response = await axios(
+//                             Object.assign({}, item?.options, {
+//                                 url: item.url,
+//                                 method: item?.options?.method || 'GET',
+//                                 timeout: item?.options?.timeout || timeout,
+//                                 responseType: 'text',
+//                             }),
+//                         );
+//                         results[index] = response.data;
+//                         resolve();
+//                     } catch (error) {
+//                         console.log(`[batchFetch][error] ${item.url}: ${error}`);
+//                         results[index] = null;
+//                         resolve();
+//                     }
+//                 });
+//             }),
+//         );
+//     });
+//
+//     await Promise.all(promises);
+//     return results;
+// };
+
 globalThis.batchFetch = async (items, maxWorkers = 5, timeoutConfig = 5000) => {
-    const queue = new PQueue({concurrency: maxWorkers});
+    const queue = new Queue(maxWorkers);
 
     // 获取全局 timeout 设置
     const timeout = timeoutConfig;
 
-    // 遍历 items 并生成任务队列
-    const promises = items.map((item) => {
-        return queue.add(async () => {
+    const results = [];
+
+    items.forEach((item, index) => {
+        queue.add(async () => {
             try {
                 const response = await axios(
                     Object.assign({}, item?.options, {
@@ -156,16 +227,16 @@ globalThis.batchFetch = async (items, maxWorkers = 5, timeoutConfig = 5000) => {
                         responseType: 'text',
                     }),
                 );
-                return response.data;
+                results[index] = response.data;
             } catch (error) {
                 console.log(`[batchFetch][error] ${item.url}: ${error}`);
-                return null;
+                results[index] = null;
             }
         });
     });
 
-    // 执行所有任务
-    return Promise.all(promises);
+    await queue.onIdle();
+    return results;
 };
 
 function base64EncodeBuf(buff, urlsafe = false) {

@@ -101,6 +101,7 @@ var rule = {
         lists.push(list1);
         // log(v_tab_urls);
         if (v_tab_urls.length > 1) {
+            let t1 = (new Date()).getTime();
             let reqUrls = v_tab_urls.slice(1).map(it => {
                 return {
                     url: it,
@@ -119,6 +120,8 @@ var rule = {
                     lists.push([]);
                 }
             });
+            let t2 = (new Date()).getTime();
+            log(`批量请求二级 ${input} 耗时${t2 - t1}毫秒:`);
         }
         let playUrls = lists.map(it => it.join('#'));
         VOD.vod_play_url = playUrls.join('$$$');
