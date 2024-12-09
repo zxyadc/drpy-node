@@ -112,6 +112,8 @@ var rule = {
                 }
             });
             let htmls = await batchFetch(reqUrls);
+            let t2 = (new Date()).getTime();
+            log(`批量请求二级 ${input} 耗时${t2 - t1}毫秒:`);
             htmls.forEach((ht) => {
                 if (ht) {
                     let list0 = pdfa(ht, '.mb-2.fullwidth&&a').map(it => pdfh(it, 'a&&Text') + '$' + pd(it, 'a&&href', input));
@@ -120,8 +122,7 @@ var rule = {
                     lists.push([]);
                 }
             });
-            let t2 = (new Date()).getTime();
-            log(`批量请求二级 ${input} 耗时${t2 - t1}毫秒:`);
+
         }
         let playUrls = lists.map(it => it.join('#'));
         VOD.vod_play_url = playUrls.join('$$$');

@@ -86,7 +86,7 @@ export default (fastify, options, done) => {
             // console.error('Error processing request:', error);
             // reply.status(500).send({error: `Failed to process request for module ${moduleName}: ${error.message}`});
 
-            fastify.log.error(`Error proxy module ${moduleName}:${error.message}`);
+            fastify.log.error(`Error api module ${moduleName}:${error.message}`);
             reply.status(500).send({error: `Failed to process module ${moduleName}: ${error.message}`});
         }
     });

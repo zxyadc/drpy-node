@@ -201,6 +201,7 @@ export async function init(filePath, env, refresh) {
             base64Decode,
             md5,
             jsonpath,
+            hlsParser,
         };
 
         // 创建一个沙箱上下文，注入需要的全局变量和函数
@@ -280,7 +281,7 @@ async function invokeWithInjectVars(rule, method, injectVars, args) {
     let result = await method.apply(injectVars, args);  // 使用 apply 临时注入 injectVars 作为上下文，并执行方法
     switch (injectVars['method']) {
         case 'class_parse':
-            result = await homeParseAfter(result, rule.类型, injectVars);
+            result = await homeParseAfter(result, rule.类型, rule.hikerListCol, rule.hikerClassListCol, injectVars);
             break;
         case '一级':
             result = await cateParseAfter(result, args[1]);
@@ -542,11 +543,17 @@ async function homeParse(rule) {
 
 }
 
-async function homeParseAfter(d, _type, injectVars) {
+async function homeParseAfter(d, _type, hikerListCol, hikerClassListCol, injectVars) {
     if (!d) {
         d = {};
     }
     d.type = _type || '影视';
+    if (hikerListCol) {
+        d.hikerListCol = hikerListCol;
+    }
+    if (hikerClassListCol) {
+        d.hikerClassListCol = hikerClassListCol;
+    }
     const {
         classes,
         filters,

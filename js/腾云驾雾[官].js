@@ -122,6 +122,8 @@ var rule = {
                     }
                 });
                 let htmls = await batchFetch(reqUrls);
+                let t2 = (new Date()).getTime();
+                log(`批量请求二级 ${detailUrl} 耗时${t2 - t1}毫秒:`);
                 htmls.forEach((ht) => {
                     if (ht) {
                         // eval(ht);
@@ -140,8 +142,6 @@ var rule = {
                         })
                     }
                 });
-                let t2 = (new Date()).getTime();
-                log(`批量请求二级 ${detailUrl} 耗时${t2 - t1}毫秒:`);
             }
         }
         let yg = d.filter(function (it) {

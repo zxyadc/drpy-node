@@ -1,9 +1,6 @@
 // import axios, {toFormData} from 'axios';
 import axios, {toFormData} from './axios.min.js';
 
-// import PQueue from 'p-queue';
-// import Queue from 'queue';
-import Queue from './queue.js';
 import crypto from 'crypto';
 import https from 'https';
 import fs from 'node:fs';
@@ -13,6 +10,15 @@ import _ from './underscore-esm.min.js'
 // import _ from 'underscore'
 import tunnel from "tunnel";
 import {jsonpath, jsoup} from './htmlParser.js';
+import hlsParser from './hls-parser.js'
+
+// import {batchFetch1, batchFetch2, batchFetch3} from './drpyBatchFetch.js';
+import {batchFetch4} from './hikerBatchFetch.js';
+
+globalThis.batchFetch = batchFetch4;
+
+globalThis.hlsParser = hlsParser;
+
 
 const confs = {};
 
@@ -86,7 +92,8 @@ async function request(url, opt = {}) {
         } else {
             agent = https.Agent({rejectUnauthorized: false,})
         }
-        console.log(`req:${url} headers:${JSON.stringify(headers)} data:${JSON.stringify(_data)}`);
+        let _url = typeof url === "object" ? url.url : url;
+        console.log(`req:${_url} headers:${JSON.stringify(headers)} data:${JSON.stringify(_data)}`);
         var resp = await axios(url, {
             responseType: respType,
             method: opt ? opt.method || 'get' : 'get',
@@ -140,104 +147,6 @@ async function request(url, opt = {}) {
     return {headers: {}, content: ''};
 }
 
-// globalThis.batchFetch = async (items, maxWorkers = 5, timeoutConfig = 5000) => {
-//     const queue = new PQueue({concurrency: maxWorkers});
-//
-//     // 获取全局 timeout 设置
-//     const timeout = timeoutConfig;
-//
-//     // 遍历 items 并生成任务队列
-//     const promises = items.map((item) => {
-//         return queue.add(async () => {
-//             try {
-//                 const response = await axios(
-//                     Object.assign({}, item?.options, {
-//                         url: item.url,
-//                         method: item?.options?.method || 'GET',
-//                         timeout: item?.options?.timeout || timeout,
-//                         responseType: 'text',
-//                     }),
-//                 );
-//                 return response.data;
-//             } catch (error) {
-//                 console.log(`[batchFetch][error] ${item.url}: ${error}`);
-//                 return null;
-//             }
-//         });
-//     });
-//
-//     // 执行所有任务
-//     return Promise.all(promises);
-// };
-
-// globalThis.batchFetch = async (items, maxWorkers = 5, timeoutConfig = 5000) => {
-//     const queue = new Queue({concurrency: maxWorkers, autostart: true});
-//
-//     // 获取全局 timeout 设置
-//     const timeout = timeoutConfig;
-//
-//     const results = [];
-//     const promises = [];
-//
-//     items.forEach((item, index) => {
-//         promises.push(
-//             new Promise((resolve) => {
-//                 queue.push(async () => {
-//                     try {
-//                         const response = await axios(
-//                             Object.assign({}, item?.options, {
-//                                 url: item.url,
-//                                 method: item?.options?.method || 'GET',
-//                                 timeout: item?.options?.timeout || timeout,
-//                                 responseType: 'text',
-//                             }),
-//                         );
-//                         results[index] = response.data;
-//                         resolve();
-//                     } catch (error) {
-//                         console.log(`[batchFetch][error] ${item.url}: ${error}`);
-//                         results[index] = null;
-//                         resolve();
-//                     }
-//                 });
-//             }),
-//         );
-//     });
-//
-//     await Promise.all(promises);
-//     return results;
-// };
-
-globalThis.batchFetch = async (items, maxWorkers = 5, timeoutConfig = 5000) => {
-    const queue = new Queue(maxWorkers);
-
-    // 获取全局 timeout 设置
-    const timeout = timeoutConfig;
-
-    const results = [];
-
-    items.forEach((item, index) => {
-        queue.add(async () => {
-            try {
-                const response = await axios(
-                    Object.assign({}, item?.options, {
-                        url: item.url,
-                        method: item?.options?.method || 'GET',
-                        timeout: item?.options?.timeout || timeout,
-                        responseType: 'text',
-                    }),
-                );
-                results[index] = response.data;
-            } catch (error) {
-                console.log(`[batchFetch][error] ${item.url}: ${error}`);
-                results[index] = null;
-            }
-        });
-    });
-
-    await queue.onIdle();
-    return results;
-};
 
 function base64EncodeBuf(buff, urlsafe = false) {
     return buff.toString(urlsafe ? 'base64url' : 'base64');

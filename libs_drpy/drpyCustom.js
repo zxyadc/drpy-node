@@ -713,7 +713,7 @@ globalThis.encodeIfContainsSpecialChars = function (value) {
     // 定义在URL中需要编码的特殊字符
     const specialChars = ":/?#[]@!$'()*+,;=%";
     // 检查值中是否包含特殊字符
-    if (specialChars.split('').some(char => value.includes(char))) {
+    if (specialChars.split('').some(char => value.toString().includes(char))) {
         // 如果包含，则使用encodeURIComponent进行编码
         return encodeURIComponent(value);
     }

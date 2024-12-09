@@ -1,5 +1,15 @@
 # drpyS更新记录
 
+### 20241210
+
+更新至V1.0.7
+
+1. 新增drpyBatchFetch.js、用3种不同方式实现drpy的batchFetch批量请求函数
+2. 引入hls-parser库用于解析处理m3u8等流媒体文件，在drpyS中提供全局对象hlsParser
+3. 新增央视
+4. 修复人人
+5. 完善batchFetch的4种实现方案
+
 ### 20241209
 
 更新至V1.0.6
@@ -9,9 +19,11 @@
 3. 新增batchFetch批量请求，给drpyS源提速！！！腾云驾雾源的二级请求已提速，几百个播放链接的动漫二级秒加载
 4. 增加ptt[优],同样支持二级batchFetch
 5. 海阔暂不支持源里执行eval,腾云驾雾二级访问不了，现在临时修改为
+
 ```javascript
 QZOutputJson = JSON5.parse(ht.split('QZOutputJson=')[1].slice(0, -1));
 ```
+
 6. 手写队列，兼容海阔nodejs单任务版不支持queque等三方模块的问题
 7. 修复pdfh不含属性解析的情况下返回结果不是字符串问题与之影响的黑料源
 

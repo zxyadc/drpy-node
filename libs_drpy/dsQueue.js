@@ -1,4 +1,4 @@
-class Queue {
+class DsQueue {
     constructor(concurrency = 1) {
         this.concurrency = concurrency;
         this.queue = [];
@@ -41,4 +41,4 @@ class Queue {
     }
 }
 
-export default Queue;
+export default DsQueue;

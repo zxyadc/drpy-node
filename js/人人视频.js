@@ -2,8 +2,7 @@
 // http://localhost:5757/api/人人视频?ac=detail&ids=447
 // http://localhost:5757/api/人人视频?wd=&pg=1
 // http://localhost:5757/api/人人视频?play=&flag=人人视频
-const {getPublicIp} = $.require('./_lib.request.js');
-
+const {getPublicIp} = $.require('_lib.request.js');
 var rule = {
     类型: '影视',
     title: '人人视频',
@@ -100,12 +99,13 @@ var rule = {
         let playmap = {};
         for (const i in playlist) {
             let form = playlist[i].player_info.show
+            let user_agent = playlist[i].player_info.user_agent
             const list = playlist[i].urls
             if (!playmap.hasOwnProperty(form)) {
                 playmap[form] = [];
             }
             for (const i in list) {
-                playmap[form].push(list[i].name.trim() + '$' + encodeURIComponent(list[i].parse_api_url));
+                playmap[form].push(list[i].name.trim() + '$' + encodeURIComponent(list[i].parse_api_url + '#' + user_agent));
 
             }
         }
@@ -141,61 +141,62 @@ var rule = {
     lazy: async function (flag, id, flags) {
         let {getProxyUrl, input} = this;
         if (input.indexOf('m3u8') < 0) {
-            input = input.replace('$ip',rule.ip);
-            let html = JSON.parse((await req(input, {
-                method: 'post',
-                // headers: {
-                //     'User-Agent': 'Mozilla/9.0 (Macintosh; Intel Mac OS X 10.8; rv:69.0) Gecko/20100101 Firefox/69.0'
-                // },
-                headers: rule.headers,
-            })).content)
-            let link = html.url
-            return {parse: 0, url: link}
-            // return {parse: 0, url: getProxyUrl() + '&url=' + encodeURIComponent(link), js: ''}
+            if (input.indexOf('json.php') > 0) {
+                let html = JSON.parse((await req(input.split('#')[0], {
+                    method: 'post',
+                    headers: {
+                        'User-Agent': input.split('#')[1]
+                    }
+                })).content)
+                let link = html.url
+                return {parse: 0, url: getProxyUrl() + '&url=' + encodeURIComponent(link), js: ''}
+            } else if (input.indexOf('parse.php') > 0) {
+                let html = JSON.parse((await req(input.split('#')[0], {
+                    method: 'post',
+                    headers: {
+                        'User-Agent': input.split('#')[1],
+                        'Connection': 'Keep-Alive',
+                        'Accept-Encoding': 'gzip',
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                    }
+                })).content)
+                let link = html.url
+                return {parse: 0, url: link, js: ''}
+            } else {
+                let html = JSON.parse((await req(input.split('#')[0], {
+                    method: 'post',
+                    headers: {
+                        'User-Agent': input.split('#')[1],
+                        'Connection': 'Keep-Alive',
+                        'Accept-Encoding': 'gzip',
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                    }
+                })).content)
+                let link = html.url
+                return {parse: 0, url: link, js: ''}
+            }
         } else {
-            return {parse: 0, url: getProxyUrl() + '&url=' + input, js: ''}
+            return {parse: 0, url: getProxyUrl() + '&url=' + encodeURIComponent(input.split('#')[0]), js: ''}
         }
     },
-    proxy_rule: async function (params) {
+    proxy_rule: async function () {
         let {input} = this;
-        input = decodeURIComponent(input);
-        if (input.includes('.mp4')) {
-            return [302, getContentType(input), '', {location: input}];
-        }
         if (input.indexOf('m3u8') < 0) {
-            let m3u8_content = (await req(input)).content
+            let m3u8_content = (await req(decodeURIComponent(input))).content
             let m3u8 = m3u8_content.replace(/#EXTINF:10\.333333,\s*https?:\/\/[^\s]+\n#EXT-X-DISCONTINUITY/, '')
             return [200, 'application/vnd.apple.mpegurl', m3u8]
         } else {
-            let m3u8_content = (await req(input)).content
+            let m3u8_content = (await req(decodeURIComponent(input))).content.replace(/#EXTINF:10\.333333,\s*https?:\/\/[^\s]+\n#EXT-X-DISCONTINUITY/, '')
             //https?:\/\/[^\s]+piantou\.(txt|zip)|piantou.txt|piantou.zip
-            if (m3u8_content.indexOf('piantou') > 0) {
+            if (m3u8_content.match(/https?:\/\/[^\s]+piantou\.(txt|zip|psd)|piantou.txt|piantou.zip|piantou.psd/)) {
                 const lines = m3u8_content.split('\n');
                 const tsUrls = [];
                 let link_start = ''
                 lines.forEach(line => {
-                    if (line.trim().startsWith('http') && line.trim().indexOf('piantou') < 0 && line.trim().endsWith('.txt') || line.trim().endsWith('.zip')) {
+                    if (line.trim().startsWith('http') && line.trim().indexOf('piantou') < 0 && /txt|zip|psd/.test(line.trim())) {
                         tsUrls.push(line)
                     }
-                    if (line.trim().endsWith('.txt') || line.trim().endsWith('.zip') && line.trim().indexOf('piantou') < 0) {
-                        link_start = input.split('?')[0].replace('playlist.m3u8', '')
-                        tsUrls.push(link_start + line.trim())
-                    } else {
-                        tsUrls.push(line)
-                    }
-                })
-                let m3u8_text = tsUrls.join('\n')
-                // log(m3u8_text)
-                return [200, 'application/vnd.apple.mpegurl', m3u8_text]
-            } else {
-                const lines = m3u8_content.split('\n');
-                const tsUrls = [];
-                let link_start = ''
-                lines.forEach(line => {
-                    if (line.trim().startsWith('http') && line.trim().endsWith('.txt') || line.trim().endsWith('.zip')) {
-                        tsUrls.push(line)
-                    }
-                    if (line.trim().endsWith('.txt') || line.trim().endsWith('.zip')) {
+                    if (/txt|zip|psd/.test(line.trim()) && line.trim().indexOf('piantou') < 0) {
                         link_start = input.split('?')[0].replace('playlist.m3u8', '')
                         tsUrls.push(link_start + line.trim())
                     } else {
@@ -204,6 +205,23 @@ var rule = {
                 })
                 let m3u8_text = tsUrls.join('\n')
                 log(m3u8_text)
+                return [200, 'application/vnd.apple.mpegurl', m3u8_text]
+            } else {
+                const lines = m3u8_content.split('\n');
+                const tsUrls = [];
+                let link_start = ''
+                lines.forEach(line => {
+                    if (line.trim().startsWith('http') && /txt|zip|psd/.test(line.trim())) {
+                        tsUrls.push(line)
+                    }
+                    if (/txt|zip|psd/.test(line.trim())) {
+                        link_start = input.split('?')[0].replace('playlist.m3u8', '')
+                        tsUrls.push(link_start + line.trim())
+                    } else {
+                        tsUrls.push(line)
+                    }
+                })
+                let m3u8_text = tsUrls.join('\n')
                 return [200, 'application/vnd.apple.mpegurl', m3u8_text]
             }
         }
