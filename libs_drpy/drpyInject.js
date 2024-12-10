@@ -13,9 +13,10 @@ import {jsonpath, jsoup} from './htmlParser.js';
 import hlsParser from './hls-parser.js'
 
 // import {batchFetch1, batchFetch2, batchFetch3} from './drpyBatchFetch.js';
-import {batchFetch4} from './hikerBatchFetch.js';
+import {batchFetch3} from './hikerBatchFetch.js';
 
-globalThis.batchFetch = batchFetch4;
+globalThis.batchFetch = batchFetch3;
+globalThis.axios = axios;
 
 globalThis.hlsParser = hlsParser;
 

@@ -1,5 +1,17 @@
 # drpyS更新记录
 
+### 20241211
+
+更新至V1.0.8
+
+1. BatchFetch默认采用fastq实现，支持海阔，性能强劲
+2. 海阔存在写源里不支持eval问题，单任务版也不行。后续尽量避免eval，多采用JSON或JSON5处理
+3. 添加axios,URL,pathLib等函数给ds源使用，推荐只在_lib库里使用
+4. 支持wasm使用。
+5. 新增加字符串扩展方法join，用法同python
+6. 完善满血版央视大全,超越hipy版cntv
+7. 本地代理增加proxyPath注入至this变量
+
 ### 20241210
 
 更新至V1.0.7

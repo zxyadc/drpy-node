@@ -164,6 +164,19 @@ Object.defineProperty(String.prototype, 'rstrip', {
     enumerable: false
 });
 
+Object.defineProperty(String.prototype, 'join', {
+    value: function (arr) {
+        if (!Array.isArray(arr)) {
+            throw new TypeError('Argument must be an array');
+        }
+        return arr.join(this);
+    },
+    writable: true,
+    configurable: true,
+    enumerable: false
+});
+
+
 //正则matchAll
 function matchesAll(str, pattern, flatten) {
     if (!pattern.global) {

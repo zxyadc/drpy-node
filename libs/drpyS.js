@@ -27,6 +27,10 @@ import '../libs_drpy/moduleLoader.js'
 
 globalThis.misc = misc;
 globalThis.utils = utils;
+globalThis.pathLib = {
+    basename: path.basename,
+    extname: path.extname,
+};
 const {sleep, sleepSync, computeHash, deepCopy, urljoin, urljoin2, joinUrl} = utils;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const es6JsPath = path.join(__dirname, '../libs_drpy/es6-extend.js');
@@ -202,6 +206,9 @@ export async function init(filePath, env, refresh) {
             md5,
             jsonpath,
             hlsParser,
+            axios,
+            URL,
+            pathLib,
         };
 
         // 创建一个沙箱上下文，注入需要的全局变量和函数

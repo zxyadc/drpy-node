@@ -99,16 +99,16 @@ export default (fastify, options, done) => {
             reply.status(404).send({error: `Module ${moduleName} not found`});
             return;
         }
-        const proxy_url = request.params['*']; // 捕获整个路径
-        fastify.log.info(`try proxy for ${moduleName} -> ${proxy_url}: ${JSON.stringify(query)}`);
+        const proxyPath = request.params['*']; // 捕获整个路径
+        fastify.log.info(`try proxy for ${moduleName} -> ${proxyPath}: ${JSON.stringify(query)}`);
         const protocol = request.protocol;
         const hostname = request.hostname;
-        const proxyUrl = `${protocol}://${hostname}${request.url}`.split('?')[0].replace(proxy_url, '') + '?do=js';
+        const proxyUrl = `${protocol}://${hostname}${request.url}`.split('?')[0].replace(proxyPath, '') + '?do=js';
         // console.log(`proxyUrl:${proxyUrl}`);
         const env = {
-            proxyUrl, getProxyUrl: function () {
+            proxyUrl,proxyPath, getProxyUrl: function () {
                 return proxyUrl
-            }
+            },
         };
         try {
             const backRespList = await drpy.proxy(modulePath, env, query);
