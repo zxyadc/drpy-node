@@ -170,7 +170,18 @@
                     }
                 },
                 error: function (xhr, status, error) {
-                    alert('请求失败，请稍后再试。');
+                    // 获取返回的 body
+                    const responseBody = xhr.responseText;
+                    console.error('Response body:', responseBody);
+                    // 可选：如果返回的是 JSON，解析它
+                    try {
+                        const jsonResponse = JSON.parse(responseBody);
+                        console.error('Parsed response:', jsonResponse);
+                        alert('请求失败，请稍后再试。' + jsonResponse.error);
+                    } catch (e) {
+                        console.error('Failed to parse response as JSON');
+                        alert('请求失败，请稍后再试。' + error);
+                    }
                 }
             });
         });

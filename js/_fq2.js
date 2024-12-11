@@ -1,5 +1,4 @@
 // http://localhost:5757/api/番茄小说[书]?ac=list&t=主分类&pg=1
-
 const {getRandomFromList} = $.require('./_lib.random.js');
 
 function testHls() {
@@ -45,7 +44,6 @@ var rule = {
         log('oheaders:', oheaders)
         log('rule_fetch_params:', rule_fetch_params)
         log('type of batchFetch:', batchFetch)
-
         testHls()
         // return {}
     },

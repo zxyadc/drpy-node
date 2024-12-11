@@ -1,6 +1,9 @@
 // import axios, {toFormData} from 'axios';
-import axios, {toFormData} from './axios.min.js';
+// import axios, {toFormData} from './axios.min.js';
+import './axios.min.js';
 
+const {toFormData} = axios;
+// console.log('type of toFormData:', typeof toFormData);
 import crypto from 'crypto';
 import https from 'https';
 import fs from 'node:fs';

@@ -214,6 +214,8 @@ export async function init(filePath, env, refresh) {
         // 创建一个沙箱上下文，注入需要的全局变量和函数
         const sandbox = {
             console,      // 将 console 注入沙箱，便于调试
+            // eval,    // 直接引入原生 eval(不要这样用，环境是隔离的会导致执行不符合预期，需要包装)
+            WebAssembly, // 允许使用原生 WebAssembly(这里即使不引用也可以在沙箱里用这个变量。写在这里骗骗自己吧)
             setTimeout,   // 注入定时器方法
             setInterval,
             clearTimeout,
@@ -226,7 +228,11 @@ export async function init(filePath, env, refresh) {
             ...drpyCustomSanbox,
             ...libsSanbox,
         };
-
+        if (typeof fetchByHiker !== 'undefined'){ // 临时解决海阔不支持eval问题，但是这个eval存在作用域问题，跟非海阔环境的有很大区别，属于残废版本
+            sandbox.eval = function (code) {
+                return vm.runInContext(code, sandbox);
+            };
+        }
         // 创建一个上下文
         const context = vm.createContext(sandbox);
 

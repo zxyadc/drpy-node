@@ -1,6 +1,7 @@
 import PQueue from 'p-queue';
 import Queue from 'queue';
-import axios from './axios.min.js';
+// import axios from './axios.min.js';
+import './axios.min.js';
 
 export const batchFetch1 = async (items, maxWorkers = 5, timeoutConfig = 5000) => {
     let t1 = (new Date()).getTime();

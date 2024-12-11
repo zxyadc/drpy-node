@@ -1,5 +1,3 @@
-// import axios from '../libs_drpy/axios.min.js';
-
 async function requestHtml(url, options) {
     try {
         let html = (await req(url, options)).content;
