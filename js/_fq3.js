@@ -1,6 +1,6 @@
-const {getIp} = $.require('http://127.0.0.1:5757/public/ip.js');
+const {getIp} = await $.import('http://127.0.0.1:5757/public/ip.js');
 
-var rule = {
+const rule = {
     类型: '小说',
     title: '番茄小说[书]',
     desc: '番茄小说纯js版本',
@@ -8,7 +8,7 @@ var rule = {
     homeUrl: 'https://fanqienovel.com/api/author/book/category_list/v0/',
     url: '/api/author/library/book_list/v0/?page_count=18&page_index=(fypage-1)&gender=-1&category_id=fyclass&creation_status=-1&word_count=-1&sort=0#fyfilter',
     class_parse: async () => {
-        log('ip:', getIp());
+        log('ip:', await getIp());
     },
     headers: {
         'User-Agent': 'PC_UA',

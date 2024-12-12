@@ -1,7 +1,6 @@
 import DsQueue from './dsQueue.js';
 import fastq from "fastq";
-// import axios from './axios.min.js';
-import './axios.min.js';
+import axios from 'axios';
 
 export const batchFetch3 = async (items, maxWorkers = 5, timeoutConfig = 5000) => {
     let t1 = (new Date()).getTime();

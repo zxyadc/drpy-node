@@ -223,16 +223,18 @@ export async function init(filePath, env, refresh) {
             module: {},   // 模块支持
             exports: {},   // 模块支持
             rule: {}, // 用于存放导出的 rule 对象
+            _asyncGetRule: null,
             ...utilsSanbox,
             ...drpySanbox,
             ...drpyCustomSanbox,
             ...libsSanbox,
         };
-        if (typeof fetchByHiker !== 'undefined'){ // 临时解决海阔不支持eval问题，但是这个eval存在作用域问题，跟非海阔环境的有很大区别，属于残废版本
+        if (typeof fetchByHiker !== 'undefined') { // 临时解决海阔不支持eval问题，但是这个eval存在作用域问题，跟非海阔环境的有很大区别，属于残废版本
             sandbox.eval = function (code) {
                 return vm.runInContext(code, sandbox);
             };
         }
+
         // 创建一个上下文
         const context = vm.createContext(sandbox);
 
@@ -240,10 +242,19 @@ export async function init(filePath, env, refresh) {
         const polyfillsScript = new vm.Script(es6_extend_code);
         polyfillsScript.runInContext(context);
 
+        // 设置沙箱到全局 $
+        sandbox.$.setSandbox(sandbox);
         // 执行文件内容，将其放入沙箱中
         const js_code = getOriginalJs(fileContent);
-        const ruleScript = new vm.Script(js_code);
+        const js_code_wrapper = `
+    _asyncGetRule  = (async function() {
+        ${js_code}
+        return rule;
+    })();
+    `;
+        const ruleScript = new vm.Script(js_code_wrapper);
         ruleScript.runInContext(context);
+        sandbox.rule = await sandbox._asyncGetRule;
 
         // rule注入完毕后添加自定义req扩展request方法进入规则,这个代码里可以直接获取rule的任意对象，而且还是独立隔离的
         const reqExtendScript = new vm.Script(req_extend_code);
