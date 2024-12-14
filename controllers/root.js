@@ -9,7 +9,7 @@ export default (fastify, options, done) => {
         const files = readdirSync(options.rootDir);
         // console.log(files);
         if (process.env.VERCEL) {
-            readmePath = path.join(options.rootDir, './README.md');
+            readmePath = path.join(options.rootDir, './public/README.md');
         } else {
             for (const file of files) {
                 if (/^readme\.md$/i.test(file)) {
