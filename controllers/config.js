@@ -50,9 +50,11 @@ export default (fastify, options, done) => {
             let requestHost = cfg_path === '/1' ? `${protocol}://${hostname}` : `http://127.0.0.1:${options.PORT}`; // 动态生成根地址
             const siteJSON = generateSiteJSON(options.jsDir, requestHost);
             const siteStr = JSON.stringify(siteJSON, null, 2);
-            writeFileSync(options.indexFilePath, siteStr, 'utf8'); // 写入 index.json
-            if (cfg_path === '/1') {
-                writeFileSync(options.customFilePath, siteStr, 'utf8'); // 写入 index.json
+            if (!process.env.VERCEL) { // Vercel 环境不支持写文件，关闭此功能
+                writeFileSync(options.indexFilePath, siteStr, 'utf8'); // 写入 index.json
+                if (cfg_path === '/1') {
+                    writeFileSync(options.customFilePath, siteStr, 'utf8'); // 写入 index.json
+                }
             }
             reply.send(siteJSON);
         } catch (error) {

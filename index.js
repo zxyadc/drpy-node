@@ -55,6 +55,15 @@ const start = async () => {
         console.log(`- Local: ${localAddress}`);
         console.log(`- LAN:   ${lanAddress}`);
         console.log(`- PLATFORM:   ${process.platform}`);
+        if (process.env.VERCEL) {
+            console.log('Running on Vercel!');
+            console.log('Vercel Environment:', process.env.VERCEL_ENV); // development, preview, production
+            console.log('Vercel URL:', process.env.VERCEL_URL);
+            console.log('Vercel Region:', process.env.VERCEL_REGION);
+        } else {
+            console.log('Not running on Vercel!');
+        }
+
     } catch (err) {
         fastify.log.error(err);
         process.exit(1);
