@@ -1,5 +1,24 @@
 # drpyS更新记录
 
+### 20241215
+
+更新至V1.0.11
+
+1. drpyS源pathLib对象增加readFile方法，支持读取data目录的指定文件，使用示例:
+
+```javascript
+const indexHtml = pathLib.readFile('./cntv/index.html');
+```
+
+2. 央视代理增加返回网页示例，用于平替cntvParser项目。关联首页的【央视点播解析工具】
+3. 增加qs工具,drpyS源里可以直接使用，示例:
+
+```javascript
+log(qs.stringify({a: 1, b: 2}))
+```
+
+4. 在.env文件中加入 `LOG_WITH_FILE = 1` 可以使请求日志输出到文件，不配置则默认输出到控制台
+
 ### 20241213
 
 更新至V1.0.10

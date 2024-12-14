@@ -1,5 +1,5 @@
 import {readFile} from 'fs/promises';
-import {readFileSync} from 'fs';
+import {existsSync, readFileSync} from 'fs';
 import {fileURLToPath} from "url";
 import path from "path";
 import vm from 'vm';
@@ -25,14 +25,30 @@ import '../libs_drpy/drpyCustom.js'
 import '../libs_drpy/moduleLoader.js'
 // import '../libs_drpy/crypto-js-wasm.js'
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const _data_path = path.join(__dirname, '../data');
+
 globalThis.misc = misc;
 globalThis.utils = utils;
 globalThis.pathLib = {
     basename: path.basename,
     extname: path.extname,
+    readFile: function (filename) {
+        let _file_path = path.join(_data_path, filename);
+        const resolvedPath = path.resolve(_data_path, _file_path); // 将路径解析为绝对路径
+        if (!resolvedPath.startsWith(_data_path)) {
+            log(`no access for read ${_file_path}`)
+            return '';
+        }
+        // 检查文件是否存在
+        if (!existsSync(resolvedPath)) {
+            log(`file not found for read ${resolvedPath}`)
+            return '';
+        }
+        return readFileSync(resolvedPath, 'utf8')
+    },
 };
 const {sleep, sleepSync, computeHash, deepCopy, urljoin, urljoin2, joinUrl} = utils;
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const es6JsPath = path.join(__dirname, '../libs_drpy/es6-extend.js');
 // 读取扩展代码
 const es6_extend_code = readFileSync(es6JsPath, 'utf8');
@@ -209,6 +225,7 @@ export async function init(filePath, env, refresh) {
             axios,
             URL,
             pathLib,
+            qs,
         };
 
         // 创建一个沙箱上下文，注入需要的全局变量和函数

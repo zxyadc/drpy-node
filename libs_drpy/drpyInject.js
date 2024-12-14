@@ -17,6 +17,7 @@ import {batchFetch3} from './hikerBatchFetch.js';
 globalThis.batchFetch = batchFetch3;
 globalThis.axios = axios;
 globalThis.hlsParser = hlsParser;
+globalThis.qs = qs;
 
 
 const confs = {};

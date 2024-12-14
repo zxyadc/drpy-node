@@ -269,6 +269,9 @@ async function processFile(url, extension) {
     return buffer;
 }
 
+const indexHtml = pathLib.readFile('./cntv/index.html');
+
 $.exports = {
-    processFile
+    processFile,
+    indexHtml
 }

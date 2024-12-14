@@ -8,6 +8,7 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 * [代码加解密工具](/admin/encoder)
 * [V我50支付凭证生成器](/authcoder?len=10&number=1)
 * [接口压测教程](/docs/httpTest.md)
+* [央视点播解析工具](/proxy/央视大全[官]/index.html)
 
 ## 更新记录
 
