@@ -73,6 +73,10 @@ const stop = async () => {
 
 // 导出 start 和 stop 方法
 export {start, stop};
+export default async function handler(req, res) {
+    await fastify.ready()
+    fastify.server.emit('request', req, res)
+}
 
 // 判断当前模块是否为主模块，如果是主模块，则启动服务
 const currentFile = path.normalize(fileURLToPath(import.meta.url)); // 使用 normalize 确保路径一致
