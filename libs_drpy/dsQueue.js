@@ -10,7 +10,7 @@ class DsQueue {
         try {
             await task();
         } catch (err) {
-            console.error('Task failed:', err);
+            console.log('Task failed:', err);
         } finally {
             this.activeCount--;
             this.next();

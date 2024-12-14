@@ -247,7 +247,7 @@ function cut(text, start, end, method, All) {
                 return cutSegments[0];
             }
         } catch (e) {
-            console.error("Error cutting text:", e);
+            console.log("Error cutting text:", e);
         }
         return result;
     }

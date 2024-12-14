@@ -65,8 +65,8 @@ if (typeof fetchByHiker === 'undefined') { // 判断是海阔直接放弃导入p
         pupWebview = new puppeteerHelper();
         console.log('puppeteerHelper imported successfully');
     } catch (error) {
-        // console.error('Failed to import puppeteerHelper:', error);
-        console.error(`Failed to import puppeteerHelper:${error.message}`);
+        // console.log('Failed to import puppeteerHelper:', error);
+        console.log(`Failed to import puppeteerHelper:${error.message}`);
     }
 }
 globalThis.pupWebview = pupWebview;
@@ -78,8 +78,8 @@ try {
     }
     globalThis.CryptoJSW = CryptoJSWasm;
 } catch (error) {
-    // console.error('Failed to import puppeteerHelper:', error);
-    console.error(`Failed to import CryptoJSWasm:${error.message}`);
+    // console.log('Failed to import puppeteerHelper:', error);
+    console.log(`Failed to import CryptoJSWasm:${error.message}`);
     globalThis.CryptoJSW = {
         loadAllWasm: async function () {
         },
@@ -298,7 +298,7 @@ export async function init(filePath, env, refresh) {
         moduleCache.set(filePath, {moduleObject, hash: fileHash});
         return moduleObject;
     } catch (error) {
-        console.error('Error in drpy.init:', error);
+        console.log('Error in drpy.init:', error);
         throw new Error(`Failed to initialize module:${error.message}`);
     }
 }

@@ -83,7 +83,7 @@ export default (fastify, options, done) => {
             reply.send(result);
 
         } catch (error) {
-            // console.error('Error processing request:', error);
+            // console.log('Error processing request:', error);
             // reply.status(500).send({error: `Failed to process request for module ${moduleName}: ${error.message}`});
 
             fastify.log.error(`Error api module ${moduleName}:${error.message}`);

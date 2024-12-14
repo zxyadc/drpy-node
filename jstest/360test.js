@@ -39,6 +39,6 @@ console.log('__dirname:', __dirname);
         console.log('Result5:', result5);
         console.log('Result6:', result6);
     } catch (error) {
-        console.error('Error during module initialization or invocation:', error);
+        console.log('Error during module initialization or invocation:', error);
     }
 })();
