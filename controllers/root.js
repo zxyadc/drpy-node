@@ -7,11 +7,15 @@ export default (fastify, options, done) => {
     fastify.get('/', async (request, reply) => {
         let readmePath = null;
         const files = readdirSync(options.rootDir);
-        console.log(files);
-        for (const file of files) {
-            if (/^readme\.md$/i.test(file)) {
-                readmePath = path.join(options.rootDir, file);
-                break;
+        // console.log(files);
+        if (process.env.VERCEL) {
+            readmePath = path.join(options.rootDir, './README.md');
+        } else {
+            for (const file of files) {
+                if (/^readme\.md$/i.test(file)) {
+                    readmePath = path.join(options.rootDir, file);
+                    break;
+                }
             }
         }
 
