@@ -7,7 +7,7 @@ export default (fastify, options, done) => {
     fastify.get('/', async (request, reply) => {
         let readmePath = null;
         const files = readdirSync(options.rootDir);
-        console.log(files);
+        // console.log(files);
         for (const file of files) {
             if (/^readme\.md$/i.test(file)) {
                 readmePath = path.join(options.rootDir, file);
@@ -17,7 +17,8 @@ export default (fastify, options, done) => {
 
         // 如果未找到 README.md 文件
         if (!readmePath) {
-            reply.code(404).send('<h1>README.md not found</h1>');
+            let fileHtml = files.map(file => `<li>${file}</li>`).join('');
+            reply.code(404).type('text/html;charset=utf-8').send(`<h1>README.md not found</h1><ul>${fileHtml}</ul>`);
             return;
         }
 
