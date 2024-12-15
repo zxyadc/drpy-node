@@ -206,14 +206,6 @@ function getClass($) {
     return {cls: {type_id: tags.value[0].v, type_name: title}, tags: [tags]};
 }
 
-function base64Encode(text) {
-    return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(text));
-}
-
-function base64Decode(text) {
-    return CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Base64.parse(text));
-}
-
 function getToken($) {
     const currentId = $('#current_id').val();
     let eToken = $('#e_token').val();

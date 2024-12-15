@@ -326,9 +326,9 @@ globalThis.fixAdM3u8Ai = async function (m3u8_url, headers) {
         last_url = m3u8.split("\n").slice(-2)[0]
     }
     if (last_url.includes(".m3u8") && last_url !== m3u8_url) {
-        m3u8_url = urljoin2(m3u8_url, last_url);
+        m3u8_url = urljoin(m3u8_url, last_url);
         log("嵌套的m3u8_url:" + m3u8_url);
-        m3u8 = (await req(m3u8_url, option)).content;
+        m3u8 = (await req(m3u8_url, option)).content
     }
     let s = m3u8.trim().split("\n").filter(it => it.trim()).join("\n");
     let ss = s.split("\n");
@@ -341,10 +341,12 @@ globalThis.fixAdM3u8Ai = async function (m3u8_url, headers) {
     for (let i = 0; i < ss.length; i++) {
         let s = ss[i];
         if (!s.startsWith("#")) {
-            if (kk == 0) firststr = s;
+            if (kk == 0)
+                firststr = s;
             if (kk > 0) {
                 if (maxl > b(firststr, s) + 1) {
-                    if (secondstr.length < 5) secondstr = s;
+                    if (secondstr.length < 5)
+                        secondstr = s;
                     kkk2++
                 } else {
                     maxl = b(firststr, s);
@@ -352,24 +354,27 @@ globalThis.fixAdM3u8Ai = async function (m3u8_url, headers) {
                 }
             }
             kk++;
-            if (kk >= 30) break
+            if (kk >= 30)
+                break
         }
     }
-    if (kkk2 > kkk1) firststr = secondstr;
+    if (kkk2 > kkk1)
+        firststr = secondstr;
     let firststrlen = firststr.length;
     let ml = Math.round(ss.length / 2).toString().length;
     let maxc = 0;
     let laststr = ss.toReversed().find(x => {
-        if (!x.startsWith("#")) {
-            let k = b(reverseString(firststr), reverseString(x));
-            maxl = b(firststr, x);
-            maxc++;
-            if (firststrlen - maxl <= ml + k || maxc > 10) {
-                return true
+            if (!x.startsWith("#")) {
+                let k = b(reverseString(firststr), reverseString(x));
+                maxl = b(firststr, x);
+                maxc++;
+                if (firststrlen - maxl <= ml + k || maxc > 10) {
+                    return true
+                }
             }
+            return false
         }
-        return false
-    });
+    );
     log("最后一条切片：" + laststr);
     let ad_urls = [];
     for (let i = 0; i < ss.length; i++) {

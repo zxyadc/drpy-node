@@ -8,10 +8,8 @@ var rule = {
     title: '素白白',
     desc: '素白白纯js版本',
     host: 'https://www.subaibaiys.com',
-    homeUrl: '',
+    homeUrl:'',
     url: '',
-    class_name: '影视筛选&电影&电视剧',
-    class_url: '',
     searchUrl: '',
     searchable: 2,
     quickSearch: 0,
@@ -63,14 +61,14 @@ var rule = {
     },
     一级: async function (tid, pg, filter, extend) {
         let {MY_CATE, input} = this;
-        if (pg <= 0) pg = 1;
+        if(pg <= 0) pg = 1;
         const html = (await getHtml({
-            url: rule.host + "/" + tid + (extend.area || "") + (extend.year || "") + (extend.class || "") + (extend.catedd || "") + "/page/" + pg,
-            headers: rule.headers
+            url:rule.host + "/" + (extend.class || tid) + (extend.area || "") + (extend.year || "")  + (extend.catedd || "") + "/page/" + pg,
+            headers:rule.headers
         })).data
         const $ = pq(html);
         let videos = []
-        for (const item of $("div.mrb > ul > li")) {
+        for (const item of $("div.bt_img > ul > li")) {
             const img = $(item).find("img:first")[0],
                 a = $(item).find("a:first")[0],
                 hdinfo = $($(item).find("div.hdinfo")[0]).text().trim(),
@@ -87,8 +85,8 @@ var rule = {
     二级: async function (ids) {
         let {input} = this;
         const html = (await getHtml({
-            url: rule.host + "/movie/" + ids[0] + ".html",
-            headers: rule.headers
+            url:rule.host + "/movie/" + ids[0] + ".html",
+            headers:rule.headers
         })).data
         const $ = pq(html);
         const html_js = $("ul.moviedteail_list > li");
@@ -112,8 +110,8 @@ var rule = {
         let page = pg || 1;
         if (page === 0) page = 1;
         const html = (await getHtml({
-            url: rule.host + "/page/1?s=" + wd,
-            headers: rule.headers
+            url:rule.host + "/page/1?s=" + wd,
+            headers:rule.headers
         })).data;
         const $ = pq(html);
         let videos = []
@@ -135,13 +133,13 @@ var rule = {
         let {input} = this;
         const link = rule.host + "/v_play/" + id + ".html"
         const html = (await getHtml({
-            url: link,
-            headers: rule.headers
+            url:link,
+            headers:rule.headers
         })).data
         const $ = pq(html)
         const js = $('script:contains(window.wp_nonce)').html();
         const group = js.match(/(var.*)eval\((\w*\(\w*\))\)/);
-        const result = eval('const md5 = CryptoJS;' + group[1] + group[2]);
+        const result = eval('const md5 = CryptoJS;'+group[1] + group[2]);
         const play_url = result.match(/url:.*?['"](.*?)['"]/)[1];
         return {parse: 0, url: play_url}
     },

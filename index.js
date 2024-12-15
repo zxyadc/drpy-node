@@ -17,6 +17,12 @@ fastify.register(fastifyStatic, {
     prefix: '/public/',
 });
 
+fastify.register(fastifyStatic, {
+    root: path.join(__dirname, 'apps'),
+    prefix: '/apps/', // 新的访问路径前缀
+    decorateReply: false, // 禁用 sendFile
+});
+
 // 注册控制器
 import {registerRoutes} from './controllers/index.js';
 
