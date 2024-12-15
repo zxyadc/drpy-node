@@ -106,7 +106,7 @@ export default (fastify, options, done) => {
         const proxyUrl = `${protocol}://${hostname}${request.url}`.split('?')[0].replace(proxyPath, '') + '?do=js';
         // console.log(`proxyUrl:${proxyUrl}`);
         const env = {
-            proxyUrl,proxyPath, getProxyUrl: function () {
+            proxyUrl, proxyPath, getProxyUrl: function () {
                 return proxyUrl
             },
         };
@@ -159,6 +159,52 @@ export default (fastify, options, done) => {
         } catch (error) {
             fastify.log.error(`Error proxy module ${moduleName}:${error.message}`);
             reply.status(500).send({error: `Failed to proxy module ${moduleName}: ${error.message}`});
+        }
+    });
+
+
+    fastify.get('/parse/:jx', async (request, reply) => {
+        let t1 = (new Date()).getTime();
+        const jxName = request.params.jx;
+        const query = request.query; // 获取 query 参数
+        const jxPath = path.join(options.jxDir, `${jxName}.js`);
+        if (!existsSync(jxPath)) {
+            return reply.status(404).send({error: `解析 ${jxName} not found`});
+        }
+        const protocol = request.protocol;
+        const hostname = request.hostname;
+        const proxyUrl = `${protocol}://${hostname}${request.url}`.split('?')[0].replace('/parse/', '/proxy/') + '/?do=js';
+        const env = {
+            proxyUrl, getProxyUrl: function () {
+                return proxyUrl
+            }
+        };
+        try {
+            const backResp = await drpy.jx(jxPath, env, query);
+            const statusCode = 200;
+            const mediaType = 'application/json; charset=utf-8';
+            if (typeof backResp === 'object') {
+                let t2 = (new Date()).getTime();
+                backResp.cost = t2 - t1;
+                return reply.code(statusCode).type(`${mediaType}; charset=utf-8`).send(JSON.stringify(backResp));
+            } else if (typeof backResp === 'string') {
+                let statusCode = backResp && backResp !== query.url ? 200 : 404;
+                let msgState = backResp && backResp !== query.url ? '成功' : '失败';
+                let t2 = (new Date()).getTime();
+                let result = {
+                    code: statusCode,
+                    url: backResp,
+                    msg: `${jxName}解析${msgState}`,
+                    cost: t2 - t1
+                }
+                return reply.code(statusCode).type(`${mediaType}; charset=utf-8`).send(JSON.stringify(result));
+            } else {
+                return reply.status(404).send({error: `${jxName}解析失败`});
+            }
+
+        } catch (error) {
+            fastify.log.error(`Error proxy jx ${jxName}:${error.message}`);
+            reply.status(500).send({error: `Failed to proxy jx ${jxName}: ${error.message}`});
         }
     });
     done();

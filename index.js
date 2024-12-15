@@ -24,6 +24,7 @@ registerRoutes(fastify, {
     rootDir: __dirname,
     docsDir: path.join(__dirname, 'docs'),
     jsDir: path.join(__dirname, 'js'),
+    jxDir: path.join(__dirname, 'jx'),
     viewsDir: path.join(__dirname, 'views'),
     PORT,
     MAX_TEXT_SIZE,

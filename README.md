@@ -17,6 +17,7 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 更新至V1.0.11
 
 1. 支持vercel部署
+2. 增加自定义解析功能
 
 [点此查看完整更新记录](docs/updateRecord.md)
 

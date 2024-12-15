@@ -9,7 +9,7 @@ import * as misc from '../utils/misc.js';
 // const { req } = await import('../utils/req.js');
 import {gbkTool} from '../libs_drpy/gbk.js'
 // import {atob, btoa, base64Encode, base64Decode, md5} from "../libs_drpy/crypto-util.js";
-import {base64Encode, base64Decode, md5} from "../libs_drpy/crypto-util.js";
+import {base64Decode, base64Encode, md5} from "../libs_drpy/crypto-util.js";
 import {getContentType, getMimeType} from "../utils/mime-type.js";
 import template from '../libs_drpy/template.js'
 import '../libs_drpy/abba.js'
@@ -57,6 +57,7 @@ const reqJsPath = path.join(__dirname, '../libs_drpy/req-extend.js');
 const req_extend_code = readFileSync(reqJsPath, 'utf8');
 // 缓存已初始化的模块和文件 hash 值
 const moduleCache = new Map();
+const jxCache = new Map();
 let pupWebview = null;
 if (typeof fetchByHiker === 'undefined') { // 判断是海阔直接放弃导入puppeteer
     try {
@@ -90,6 +91,156 @@ try {
     };
 }
 
+export async function getSandbox(env = {}) {
+    const {getProxyUrl} = env;
+    // (可选) 加载所有 wasm 文件
+    await CryptoJSW.loadAllWasm();
+    const utilsSanbox = {
+        sleep,
+        sleepSync,
+        utils,
+        misc,
+        computeHash,
+        deepCopy,
+        urljoin,
+        urljoin2,
+        joinUrl,
+        $,
+        pupWebview,
+        getProxyUrl,
+        getContentType, getMimeType,
+    };
+    const drpySanbox = {
+        jsp,
+        pdfh,
+        pd,
+        pdfa,
+        jsoup,
+        pdfl,
+        pjfh,
+        pj,
+        pjfa,
+        pq,
+        local,
+        md5X,
+        rsaX,
+        aesX,
+        desX,
+        req,
+        batchFetch,
+        JSProxyStream,
+        JSFile,
+        js2Proxy,
+        log,
+        print,
+    };
+    const drpyCustomSanbox = {
+        MOBILE_UA,
+        PC_UA,
+        UA,
+        UC_UA,
+        IOS_UA,
+        RULE_CK,
+        CATE_EXCLUDE,
+        TAB_EXCLUDE,
+        OCR_RETRY,
+        OCR_API,
+        nodata,
+        SPECIAL_URL,
+        setResult,
+        setHomeResult,
+        setResult2,
+        urlDeal,
+        tellIsJx,
+        urlencode,
+        encodeUrl,
+        uint8ArrayToBase64,
+        Utf8ArrayToStr,
+        gzip,
+        ungzip,
+        encodeStr,
+        decodeStr,
+        getCryptoJS,
+        RSA,
+        fixAdM3u8Ai,
+        forceOrder,
+        getQuery,
+        stringify,
+        dealJson,
+        OcrApi,
+        getHome,
+        buildUrl,
+        keysToLowerCase,
+        parseQueryString,
+        encodeIfContainsSpecialChars,
+        objectToQueryString,
+    };
+
+    const libsSanbox = {
+        matchesAll,
+        cut,
+        gbkTool,
+        CryptoJS,
+        CryptoJSW,
+        JSEncrypt,
+        NODERSA,
+        pako,
+        JSON5,
+        jinja,
+        template,
+        atob,
+        btoa,
+        base64Encode,
+        base64Decode,
+        md5,
+        jsonpath,
+        hlsParser,
+        axios,
+        URL,
+        pathLib,
+        qs,
+    };
+
+    // 创建一个沙箱上下文，注入需要的全局变量和函数
+    const sandbox = {
+        console,      // 将 console 注入沙箱，便于调试
+        // eval,    // 直接引入原生 eval(不要这样用，环境是隔离的会导致执行不符合预期，需要包装)
+        WebAssembly, // 允许使用原生 WebAssembly(这里即使不引用也可以在沙箱里用这个变量。写在这里骗骗自己吧)
+        setTimeout,   // 注入定时器方法
+        setInterval,
+        clearTimeout,
+        clearInterval,
+        module: {},   // 模块支持
+        exports: {},   // 模块支持
+        rule: {}, // 用于存放导出的 rule 对象
+        lazy: async function () {
+        }, // 用于导出解析的默认函数
+        _asyncGetRule: null,
+        ...utilsSanbox,
+        ...drpySanbox,
+        ...drpyCustomSanbox,
+        ...libsSanbox,
+    };
+    if (typeof fetchByHiker !== 'undefined') { // 临时解决海阔不支持eval问题，但是这个eval存在作用域问题，跟非海阔环境的有很大区别，属于残废版本
+        sandbox.eval = function (code) {
+            return vm.runInContext(code, sandbox);
+        };
+    }
+
+    // 创建一个上下文
+    const context = vm.createContext(sandbox);
+
+    // 注入扩展代码到沙箱中
+    const polyfillsScript = new vm.Script(es6_extend_code);
+    polyfillsScript.runInContext(context);
+
+    // 设置沙箱到全局 $
+    sandbox.$.setSandbox(sandbox);
+    return {
+        sandbox,
+        context
+    }
+}
 
 /**
  * 初始化模块：加载并执行模块文件，存储初始化后的 rule 对象
@@ -114,153 +265,9 @@ export async function init(filePath, env, refresh) {
                 return cached.moduleObject;
             }
         }
-        const {getProxyUrl} = env;
-        // console.log('env:',env);
-        // console.log('getProxyUrl:',getProxyUrl);
-        // (可选) 加载所有 wasm 文件
-        await CryptoJSW.loadAllWasm();
-
         log(`Loading module: ${filePath}`);
         let t1 = utils.getNowTime();
-        const utilsSanbox = {
-            sleep,
-            sleepSync,
-            utils,
-            misc,
-            computeHash,
-            deepCopy,
-            urljoin,
-            urljoin2,
-            joinUrl,
-            $,
-            pupWebview,
-            getProxyUrl,
-            getContentType, getMimeType,
-        };
-        const drpySanbox = {
-            jsp,
-            pdfh,
-            pd,
-            pdfa,
-            jsoup,
-            pdfl,
-            pjfh,
-            pj,
-            pjfa,
-            pq,
-            local,
-            md5X,
-            rsaX,
-            aesX,
-            desX,
-            req,
-            batchFetch,
-            JSProxyStream,
-            JSFile,
-            js2Proxy,
-            log,
-            print,
-        };
-        const drpyCustomSanbox = {
-            MOBILE_UA,
-            PC_UA,
-            UA,
-            UC_UA,
-            IOS_UA,
-            RULE_CK,
-            CATE_EXCLUDE,
-            TAB_EXCLUDE,
-            OCR_RETRY,
-            OCR_API,
-            nodata,
-            SPECIAL_URL,
-            setResult,
-            setHomeResult,
-            setResult2,
-            urlDeal,
-            tellIsJx,
-            urlencode,
-            encodeUrl,
-            uint8ArrayToBase64,
-            Utf8ArrayToStr,
-            gzip,
-            ungzip,
-            encodeStr,
-            decodeStr,
-            getCryptoJS,
-            RSA,
-            fixAdM3u8Ai,
-            forceOrder,
-            getQuery,
-            stringify,
-            dealJson,
-            OcrApi,
-            getHome,
-            buildUrl,
-            keysToLowerCase,
-            parseQueryString,
-            encodeIfContainsSpecialChars,
-            objectToQueryString,
-        };
-
-        const libsSanbox = {
-            matchesAll,
-            cut,
-            gbkTool,
-            CryptoJS,
-            CryptoJSW,
-            JSEncrypt,
-            NODERSA,
-            pako,
-            JSON5,
-            jinja,
-            template,
-            atob,
-            btoa,
-            base64Encode,
-            base64Decode,
-            md5,
-            jsonpath,
-            hlsParser,
-            axios,
-            URL,
-            pathLib,
-            qs,
-        };
-
-        // 创建一个沙箱上下文，注入需要的全局变量和函数
-        const sandbox = {
-            console,      // 将 console 注入沙箱，便于调试
-            // eval,    // 直接引入原生 eval(不要这样用，环境是隔离的会导致执行不符合预期，需要包装)
-            WebAssembly, // 允许使用原生 WebAssembly(这里即使不引用也可以在沙箱里用这个变量。写在这里骗骗自己吧)
-            setTimeout,   // 注入定时器方法
-            setInterval,
-            clearTimeout,
-            clearInterval,
-            module: {},   // 模块支持
-            exports: {},   // 模块支持
-            rule: {}, // 用于存放导出的 rule 对象
-            _asyncGetRule: null,
-            ...utilsSanbox,
-            ...drpySanbox,
-            ...drpyCustomSanbox,
-            ...libsSanbox,
-        };
-        if (typeof fetchByHiker !== 'undefined') { // 临时解决海阔不支持eval问题，但是这个eval存在作用域问题，跟非海阔环境的有很大区别，属于残废版本
-            sandbox.eval = function (code) {
-                return vm.runInContext(code, sandbox);
-            };
-        }
-
-        // 创建一个上下文
-        const context = vm.createContext(sandbox);
-
-        // 注入扩展代码到沙箱中
-        const polyfillsScript = new vm.Script(es6_extend_code);
-        polyfillsScript.runInContext(context);
-
-        // 设置沙箱到全局 $
-        sandbox.$.setSandbox(sandbox);
+        const {sandbox, context} = await getSandbox()
         // 执行文件内容，将其放入沙箱中
         const js_code = getOriginalJs(fileContent);
         const js_code_wrapper = `
@@ -300,6 +307,43 @@ export async function init(filePath, env, refresh) {
     } catch (error) {
         console.log('Error in drpy.init:', error);
         throw new Error(`Failed to initialize module:${error.message}`);
+    }
+}
+
+export async function initJx(filePath, env, refresh) {
+    try {
+        // 读取文件内容
+        const fileContent = await readFile(filePath, 'utf-8');
+        // 计算文件的 hash 值
+        const fileHash = computeHash(fileContent);
+        // 检查缓存：是否有文件且未刷新且文件 hash 未变化
+        if (jxCache.has(filePath) && !refresh) {
+            const cached = jxCache.get(filePath);
+            if (cached.hash === fileHash) {
+                // log(`Module ${filePath} already initialized and unchanged, returning cached instance.`);
+                return cached.lazy;
+            }
+        }
+        log(`Loading jx: ${filePath}`);
+        let t1 = utils.getNowTime();
+        const {sandbox, context} = await getSandbox()
+        // 执行文件内容，将其放入沙箱中
+        const js_code = getOriginalJs(fileContent);
+        const ruleScript = new vm.Script(js_code);
+        ruleScript.runInContext(context);
+
+        const reqExtendScript = new vm.Script(req_extend_code);
+        reqExtendScript.runInContext(context);
+
+        let t2 = utils.getNowTime();
+        const lazy = sandbox.lazy;
+        const cost = t2 - t1;
+        console.log(`加载解析:${filePath} 耗时 ${cost}毫秒`)
+        jxCache.set(filePath, {lazy, hash: fileHash});
+        return lazy;
+    } catch (error) {
+        console.log('Error in drpy.initJx:', error);
+        throw new Error(`Failed to initialize jx:${error.message}`);
     }
 }
 
@@ -945,6 +989,16 @@ export async function proxy(filePath, env, params) {
         });
     } catch (e) {
         return [500, 'text/plain', '代理规则错误:' + e.message]
+    }
+}
+
+export async function jx(filePath, env, params) {
+    params = params || {};
+    try {
+        const lazy = await initJx(filePath, env); // 确保模块已初始化
+        return await lazy(params.url || '', params)
+    } catch (e) {
+        return {code: 404, url: '', msg: `${filePath} 代理解析错误:${e.message}`, cost: ''}
     }
 }
 

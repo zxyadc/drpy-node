@@ -25,6 +25,49 @@ function generateSiteJSON(jsDir, requestHost) {
     return {sites};
 }
 
+function generateParseJSON(jxDir, requestHost) {
+    const files = readdirSync(jxDir);
+    const parses = files
+        .filter((file) => file.endsWith('.js') && !file.startsWith('_')) // 筛选出不是 "_" 开头的 .js 文件
+        .map((file) => {
+            const baseName = path.basename(file, '.js'); // 去掉文件扩展名
+            const api = `${requestHost}/parse/${baseName}?url=`;  // 使用请求的 host 地址，避免硬编码端口
+            return {
+                name: baseName,
+                url: api,
+                type: 1,
+                ext: {
+                    flag: [
+                        "qiyi",
+                        "imgo",
+                        "爱奇艺",
+                        "奇艺",
+                        "qq",
+                        "qq 预告及花絮",
+                        "腾讯",
+                        "youku",
+                        "优酷",
+                        "pptv",
+                        "PPTV",
+                        "letv",
+                        "乐视",
+                        "leshi",
+                        "mgtv",
+                        "芒果",
+                        "sohu",
+                        "xigua",
+                        "fun",
+                        "风行"
+                    ]
+                },
+                header: {
+                    "User-Agent": "Mozilla/5.0"
+                }
+            }
+        });
+    return {parses};
+}
+
 export default (fastify, options, done) => {
 
     fastify.get('/index', async (request, reply) => {
@@ -49,14 +92,16 @@ export default (fastify, options, done) => {
             console.log('port:', port);
             let requestHost = cfg_path === '/1' ? `${protocol}://${hostname}` : `http://127.0.0.1:${options.PORT}`; // 动态生成根地址
             const siteJSON = generateSiteJSON(options.jsDir, requestHost);
-            const siteStr = JSON.stringify(siteJSON, null, 2);
+            const parseJSON = generateParseJSON(options.jxDir, requestHost);
+            const configObj = {...siteJSON, ...parseJSON};
+            const configStr = JSON.stringify(configObj, null, 2);
             if (!process.env.VERCEL) { // Vercel 环境不支持写文件，关闭此功能
-                writeFileSync(options.indexFilePath, siteStr, 'utf8'); // 写入 index.json
+                writeFileSync(options.indexFilePath, configStr, 'utf8'); // 写入 index.json
                 if (cfg_path === '/1') {
-                    writeFileSync(options.customFilePath, siteStr, 'utf8'); // 写入 index.json
+                    writeFileSync(options.customFilePath, configStr, 'utf8'); // 写入 index.json
                 }
             }
-            reply.send(siteJSON);
+            reply.send(configObj);
         } catch (error) {
             reply.status(500).send({error: 'Failed to generate site JSON', details: error.message});
         }
