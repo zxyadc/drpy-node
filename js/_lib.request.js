@@ -26,9 +26,27 @@ async function getPublicIp() {
     return ip_obj.origin
 }
 
+async function getHtml(config) {
+    try {
+        return await axios.request(typeof config === "string" ? config : {
+            url: config.url,
+            method: config.method || 'GET',
+            headers: config.headers || {
+                'User-Agent': PC_UA
+            },
+            data: config.data || '',
+            responseType: config.responseType || '',//'arraybuffer'
+        })
+    } catch (e) {
+        return e.response
+    }
+
+}
+
 $.exports = {
     requestHtml,
     requestJson,
     getPublicIp,
+    getHtml
     // axios // 没法import系统库
 }

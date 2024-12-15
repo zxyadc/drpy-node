@@ -20,6 +20,8 @@ log(qs.stringify({a: 1, b: 2}))
 4. 在.env文件中加入 `LOG_WITH_FILE = 1` 可以使请求日志输出到文件，不配置则默认输出到控制台
 5. 支持vercel部署，首页报错找不到readme.md无关大雅，能用就行,直接访问部署好的服务地址/config/1
 6. 支持自定义解析。放在jx目录的js文件
+7. 新增虾米解析，素白白等源，优化海阔eval机制
+8. 解析支持$.import和$.require使用js目录下的lib
 
 ### 20241213
 

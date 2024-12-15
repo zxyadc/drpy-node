@@ -216,26 +216,26 @@ export async function getSandbox(env = {}) {
         lazy: async function () {
         }, // 用于导出解析的默认函数
         _asyncGetRule: null,
+        _asyncGetLazy: null,
         ...utilsSanbox,
         ...drpySanbox,
         ...drpyCustomSanbox,
         ...libsSanbox,
     };
-    if (typeof fetchByHiker !== 'undefined') { // 临时解决海阔不支持eval问题，但是这个eval存在作用域问题，跟非海阔环境的有很大区别，属于残废版本
-        sandbox.eval = function (code) {
-            return vm.runInContext(code, sandbox);
-        };
-    }
-
     // 创建一个上下文
     const context = vm.createContext(sandbox);
-
     // 注入扩展代码到沙箱中
     const polyfillsScript = new vm.Script(es6_extend_code);
     polyfillsScript.runInContext(context);
 
     // 设置沙箱到全局 $
     sandbox.$.setSandbox(sandbox);
+    if (typeof fetchByHiker !== 'undefined') { // 临时解决海阔不支持eval问题，但是这个eval存在作用域问题，跟非海阔环境的有很大区别，属于残废版本
+        sandbox.eval = function (code) {
+            const evalScript = new vm.Script(code);
+            return evalScript.runInContext(context);
+        };
+    }
     return {
         sandbox,
         context
@@ -329,8 +329,19 @@ export async function initJx(filePath, env, refresh) {
         const {sandbox, context} = await getSandbox()
         // 执行文件内容，将其放入沙箱中
         const js_code = getOriginalJs(fileContent);
-        const ruleScript = new vm.Script(js_code);
+        const js_code_wrapper = `
+    _asyncGetLazy  = (async function() {
+        ${js_code}
+        return lazy;
+    })();
+    `;
+        const ruleScript = new vm.Script(js_code_wrapper);
         ruleScript.runInContext(context);
+        sandbox.lazy = await sandbox._asyncGetLazy;
+
+        // const js_code = getOriginalJs(fileContent);
+        // const ruleScript = new vm.Script(js_code);
+        // ruleScript.runInContext(context);
 
         const reqExtendScript = new vm.Script(req_extend_code);
         reqExtendScript.runInContext(context);
