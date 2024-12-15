@@ -139,7 +139,7 @@ var rule = {
         const $ = pq(html)
         const js = $('script:contains(window.wp_nonce)').html();
         const group = js.match(/(var.*)eval\((\w*\(\w*\))\)/);
-        const result = eval('const md5 = CryptoJS;'+group[1] + group[2]);
+        const result = eval('md5 = CryptoJS;'+group[1] + group[2]);
         const play_url = result.match(/url:.*?['"](.*?)['"]/)[1];
         return {parse: 0, url: play_url}
     },
