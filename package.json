@@ -6,7 +6,8 @@
   "scripts": {
     "build": "node index.js",
     "dev": "node index.js",
-    "dev-win": "chcp 65001 && node index.js"
+    "dev-win": "chcp 65001 && node index.js",
+    "package": "python package.py"
   },
   "engines": {
     "node": ">17 <23"

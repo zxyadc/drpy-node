@@ -22,6 +22,7 @@ log(qs.stringify({a: 1, b: 2}))
 6. 支持自定义解析。放在jx目录的js文件
 7. 新增虾米解析，素白白等源，优化海阔eval机制
 8. 解析支持$.import和$.require使用js目录下的lib
+9. 增加python脚本用于打包发布本地版7z文件
 
 ### 20241213
 
