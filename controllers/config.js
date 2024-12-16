@@ -1,27 +1,40 @@
 import {readdirSync, readFileSync, writeFileSync, existsSync} from 'fs';
 import path from 'path';
+import * as drpy from '../libs/drpyS.js';
 
 // 工具函数：生成 JSON 数据
-function generateSiteJSON(jsDir, requestHost) {
+async function generateSiteJSON(jsDir, requestHost) {
     const files = readdirSync(jsDir);
-    const sites = files
-        .filter((file) => file.endsWith('.js') && !file.startsWith('_')) // 筛选出不是 "_" 开头的 .js 文件
-        .map((file) => {
-            const baseName = path.basename(file, '.js'); // 去掉文件扩展名
-            const key = `drpyS_${baseName}`;
-            const name = `${baseName}(DS)`;
-            const api = `${requestHost}/api/${baseName}`;  // 使用请求的 host 地址，避免硬编码端口
-            return {
-                key,
-                name,
-                type: 4, // 固定值
-                api,
-                searchable: 1, // 固定值
-                filterable: 1, // 固定值
-                quickSearch: 0, // 固定值
-                ext: "", // 固定为空字符串
-            };
-        });
+    const valid_files = files.filter((file) => file.endsWith('.js') && !file.startsWith('_')); // 筛选出不是 "_" 开头的 .js 文件
+    let sites = [];
+    for (const file of valid_files) {
+        const baseName = path.basename(file, '.js'); // 去掉文件扩展名
+        const key = `drpyS_${baseName}`;
+        const name = `${baseName}(DS)`;
+        const api = `${requestHost}/api/${baseName}`;  // 使用请求的 host 地址，避免硬编码端口
+        let ruleObject = {
+            searchable: 1, // 固定值
+            filterable: 1, // 固定值
+            quickSearch: 0, // 固定值
+        };
+        try {
+            ruleObject = await drpy.getRuleObject(path.join(jsDir, file));
+            // log(file, ruleObject.title);
+        } catch (e) {
+            log(`file:${file} error:${e.message}`);
+        }
+        const site = {
+            key,
+            name,
+            type: 4, // 固定值
+            api,
+            searchable: ruleObject.searchable,
+            filterable: ruleObject.filterable,
+            quickSearch: ruleObject.quickSearch,
+            ext: "", // 固定为空字符串
+        };
+        sites.push(site);
+    }
     return {sites};
 }
 
@@ -82,6 +95,7 @@ export default (fastify, options, done) => {
 
     // 接口：返回配置 JSON，同时写入 index.json
     fastify.get('/config*', async (request, reply) => {
+        let t1 = (new Date()).getTime();
         const cfg_path = request.params['*']; // 捕获整个路径
         console.log(cfg_path);
         try {
@@ -91,7 +105,7 @@ export default (fastify, options, done) => {
             const port = request.socket.localPort;  // 获取当前服务的端口
             console.log('port:', port);
             let requestHost = cfg_path === '/1' ? `${protocol}://${hostname}` : `http://127.0.0.1:${options.PORT}`; // 动态生成根地址
-            const siteJSON = generateSiteJSON(options.jsDir, requestHost);
+            const siteJSON = await generateSiteJSON(options.jsDir, requestHost);
             const parseJSON = generateParseJSON(options.jxDir, requestHost);
             const configObj = {...siteJSON, ...parseJSON};
             const configStr = JSON.stringify(configObj, null, 2);
@@ -101,6 +115,8 @@ export default (fastify, options, done) => {
                     writeFileSync(options.customFilePath, configStr, 'utf8'); // 写入 index.json
                 }
             }
+            let t2 = (new Date()).getTime();
+            configObj.cost = t2 - t1;
             reply.send(configObj);
         } catch (error) {
             reply.status(500).send({error: 'Failed to generate site JSON', details: error.message});

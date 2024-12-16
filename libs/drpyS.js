@@ -57,6 +57,7 @@ const reqJsPath = path.join(__dirname, '../libs_drpy/req-extend.js');
 const req_extend_code = readFileSync(reqJsPath, 'utf8');
 // 缓存已初始化的模块和文件 hash 值
 const moduleCache = new Map();
+const ruleObjectCache = new Map();
 const jxCache = new Map();
 let pupWebview = null;
 if (typeof fetchByHiker === 'undefined') { // 判断是海阔直接放弃导入puppeteer
@@ -267,7 +268,7 @@ export async function init(filePath, env, refresh) {
         }
         log(`Loading module: ${filePath}`);
         let t1 = utils.getNowTime();
-        const {sandbox, context} = await getSandbox()
+        const {sandbox, context} = await getSandbox(env);
         // 执行文件内容，将其放入沙箱中
         const js_code = getOriginalJs(fileContent);
         const js_code_wrapper = `
@@ -310,6 +311,52 @@ export async function init(filePath, env, refresh) {
     }
 }
 
+export async function getRuleObject(filePath, env, refresh) {
+    try {
+        // 读取文件内容
+        const fileContent = await readFile(filePath, 'utf-8');
+        // 计算文件的 hash 值
+        const fileHash = computeHash(fileContent);
+
+        // 检查缓存：是否有文件且未刷新且文件 hash 未变化
+        if (ruleObjectCache.has(filePath) && !refresh) {
+            const cached = ruleObjectCache.get(filePath);
+            if (cached.hash === fileHash) {
+                // log(`Module ${filePath} already initialized and unchanged, returning cached instance.`);
+                return cached.ruleObject;
+            }
+        }
+        log(`Loading RuleObject: ${filePath}`);
+        let t1 = utils.getNowTime();
+        const {sandbox, context} = await getSandbox(env);
+        const js_code = getOriginalJs(fileContent);
+        const js_code_wrapper = `
+    _asyncGetRule  = (async function() {
+        ${js_code}
+        return rule;
+    })();
+    `;
+        const ruleScript = new vm.Script(js_code_wrapper);
+        ruleScript.runInContext(context);
+        sandbox.rule = await sandbox._asyncGetRule;
+        const rule = sandbox.rule;
+        let t2 = utils.getNowTime();
+        const ruleObject = deepCopy(rule);
+        // 设置可搜索、可筛选、可快搜等属性
+        ruleObject.searchable = ruleObject.hasOwnProperty('searchable') ? Number(ruleObject.searchable) : 1;
+        ruleObject.filterable = ruleObject.hasOwnProperty('filterable') ? Number(ruleObject.filterable) : 1;
+        ruleObject.quickSearch = ruleObject.hasOwnProperty('quickSearch') ? Number(ruleObject.quickSearch) : 0;
+        ruleObject.cost = t2 - t1;
+        // console.log(`${filePath} headers:`, moduleObject.headers);
+        // 缓存模块和文件的 hash 值
+        ruleObjectCache.set(filePath, {ruleObject, hash: fileHash});
+        return ruleObject
+    } catch (error) {
+        console.log(`${filePath} Error in drpy.getRuleObject:${error.message}`);
+        return {}
+    }
+}
+
 export async function initJx(filePath, env, refresh) {
     try {
         // 读取文件内容
@@ -326,7 +373,7 @@ export async function initJx(filePath, env, refresh) {
         }
         log(`Loading jx: ${filePath}`);
         let t1 = utils.getNowTime();
-        const {sandbox, context} = await getSandbox()
+        const {sandbox, context} = await getSandbox(env)
         // 执行文件内容，将其放入沙箱中
         const js_code = getOriginalJs(fileContent);
         const js_code_wrapper = `

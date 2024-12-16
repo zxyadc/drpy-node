@@ -184,6 +184,14 @@ export default (fastify, options, done) => {
             const statusCode = 200;
             const mediaType = 'application/json; charset=utf-8';
             if (typeof backResp === 'object') {
+                if (!backResp.code) {
+                    let statusCode = backResp.url && backResp.url !== query.url ? 200 : 404;
+                    backResp.code = statusCode
+                }
+                if (!backResp.msg) {
+                    let msgState = backResp.url && backResp.url !== query.url ? '成功' : '失败';
+                    backResp.msg = `${jxName}解析${msgState}`;
+                }
                 let t2 = (new Date()).getTime();
                 backResp.cost = t2 - t1;
                 return reply.code(statusCode).type(`${mediaType}; charset=utf-8`).send(JSON.stringify(backResp));

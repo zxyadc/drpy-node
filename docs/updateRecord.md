@@ -1,5 +1,14 @@
 # drpyS更新记录
 
+### 20241217
+
+更新至V1.0.13
+
+1. 动态计算生成配置里的 `searchable` `filterable` `quickSearch` `cost`属性
+2. 修复前面版本变更导致的 `getProxyUrl` 环境异常问题
+3. 解析的object支持返回header:{"use-agent":"Mozilla/5.0"}
+4. 解析返回object会自动添加code和msg(如果没手动指定)
+
 ### 20241216
 
 更新至V1.0.12
