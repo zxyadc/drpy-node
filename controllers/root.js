@@ -1,11 +1,14 @@
 import path from 'path';
-import {readdirSync, readFileSync, existsSync} from 'fs';
+import {readdirSync, readFileSync, writeFileSync, existsSync} from 'fs';
 import '../utils/marked.min.js';
+import {computeHash} from '../utils/utils.js';
 
 export default (fastify, options, done) => {
     // 添加 / 接口
     fastify.get('/', async (request, reply) => {
         let readmePath = null;
+        const indexHtmlPath = path.join(options.rootDir, 'public/index.html');
+        // console.log(`indexHtmlPath:${indexHtmlPath}`);
         const files = readdirSync(options.rootDir);
         // console.log(files);
         for (const file of files) {
@@ -16,10 +19,12 @@ export default (fastify, options, done) => {
         }
 
         // 如果未找到 README.md 文件
-        if (!readmePath) {
+        if (!readmePath && !process.env.VERCEL) {
             let fileHtml = files.map(file => `<li>${file}</li>`).join('');
-            reply.code(404).type('text/html;charset=utf-8').send(`<h1>README.md not found</h1><ul>${fileHtml}</ul>`);
-            return;
+            return reply.code(404).type('text/html;charset=utf-8').send(`<h1>README.md not found</h1><ul>${fileHtml}</ul>`);
+        } else if (!readmePath && process.env.VERCEL) {
+            const tmpIndexHtml = readFileSync(indexHtmlPath, 'utf-8');
+            return reply.type('text/html;charset=utf-8').send(tmpIndexHtml);
         }
 
         // 读取 README.md 文件内容
@@ -27,9 +32,7 @@ export default (fastify, options, done) => {
 
         // 将 Markdown 转换为 HTML
         const htmlContent = marked.parse(markdownContent);
-
-        // 返回 HTML 内容
-        reply.type('text/html').send(`
+        const indexHtml = `
                 <!DOCTYPE html>
                 <html lang="en">
                 <head>
@@ -41,7 +44,22 @@ export default (fastify, options, done) => {
                     ${htmlContent}
                 </body>
                 </html>
-            `);
+            `;
+        const indexHtmlHash = computeHash(indexHtml);
+        if (!existsSync(indexHtmlPath)) {
+            console.log(`将readme.md 本地文件:${indexHtmlPath}`);
+            writeFileSync(indexHtmlPath, indexHtml, 'utf8');
+        } else {
+            const tmpIndexHtml = readFileSync(indexHtmlPath, 'utf-8');
+            const tmpIndexHtmlHash = computeHash(tmpIndexHtml);
+            if (indexHtmlHash !== tmpIndexHtmlHash) {
+                console.log(`readme.md发生了改变，更新本地文件:${indexHtmlPath}`);
+                writeFileSync(indexHtmlPath, indexHtml, 'utf8');
+            }
+        }
+
+        // 返回 HTML 内容
+        reply.type('text/html;charset=utf-8').send(indexHtml);
     });
 
     // 新增 /favicon.ico 路由

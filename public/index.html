@@ -1,0 +1,59 @@
+
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>README</title>
+                </head>
+                <body>
+                    <h1 id="drpysdrpy-node">drpyS(drpy-node)</h1>
+<p>nodejs作为服务端的drpy实现。全面升级异步写法</p>
+<ul>
+<li><a href="/config">本地配置接口-动态本地</a></li>
+<li><a href="/config/1">本地配置接口-动态外网/局域网</a></li>
+<li><a href="/index">本地配置接口-静态</a></li>
+<li><a href="/admin/encoder">代码加解密工具</a></li>
+<li><a href="/authcoder?len=10&amp;number=1">V我50支付凭证生成器</a></li>
+<li><a href="/docs/httpTest.md">接口压测教程</a></li>
+<li><a href="/proxy/%E5%A4%AE%E8%A7%86%E5%A4%A7%E5%85%A8%5B%E5%AE%98%5D/index.html">央视点播解析工具</a></li>
+<li><a href="/apps/cookie-butler/index.html">cookie管理插件</a></li>
+</ul>
+<h2 id="更新记录">更新记录</h2>
+<h3 id="20241218">20241218</h3>
+<p>更新至V1.0.14</p>
+<ol>
+<li>增加源</li>
+<li>优化vercel部署兼容性</li>
+</ol>
+<p><a href="docs/updateRecord.md">点此查看完整更新记录</a></p>
+<h2 id="基础框架">基础框架</h2>
+<p>todo:</p>
+<ol>
+<li>js里的源能否去除export开头，保持跟qjs一致</li>
+<li>js里的源，像一级这种异步js，里面调用未定义的函数，能否不通过函数参数传入直接注入调用</li>
+<li>在源的各个函数调用的时候动态注入input、MY_URL等局部变量不影响全局。搞了半天没成功，有点难受，待解决</li>
+</ol>
+<p>写源的函数不可以使用箭头函数，箭头函数无法拿到this作用域就没法获取input和MY_URL变量</p>
+<p>精简去除的库:</p>
+<ol>
+<li>axios</li>
+<li>jsonpath</li>
+<li>underscore</li>
+<li>pino-pretty</li>
+<li>deasync</li>
+</ol>
+<h2 id="参考资料">参考资料</h2>
+<ul>
+<li><a href="docs/crypto-js-wasm/readme-CN.md">crypto-js-wasm使用教程</a></li>
+<li><a href="docs/pupInstall.md">puppeteer使用教程</a></li>
+<li><a href="docs/ruleAttr.md">drpyS源属性说明</a></li>
+</ul>
+<h2 id="问题说明">问题说明</h2>
+<ol>
+<li>windows上直接运行index.js可能会发现运行过程中的日志打印出中文乱码。建议通过yarn dev运行或者在package.json里点击dev脚本运行</li>
+</ol>
+
+                </body>
+                </html>
+            

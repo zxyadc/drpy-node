@@ -36,9 +36,9 @@ var rule = {
     预处理: async () => {
         let domain_config = {
             method: 'GET',
-            url: 'http://111.180.203.165:9999/d/115/jiekou.txt'
+            url: 'http://111.180.203.165:9999/d/115/jiekou.txt',
         }
-        let homeUrl = (await req(domain_config.url)).content;
+        let homeUrl = (await req(domain_config.url, {headers: {'User-Agent': 'okhttp/3.14.9'}})).content;
         log('homeUrl:', homeUrl);
         if (homeUrl) {
             rule.homeUrl = homeUrl;
@@ -154,7 +154,8 @@ var rule = {
                 let html = JSON.parse((await req(input.split('#')[0], {
                     method: 'post',
                     headers: {
-                        'User-Agent': input.split('#')[1],
+                        // 'User-Agent': input.split('#')[1],
+                        'User-Agent': '7788',
                         'Connection': 'Keep-Alive',
                         'Accept-Encoding': 'gzip',
                         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
@@ -166,7 +167,8 @@ var rule = {
                 let html = JSON.parse((await req(input.split('#')[0], {
                     method: 'post',
                     headers: {
-                        'User-Agent': input.split('#')[1],
+                        // 'User-Agent': input.split('#')[1],
+                        'User-Agent': '7788',
                         'Connection': 'Keep-Alive',
                         'Accept-Encoding': 'gzip',
                         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'

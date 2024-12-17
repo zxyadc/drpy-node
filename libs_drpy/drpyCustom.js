@@ -328,7 +328,7 @@ globalThis.fixAdM3u8Ai = async function (m3u8_url, headers) {
     if (last_url.includes(".m3u8") && last_url !== m3u8_url) {
         m3u8_url = urljoin(m3u8_url, last_url);
         log("嵌套的m3u8_url:" + m3u8_url);
-        m3u8 = (await req(m3u8_url, option)).content
+        m3u8 = (await req(m3u8_url, option)).content;
     }
     let s = m3u8.trim().split("\n").filter(it => it.trim()).join("\n");
     let ss = s.split("\n");

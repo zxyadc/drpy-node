@@ -13,11 +13,12 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 
 ## 更新记录
 
-### 20241217
+### 20241218
 
-更新至V1.0.13
+更新至V1.0.14
 
-1. 配置生成逻辑优化
+1. 增加源
+2. 优化vercel部署兼容性
 
 [点此查看完整更新记录](docs/updateRecord.md)
 
@@ -43,6 +44,7 @@ todo:
 
 * [crypto-js-wasm使用教程](docs/crypto-js-wasm/readme-CN.md)
 * [puppeteer使用教程](docs/pupInstall.md)
+* [drpyS源属性说明](docs/ruleAttr.md)
 
 ## 问题说明
 
