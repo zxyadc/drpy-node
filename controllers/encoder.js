@@ -10,6 +10,14 @@ export default (fastify, options, done) => {
             return reply.status(400).send({error: 'Missing required parameters: code and type'});
         }
 
+        // 检查文本大小
+        const textSize = Buffer.byteLength(code, 'utf8'); // 获取 UTF-8 编码的字节大小
+        if (textSize > options.MAX_TEXT_SIZE) {
+            return reply
+                .status(400)
+                .send({error: `Text content exceeds the maximum size of ${options.MAX_TEXT_SIZE / 1024} KB`});
+        }
+
         try {
             let result;
 

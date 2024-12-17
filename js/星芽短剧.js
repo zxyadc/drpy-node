@@ -6,11 +6,14 @@ var rule = {
     类型: '影视',
     title: '星芽短剧',
     desc: '星芽短剧纯js版本',
-    homeUrl: 'https://app.whjzjx.cn',
-    url: '',
+    host: 'https://app.whjzjx.cn',
+    url: '/cloud/v2/theaterfyfilter',
+    filter_url: '/home_page?theater_class_id=fyclass&type=1&{{fl.type or "class2_ids=0"}}&page_num=fypage&page_size=24',
     searchUrl: '/v3/search',
     searchable: 2,
-    quickSearch: 0,
+    quickSearch: 1,
+    filterable: 1,
+    filter: 'H4sIAAAAAAAAA6vmUgACJUMlK4VoMBMEquEssGR2aiVQWqmksiBVSQdVKi8xNxUk93zj7qfzutFlyxJzSlNRTMZuA8I4kFlPW1e8bF6BZhbCTJCS5JzE4mKj+MyUYlsDJQx1tZha8dn3snnv0x1NxNpnQrF9T/uXvFjcSqx9phTb97xvw5Pdi1+saHjWTLSthpRb+6xjxvOl84i10IjycH3Z0PZi0VpiLTSnPFxX7n+xrYvoEKXcwqd9bU/7NxGdUCnPGS+2zni6cj/RUWhGeZAunfe0ZzfRFlKeSF+29z6fMp9YC6ngwSlznq5bQKx9xsbUKGxIzvzGVMgbfS1PdxIdkcaUR+SLCT1P180l1kJLyu1rmfhsC9Glm7ERxRY+2bWJhCg0MaTchzMnPGtEr9JxWmiBxT4UkVguVPFYrloA8HqNcnwIAAA=',
     headers: {
         'User-Agent': 'okhttp/4.10.0',
         'Accept-Encoding': 'gzip',
@@ -36,41 +39,13 @@ var rule = {
         'support_h265': '1'
     },
     timeout: 5000,
+    class_name: '剧场&热播剧&会员专享&星选好剧&新剧&阳光剧场',
+    class_url: '1&2&8&7&3&5',
     play_parse: true,
     class_parse: async () => {
-        let classes = [{
-            type_id: '1',
-            type_name: '剧场',
-        }, {
-            type_id: '2',
-            type_name: '热播剧',
-        }, {
-            type_id: '8',
-            type_name: '会员专享',
-        }, {
-            type_id: '7',
-            type_name: '星选好剧',
-        }, {
-            type_id: '3',
-            type_name: '新剧'
-        }, {
-            type_id: '5',
-            type_name: '阳光剧场'
-        }];
-        return {
-            class: classes,
-        }
     },
     预处理: async () => {
-        let data = {
-            'device': '24250683a3bdb3f118dff25ba4b1cba1a',
-            'install_first_open': 'false',
-            'first_install_time': '1723214205125',
-            'last_update_time': '1723214205125',
-            'report_link_url': ''
-        };
-        let html = JSON.parse((await req('https://u.shytkjgs.com/user/v1/account/login', {
-            method: 'POST',
+        let html = await post('https://u.shytkjgs.com/user/v1/account/login', {
             headers: {
                 'User-Agent': 'okhttp/4.10.0',
                 'Accept-Encoding': 'gzip',
@@ -95,51 +70,45 @@ var rule = {
                 'ab_id': '',
                 'support_h265': '1'
             },
-            data: data
-        })).content)
+            body: "device=24250683a3bdb3f118dff25ba4b1cba1a&install_first_open=false&first_install_time=1723214205125&last_update_time=1723214205125&report_link_url="
+        });
+        html = JSON.parse(html);
         try {
             rule.headers['authorization'] = html.data.token
         } catch (e) {
             rule.headers['authorization'] = html.data.data.token
         }
-
+        log('authorization:', rule.headers['authorization']);
     },
     推荐: async () => {
         return []
     },
     一级: async function (tid, pg, filter, extend) {
-        let {MY_CATE, input} = this;
-        if (pg <= 0) pg = 1;
-        const html = JSON.parse((await req(`${rule.homeUrl}/cloud/v2/theater/home_page?theater_class_id=${tid}&type=1&class2_ids=0&page_num=${pg}&page_size=24`,
-            {
-                method: 'get',
-                headers: rule.headers
-            })).content)
-        let videos = [];
-        const data = html.data.list
-        log(data)
-        data.forEach((it) => {
-            videos.push({
+        let {input} = this;
+        let d = [];
+        let html = await request(input, {headers: rule.headers});
+        let data = JSON.parse(html).data.list;
+        data.forEach(it => {
+            let id = 'https://app.whjzjx.cn/v2/theater_parent/detail?theater_parent_id=' + it.theater.id;
+            d.push({
+                url: id,
                 title: it.theater.title,
-                url: 'https://app.whjzjx.cn/v2/theater_parent/detail?theater_parent_id=' + it.theater.id,
-                desc: it.total,
-                pic_url: it.theater.cover_url,
+                img: it.theater.cover_url,
+                desc: it.theater.theme,
             })
         })
-        return setResult(videos)
+        return setResult(d);
     },
     二级: async function (ids) {
         let {input} = this;
-        let html = JSON.parse((await req(input, {
-            method: 'get',
-            headers: rule.headers
-        })).content);
-        const data = html.data
+        let urls = [];
+        let html = await request(input, {headers: rule.headers});
+        let data = JSON.parse(html).data;
         let vod = {
             vod_id: input,
-            vod_name: data.theaters.son_title
+            vod_name: data.theaters.son_title,
+            vod_pic: data.cover_url,
         }
-        const urls = []
         let playFroms = [];
         let playUrls = [];
         data.theaters.forEach(it => {
@@ -152,24 +121,21 @@ var rule = {
         return vod
     },
     搜索: async function (wd, quick, pg) {
-        let {input} = this
-        const text = {"text": wd}
-        let html = JSON.parse((await req(`${rule.homeUrl}${input}`, {
-            method: 'post',
-            headers: rule.headers,
-            data: text
-        })).content);
-        let videos = [];
-        const data = html.data.theater.search_data
-        data.forEach((it) => {
-            videos.push({
+        let {input, KEY} = this
+        let d = [];
+        let html = await post(input, {headers: rule.headers, body: {"text": KEY}})
+        let list = JSON.parse(html).data.theater.search_data;
+        list.forEach(it => {
+            let id = 'https://app.whjzjx.cn/v2/theater_parent/detail?theater_parent_id=' + it.id;
+            d.push({
+                url: id,
                 title: it.title,
-                url: 'https://app.whjzjx.cn/v2/theater_parent/detail?theater_parent_id=' + it.id,
                 desc: it.total,
-                pic_url: it.cover_url,
+                img: it.cover_url,
+                content: it.introduction,
             })
         })
-        return setResult(videos)
+        return setResult(d);
     },
     lazy: async function (flag, id, flags) {
         let {input} = this;

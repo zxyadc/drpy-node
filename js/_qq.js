@@ -1,7 +1,17 @@
 var rule = {
-    title: '标题1',
+    title: '_qq测试源',
     description: '这是描述',
     category: '视频',
+    host:'https://github.com/hjdhnx/drpy-node',
+    headers: {
+        'User-Agent': 'PC_UA',
+    },
+    hostJs:async function(){
+        let {HOST} = this;
+        log('HOST:',HOST);
+        log('request:',typeof request);
+        return 'https://www.baidu.com';
+    },
     class_parse: async () => {
         // await CryptoJSW.MD5.loadWasm();
         const rstMD5 = CryptoJSW.MD5('message').toString();
@@ -17,11 +27,12 @@ var rule = {
     预处理: async () => {
         console.log('执行了预处理')
         rule.title = 'qq影视'
-        await local.set(rule.title, 'cookie', 'qwer1234')
+        local.set(rule.title, 'cookie', 'qwerxxxx')
 
     },
     推荐: async function (...args) {
         console.log('执行了推荐函数');
+        log('rule.title',rule.title);
         // log(typeof (getProxyUrl));
         // log(getProxyUrl());
         let {getProxyUrl} = this;
@@ -29,7 +40,8 @@ var rule = {
         console.log(typeof (jsp))
         console.log(typeof (pdfh))
         console.log('pako:', typeof (pako))
-        let html = (await req('https://www.baidu.com/', {})).content
+        // let html = (await req('https://www.baidu.com/', {})).content
+        let html = await request('https://www.baidu.com/')
         console.log(html)
         let cookie = await local.get(rule.title, 'cookie')
         console.log(cookie)

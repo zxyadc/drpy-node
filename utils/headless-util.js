@@ -7,7 +7,10 @@ class PuppeteerHelper {
     }
 
     async gotoHtml(config) {
-        this.browser = await puppeteer.launch({headless: config.headless || true}); // 可以设置为true以无头模式运行
+        this.browser = await puppeteer.launch({
+            headless: config.headless || true,
+            executablePath: process.env.CHROME_PATH
+        }); // 可以设置为true以无头模式运行
         this.page = await this.browser.newPage();
         await this.page.setExtraHTTPHeaders(config.headers || {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36',
@@ -17,7 +20,10 @@ class PuppeteerHelper {
     }
 
     async gotoCookie(config) {
-        this.browser = await puppeteer.launch({headless: config.headless || true}); // 可以设置为true以无头模式运行
+        this.browser = await puppeteer.launch({
+            headless: config.headless || true,
+            executablePath: process.env.CHROME_PATH
+        }); // 可以设置为true以无头模式运行
         this.page = await this.browser.newPage();
         await this.page.goto(config.url, config.options || {});
         // 获取当前页面的cookies

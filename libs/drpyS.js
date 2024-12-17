@@ -1,5 +1,5 @@
 import {readFile} from 'fs/promises';
-import {readFileSync} from 'fs';
+import {existsSync, readFileSync} from 'fs';
 import {fileURLToPath} from "url";
 import path from "path";
 import vm from 'vm';
@@ -9,7 +9,8 @@ import * as misc from '../utils/misc.js';
 // const { req } = await import('../utils/req.js');
 import {gbkTool} from '../libs_drpy/gbk.js'
 // import {atob, btoa, base64Encode, base64Decode, md5} from "../libs_drpy/crypto-util.js";
-import {base64Encode, base64Decode, md5} from "../libs_drpy/crypto-util.js";
+import {base64Decode, base64Encode, md5} from "../libs_drpy/crypto-util.js";
+import {getContentType, getMimeType} from "../utils/mime-type.js";
 import template from '../libs_drpy/template.js'
 import '../libs_drpy/abba.js'
 import '../libs_drpy/drpyInject.js'
@@ -24,47 +25,223 @@ import '../libs_drpy/drpyCustom.js'
 import '../libs_drpy/moduleLoader.js'
 // import '../libs_drpy/crypto-js-wasm.js'
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const _data_path = path.join(__dirname, '../data');
+
 globalThis.misc = misc;
 globalThis.utils = utils;
+globalThis.pathLib = {
+    basename: path.basename,
+    extname: path.extname,
+    readFile: function (filename) {
+        let _file_path = path.join(_data_path, filename);
+        const resolvedPath = path.resolve(_data_path, _file_path); // 将路径解析为绝对路径
+        if (!resolvedPath.startsWith(_data_path)) {
+            log(`no access for read ${_file_path}`)
+            return '';
+        }
+        // 检查文件是否存在
+        if (!existsSync(resolvedPath)) {
+            log(`file not found for read ${resolvedPath}`)
+            return '';
+        }
+        return readFileSync(resolvedPath, 'utf8')
+    },
+};
 const {sleep, sleepSync, computeHash, deepCopy, urljoin, urljoin2, joinUrl} = utils;
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const es6JsPath = path.join(__dirname, '../libs_drpy/es6-extend.js');
 // 读取扩展代码
 const es6_extend_code = readFileSync(es6JsPath, 'utf8');
+const reqJsPath = path.join(__dirname, '../libs_drpy/req-extend.js');
+// 读取网络请求扩展代码
+const req_extend_code = readFileSync(reqJsPath, 'utf8');
 // 缓存已初始化的模块和文件 hash 值
 const moduleCache = new Map();
+const ruleObjectCache = new Map();
+const jxCache = new Map();
 let pupWebview = null;
 if (typeof fetchByHiker === 'undefined') { // 判断是海阔直接放弃导入puppeteer
     try {
         // 尝试动态导入模块puppeteerHelper
-        const {puppeteerHelper} = await import('../utils/headless-util');  // 使用动态 import
+        const {puppeteerHelper} = await import('../utils/headless-util.js');  // 使用动态 import
         pupWebview = new puppeteerHelper();
         console.log('puppeteerHelper imported successfully');
     } catch (error) {
-        // console.error('Failed to import puppeteerHelper:', error);
-        console.error(`Failed to import puppeteerHelper:${error.message}`);
+        // console.log('Failed to import puppeteerHelper:', error);
+        console.log(`Failed to import puppeteerHelper:${error.message}`);
     }
 }
 globalThis.pupWebview = pupWebview;
 try {
-    if (typeof fetchByHiker === 'undefined') {
-        await import('../libs_drpy/crypto-js-wasm.js'); // 使用动态 import规避海阔报错无法运行问题
-    } else {
+    if (typeof fetchByHiker !== 'undefined' && typeof globalThis.import === 'function') {
         await globalThis.import('../libs_drpy/crypto-js-wasm.js'); // 海阔放在globalThis里去动态引入
+    } else {
+        await import('../libs_drpy/crypto-js-wasm.js'); // 使用动态 import规避海阔报错无法运行问题
     }
     globalThis.CryptoJSW = CryptoJSWasm;
 } catch (error) {
-    // console.error('Failed to import puppeteerHelper:', error);
-    console.error(`Failed to import CryptoJSWasm:${error.message}`);
+    // console.log('Failed to import puppeteerHelper:', error);
+    console.log(`Failed to import CryptoJSWasm:${error.message}`);
     globalThis.CryptoJSW = {
         loadAllWasm: async function () {
         },
-        MD5: async function (str) {
-            return md5(str)
-        },
+        // MD5: async function (str) {
+        //     return md5(str)
+        // },
+        ...CryptoJS
     };
 }
 
+export async function getSandbox(env = {}) {
+    const {getProxyUrl} = env;
+    // (可选) 加载所有 wasm 文件
+    await CryptoJSW.loadAllWasm();
+    const utilsSanbox = {
+        sleep,
+        sleepSync,
+        utils,
+        misc,
+        computeHash,
+        deepCopy,
+        urljoin,
+        urljoin2,
+        joinUrl,
+        $,
+        pupWebview,
+        getProxyUrl,
+        getContentType, getMimeType,
+    };
+    const drpySanbox = {
+        jsp,
+        pdfh,
+        pd,
+        pdfa,
+        jsoup,
+        pdfl,
+        pjfh,
+        pj,
+        pjfa,
+        pq,
+        local,
+        md5X,
+        rsaX,
+        aesX,
+        desX,
+        req,
+        batchFetch,
+        JSProxyStream,
+        JSFile,
+        js2Proxy,
+        log,
+        print,
+    };
+    const drpyCustomSanbox = {
+        MOBILE_UA,
+        PC_UA,
+        UA,
+        UC_UA,
+        IOS_UA,
+        RULE_CK,
+        CATE_EXCLUDE,
+        TAB_EXCLUDE,
+        OCR_RETRY,
+        OCR_API,
+        nodata,
+        SPECIAL_URL,
+        setResult,
+        setHomeResult,
+        setResult2,
+        urlDeal,
+        tellIsJx,
+        urlencode,
+        encodeUrl,
+        uint8ArrayToBase64,
+        Utf8ArrayToStr,
+        gzip,
+        ungzip,
+        encodeStr,
+        decodeStr,
+        getCryptoJS,
+        RSA,
+        fixAdM3u8Ai,
+        forceOrder,
+        getQuery,
+        stringify,
+        dealJson,
+        OcrApi,
+        getHome,
+        buildUrl,
+        keysToLowerCase,
+        parseQueryString,
+        encodeIfContainsSpecialChars,
+        objectToQueryString,
+    };
+
+    const libsSanbox = {
+        matchesAll,
+        cut,
+        gbkTool,
+        CryptoJS,
+        CryptoJSW,
+        JSEncrypt,
+        NODERSA,
+        pako,
+        JSON5,
+        jinja,
+        template,
+        atob,
+        btoa,
+        base64Encode,
+        base64Decode,
+        md5,
+        jsonpath,
+        hlsParser,
+        axios,
+        URL,
+        pathLib,
+        qs,
+    };
+
+    // 创建一个沙箱上下文，注入需要的全局变量和函数
+    const sandbox = {
+        console,      // 将 console 注入沙箱，便于调试
+        // eval,    // 直接引入原生 eval(不要这样用，环境是隔离的会导致执行不符合预期，需要包装)
+        WebAssembly, // 允许使用原生 WebAssembly(这里即使不引用也可以在沙箱里用这个变量。写在这里骗骗自己吧)
+        setTimeout,   // 注入定时器方法
+        setInterval,
+        clearTimeout,
+        clearInterval,
+        module: {},   // 模块支持
+        exports: {},   // 模块支持
+        rule: {}, // 用于存放导出的 rule 对象
+        lazy: async function () {
+        }, // 用于导出解析的默认函数
+        _asyncGetRule: null,
+        _asyncGetLazy: null,
+        ...utilsSanbox,
+        ...drpySanbox,
+        ...drpyCustomSanbox,
+        ...libsSanbox,
+    };
+    // 创建一个上下文
+    const context = vm.createContext(sandbox);
+    // 注入扩展代码到沙箱中
+    const polyfillsScript = new vm.Script(es6_extend_code);
+    polyfillsScript.runInContext(context);
+
+    // 设置沙箱到全局 $
+    sandbox.$.setSandbox(sandbox);
+    if (typeof fetchByHiker !== 'undefined') { // 临时解决海阔不支持eval问题，但是这个eval存在作用域问题，跟非海阔环境的有很大区别，属于残废版本
+        sandbox.eval = function (code) {
+            const evalScript = new vm.Script(code);
+            return evalScript.runInContext(context);
+        };
+    }
+    return {
+        sandbox,
+        context
+    }
+}
 
 /**
  * 初始化模块：加载并执行模块文件，存储初始化后的 rule 对象
@@ -89,121 +266,142 @@ export async function init(filePath, env, refresh) {
                 return cached.moduleObject;
             }
         }
-        const {getProxyUrl} = env;
-        // console.log('env:',env);
-        // console.log('getProxyUrl:',getProxyUrl);
-        // (可选) 加载所有 wasm 文件
-        await CryptoJSW.loadAllWasm();
-
         log(`Loading module: ${filePath}`);
         let t1 = utils.getNowTime();
-        const utilsSanbox = {
-            sleep,
-            sleepSync,
-            utils,
-            misc,
-            computeHash,
-            deepCopy,
-            urljoin,
-            urljoin2,
-            joinUrl,
-            MOBILE_UA, PC_UA, UA, UC_UA, IOS_UA, nodata,
-            setResult,
-            $,
-            pupWebview,
-            getProxyUrl,
-        };
-        const drpySanbox = {
-            jsp,
-            pdfh,
-            pd,
-            pdfa,
-            pdfl,
-            pjfh,
-            pj,
-            pjfa,
-            pq,
-            local,
-            md5X,
-            rsaX,
-            aesX,
-            desX,
-            req,
-            JSProxyStream,
-            JSFile,
-            js2Proxy,
-            log,
-            print,
-        };
-
-        const libsSanbox = {
-            matchesAll,
-            cut,
-            gbkTool,
-            CryptoJS,
-            CryptoJSW,
-            JSEncrypt,
-            NODERSA,
-            pako,
-            JSON5,
-            jinja,
-            template,
-            atob,
-            btoa,
-            base64Encode,
-            base64Decode,
-            md5,
-            jsonpath,
-        };
-
-        // 创建一个沙箱上下文，注入需要的全局变量和函数
-        const sandbox = {
-            console,      // 将 console 注入沙箱，便于调试
-            setTimeout,   // 注入定时器方法
-            setInterval,
-            clearTimeout,
-            clearInterval,
-            module: {},   // 模块支持
-            exports: {},   // 模块支持
-            rule: {}, // 用于存放导出的 rule 对象
-            ...utilsSanbox,
-            ...drpySanbox,
-            ...libsSanbox,
-        };
-
-        // 创建一个上下文
-        const context = vm.createContext(sandbox);
-
-        // 注入扩展代码到沙箱中
-        const polyfillsScript = new vm.Script(es6_extend_code);
-        polyfillsScript.runInContext(context);
-
+        const {sandbox, context} = await getSandbox(env);
         // 执行文件内容，将其放入沙箱中
         const js_code = getOriginalJs(fileContent);
-        const script = new vm.Script(js_code);
-        script.runInContext(context);
+        const js_code_wrapper = `
+    _asyncGetRule  = (async function() {
+        ${js_code}
+        return rule;
+    })();
+    `;
+        const ruleScript = new vm.Script(js_code_wrapper);
+        ruleScript.runInContext(context);
+        sandbox.rule = await sandbox._asyncGetRule;
+
+        // rule注入完毕后添加自定义req扩展request方法进入规则,这个代码里可以直接获取rule的任意对象，而且还是独立隔离的
+        const reqExtendScript = new vm.Script(req_extend_code);
+        reqExtendScript.runInContext(context);
 
         // 访问沙箱中的 rule 对象。不进行deepCopy了,避免初始化或者预处理对rule.xxx进行修改后，在其他函数里使用却没生效问题
         // const moduleObject = utils.deepCopy(sandbox.rule);
-        const moduleObject = sandbox.rule;
-        await initParse(moduleObject);
-
-        // 检查并执行 `预处理` 方法
-        if (typeof moduleObject.预处理 === 'function') {
-            log('Executing preprocessing...');
-            await moduleObject.预处理();
-        }
-
+        const rule = sandbox.rule;
+        await initParse(rule, vm, context);
+        // otherScript放入到initParse去执行
+//         const otherScript = new vm.Script(`
+// globalThis.jsp = new jsoup(rule.host||'');
+// globalThis.pdfh = pdfh;
+// globalThis.pd = pd;
+// globalThis.pdfa = pdfa;
+// globalThis.HOST = rule.host||'';
+//         `);
+//         otherScript.runInContext(context);
         let t2 = utils.getNowTime();
+        const moduleObject = utils.deepCopy(rule);
         moduleObject.cost = t2 - t1;
         // console.log(`${filePath} headers:`, moduleObject.headers);
-
         // 缓存模块和文件的 hash 值
         moduleCache.set(filePath, {moduleObject, hash: fileHash});
         return moduleObject;
     } catch (error) {
-        console.error('Error in drpy.init:', error);
+        console.log('Error in drpy.init:', error);
         throw new Error(`Failed to initialize module:${error.message}`);
+    }
+}
+
+export async function getRuleObject(filePath, env, refresh) {
+    try {
+        // 读取文件内容
+        const fileContent = await readFile(filePath, 'utf-8');
+        // 计算文件的 hash 值
+        const fileHash = computeHash(fileContent);
+
+        // 检查缓存：是否有文件且未刷新且文件 hash 未变化
+        if (ruleObjectCache.has(filePath) && !refresh) {
+            const cached = ruleObjectCache.get(filePath);
+            if (cached.hash === fileHash) {
+                // log(`Module ${filePath} already initialized and unchanged, returning cached instance.`);
+                return cached.ruleObject;
+            }
+        }
+        log(`Loading RuleObject: ${filePath}`);
+        let t1 = utils.getNowTime();
+        const {sandbox, context} = await getSandbox(env);
+        const js_code = getOriginalJs(fileContent);
+        const js_code_wrapper = `
+    _asyncGetRule  = (async function() {
+        ${js_code}
+        return rule;
+    })();
+    `;
+        const ruleScript = new vm.Script(js_code_wrapper);
+        ruleScript.runInContext(context);
+        sandbox.rule = await sandbox._asyncGetRule;
+        const rule = sandbox.rule;
+        let t2 = utils.getNowTime();
+        const ruleObject = deepCopy(rule);
+        // 设置可搜索、可筛选、可快搜等属性
+        ruleObject.searchable = ruleObject.hasOwnProperty('searchable') ? Number(ruleObject.searchable) : 1;
+        ruleObject.filterable = ruleObject.hasOwnProperty('filterable') ? Number(ruleObject.filterable) : 1;
+        ruleObject.quickSearch = ruleObject.hasOwnProperty('quickSearch') ? Number(ruleObject.quickSearch) : 0;
+        ruleObject.cost = t2 - t1;
+        // console.log(`${filePath} headers:`, moduleObject.headers);
+        // 缓存模块和文件的 hash 值
+        ruleObjectCache.set(filePath, {ruleObject, hash: fileHash});
+        return ruleObject
+    } catch (error) {
+        console.log(`${filePath} Error in drpy.getRuleObject:${error.message}`);
+        return {}
+    }
+}
+
+export async function initJx(filePath, env, refresh) {
+    try {
+        // 读取文件内容
+        const fileContent = await readFile(filePath, 'utf-8');
+        // 计算文件的 hash 值
+        const fileHash = computeHash(fileContent);
+        // 检查缓存：是否有文件且未刷新且文件 hash 未变化
+        if (jxCache.has(filePath) && !refresh) {
+            const cached = jxCache.get(filePath);
+            if (cached.hash === fileHash) {
+                // log(`Module ${filePath} already initialized and unchanged, returning cached instance.`);
+                return cached.lazy;
+            }
+        }
+        log(`Loading jx: ${filePath}`);
+        let t1 = utils.getNowTime();
+        const {sandbox, context} = await getSandbox(env)
+        // 执行文件内容，将其放入沙箱中
+        const js_code = getOriginalJs(fileContent);
+        const js_code_wrapper = `
+    _asyncGetLazy  = (async function() {
+        ${js_code}
+        return lazy;
+    })();
+    `;
+        const ruleScript = new vm.Script(js_code_wrapper);
+        ruleScript.runInContext(context);
+        sandbox.lazy = await sandbox._asyncGetLazy;
+
+        // const js_code = getOriginalJs(fileContent);
+        // const ruleScript = new vm.Script(js_code);
+        // ruleScript.runInContext(context);
+
+        const reqExtendScript = new vm.Script(req_extend_code);
+        reqExtendScript.runInContext(context);
+
+        let t2 = utils.getNowTime();
+        const lazy = sandbox.lazy;
+        const cost = t2 - t1;
+        console.log(`加载解析:${filePath} 耗时 ${cost}毫秒`)
+        jxCache.set(filePath, {lazy, hash: fileHash});
+        return lazy;
+    } catch (error) {
+        console.log('Error in drpy.initJx:', error);
+        throw new Error(`Failed to initialize jx:${error.message}`);
     }
 }
 
@@ -226,19 +424,22 @@ async function invokeWithInjectVars(rule, method, injectVars, args) {
     let result = await method.apply(injectVars, args);  // 使用 apply 临时注入 injectVars 作为上下文，并执行方法
     switch (injectVars['method']) {
         case 'class_parse':
-            result = await homeParseAfter(result, rule.类型);
+            result = await homeParseAfter(result, rule.类型, rule.hikerListCol, rule.hikerClassListCol, injectVars);
             break;
         case '一级':
             result = await cateParseAfter(result, args[1]);
+            console.log(`一级 ${injectVars.input} 执行完毕,结果为:`, JSON.stringify(result.list.slice(0, 2)));
             break;
         case '二级':
             result = await detailParseAfter(result);
             break;
         case '搜索':
             result = await searchParseAfter(result, args[2]);
+            console.log(`搜索 ${injectVars.input} 执行完毕,结果为:`, JSON.stringify(result.list.slice(0, 2)));
             break;
         case 'lazy':
             result = await playParseAfter(rule, result, args[1], args[0]);
+            console.log(`免嗅 ${injectVars.input} 执行完毕,结果为:`, JSON.stringify(result));
             break;
     }
     return result
@@ -256,6 +457,18 @@ async function invokeWithInjectVars(rule, method, injectVars, args) {
 async function invokeMethod(filePath, env, method, args = [], injectVars = {}) {
     const moduleObject = await init(filePath, env); // 确保模块已初始化
     switch (method) {
+        case 'class_parse':
+            injectVars = await homeParse(moduleObject, ...args);
+            if (!injectVars) {
+                return {}
+            }
+            break
+        case '推荐':
+            injectVars = await homeVodParse(moduleObject, ...args);
+            if (!injectVars) {
+                return {}
+            }
+            break
         case '一级':
             injectVars = await cateParse(moduleObject, ...args);
             if (!injectVars) {
@@ -293,13 +506,36 @@ async function invokeMethod(filePath, env, method, args = [], injectVars = {}) {
     if (moduleObject[method] && typeof moduleObject[method] === 'function') {
         // console.log('injectVars:', injectVars);
         return await invokeWithInjectVars(moduleObject, moduleObject[method], injectVars, args);
+    } else if (!moduleObject[method] && method === 'class_parse') { // 新增特性，可以不写class_parse属性
+        const tmpClassFunction = async function () {
+        };
+        return await invokeWithInjectVars(moduleObject, tmpClassFunction, injectVars, args);
     } else {
-        throw new Error(`Method ${method} not found in module ${filePath}`);
+        if (['推荐', '一级', '搜索'].includes(method)) {
+            return []
+        } else if (['二级', 'lazy'].includes(method)) {
+            return {}
+        } else {  // class_parse一定要有，这样即使不返回数据都能自动取class_name和class_url的内容
+            throw new Error(`Method ${method} not found in module ${filePath}`);
+        }
     }
 }
 
-async function initParse(rule) {
+async function initParse(rule, vm, context) {
     rule.host = (rule.host || '').rstrip('/');
+    // 检查并执行 `hostJs` 方法
+    if (typeof rule.hostJs === 'function') {
+        log('Executing hostJs...');
+        try {
+            let HOST = await rule.hostJs.apply({input: rule.host, MY_URL: rule.host, HOST: rule.host});
+            if (HOST) {
+                rule.host = HOST.rstrip('/');
+                log(`已动态设置规则【${rule.title}】的host为: ${rule.host}`);
+            }
+        } catch (e) {
+            log(`hostJs执行错误:${e.message}`);
+        }
+    }
     let rule_cate_excludes = (rule.cate_exclude || '').split('|').filter(it => it.trim());
     let rule_tab_excludes = (rule.tab_exclude || '').split('|').filter(it => it.trim());
     rule_cate_excludes = rule_cate_excludes.concat(CATE_EXCLUDE.split('|').filter(it => it.trim()));
@@ -385,12 +621,115 @@ async function initParse(rule) {
     } else {
         rule.headers = {}
     }
+    // 新版放入规则内部
+    rule.oheaders = deepCopy(rule.headers);
+    rule.rule_fetch_params = {'headers': rule.headers, 'timeout': rule.timeout, 'encoding': rule.encoding};
+    const originalScript = new vm.Script(`
+globalThis.oheaders = rule.oheaders
+globalThis.rule_fetch_params = rule.rule_fetch_params;
+        `);
+    originalScript.runInContext(context);
+
+    // 检查并执行 `预处理` 方法
+    if (typeof rule.预处理 === 'function') {
+        log('Executing 预处理...');
+        await rule.预处理();
+    }
+
+    const otherScript = new vm.Script(`
+globalThis.jsp = new jsoup(rule.host||'');
+globalThis.pdfh = pdfh;
+globalThis.pd = pd;
+globalThis.pdfa = pdfa;
+globalThis.HOST = rule.host||'';
+        `);
+    otherScript.runInContext(context);
     return rule
 }
 
-async function homeParseAfter(d, _type) {
+async function homeParse(rule) {
+    let url = rule.homeUrl;
+    if (typeof (rule.filter) === 'string' && rule.filter.trim().length > 0) {
+        try {
+            let filter_json = ungzip(rule.filter.trim());
+            rule.filter = JSON.parse(filter_json);
+        } catch (e) {
+            rule.filter = {};
+        }
+    }
+    let classes = [];
+    if (rule.class_name && rule.class_url) {
+        let names = rule.class_name.split('&');
+        let urls = rule.class_url.split('&');
+        let cnt = Math.min(names.length, urls.length);
+        for (let i = 0; i < cnt; i++) {
+            classes.push({
+                'type_id': urls[i],
+                'type_name': names[i]
+            });
+        }
+    }
+    const jsp = new jsoup(url);
+    return {
+        TYPE: 'home',
+        input: url,
+        MY_URL: url,
+        classes: classes,
+        filters: rule.filter,
+        cate_exclude: rule.cate_exclude,
+        fetch_params: deepCopy(rule.rule_fetch_params),
+        jsp: jsp,
+        pdfh: jsp.pdfh.bind(jsp),
+        pdfa: jsp.pdfa.bind(jsp),
+        pd: jsp.pd.bind(jsp),
+    }
+
+}
+
+async function homeParseAfter(d, _type, hikerListCol, hikerClassListCol, injectVars) {
+    if (!d) {
+        d = {};
+    }
     d.type = _type || '影视';
+    if (hikerListCol) {
+        d.hikerListCol = hikerListCol;
+    }
+    if (hikerClassListCol) {
+        d.hikerClassListCol = hikerClassListCol;
+    }
+    const {
+        classes,
+        filters,
+        cate_exclude
+    } = injectVars;
+    if (!Array.isArray(d.class)) {
+        d.class = classes;
+    }
+    if (!d.filters) {
+        d.filters = filters;
+    }
+    if (!d.list) {
+        d.list = [];
+    }
+    d.class = d.class.filter(it => !cate_exclude || !(new RegExp(cate_exclude).test(it.type_name)));
     return d
+}
+
+async function homeVodParse(rule) {
+    let url = rule.homeUrl;
+    const jsp = new jsoup(url);
+    return {
+        TYPE: 'home',
+        input: url,
+        MY_URL: url,
+        HOST: rule.host,
+        double: rule.double,
+        fetch_params: deepCopy(rule.rule_fetch_params),
+        jsp: jsp,
+        pdfh: jsp.pdfh.bind(jsp),
+        pdfa: jsp.pdfa.bind(jsp),
+        pd: jsp.pd.bind(jsp),
+    }
 }
 
 async function cateParse(rule, tid, pg, filter, extend) {
@@ -439,13 +778,19 @@ async function cateParse(rule, tid, pg, filter, extend) {
             url = url.replaceAll('fypage', pg);
         }
     }
+    const jsp = new jsoup(url);
     return {
         MY_CATE: tid,
         MY_FL: extend,
         TYPE: 'cate',
         input: url,
         MY_URL: url,
-        MY_PAGE: pg
+        MY_PAGE: pg,
+        fetch_params: deepCopy(rule.rule_fetch_params),
+        jsp: jsp,
+        pdfh: jsp.pdfh.bind(jsp),
+        pdfa: jsp.pdfa.bind(jsp),
+        pd: jsp.pd.bind(jsp),
     }
 }
 
@@ -478,11 +823,19 @@ async function detailParse(rule, ids) {
     } else {
         url = detailUrl
     }
+    const jsp = new jsoup(url);
     return {
         TYPE: 'detail',
         input: url,
         vid: vid,
+        orId: orId,
         MY_URL: url,
+        fetch_params: deepCopy(rule.rule_fetch_params),
+        jsp: jsp,
+        pdfh: jsp.pdfh.bind(jsp),
+        pdfa: jsp.pdfa.bind(jsp),
+        pd: jsp.pd.bind(jsp),
+        pdfl: jsp.pdfl.bind(jsp), // 二级绑定pdfl函数
     }
 }
 
@@ -526,7 +879,7 @@ async function searchParse(rule, wd, quick, pg) {
             url = url.replaceAll('fypage', pg);
         }
     }
-
+    const jsp = new jsoup(url);
     return {
         TYPE: 'search',
         MY_PAGE: pg,
@@ -534,6 +887,11 @@ async function searchParse(rule, wd, quick, pg) {
         input: url,
         MY_URL: url,
         detailUrl: rule.detailUrl || '',
+        fetch_params: deepCopy(rule.rule_fetch_params),
+        jsp: jsp,
+        pdfh: jsp.pdfh.bind(jsp),
+        pdfa: jsp.pdfa.bind(jsp),
+        pd: jsp.pd.bind(jsp),
     }
 
 }
@@ -560,12 +918,18 @@ async function playParse(rule, flag, id, flags) {
     }
     url = decodeURIComponent(url);
     // log('playParse:', url)
+    const jsp = new jsoup(url);
     return {
         TYPE: 'play',
         MY_FLAG: flag,
         flag: flag,
         input: url,
         MY_URL: url,
+        fetch_params: deepCopy(rule.rule_fetch_params),
+        jsp: jsp,
+        pdfh: jsp.pdfh.bind(jsp),
+        pdfa: jsp.pdfa.bind(jsp),
+        pd: jsp.pd.bind(jsp),
     }
 }
 
@@ -686,6 +1050,16 @@ export async function proxy(filePath, env, params) {
     }
 }
 
+export async function jx(filePath, env, params) {
+    params = params || {};
+    try {
+        const lazy = await initJx(filePath, env); // 确保模块已初始化
+        return await lazy(params.url || '', params)
+    } catch (e) {
+        return {code: 404, url: '', msg: `${filePath} 代理解析错误:${e.message}`, cost: ''}
+    }
+}
+
 /**
  * 获取加密前的原始的js源文本
  * @param js_code
@@ -787,4 +1161,19 @@ export const jsEncoder = {
         let rsa_private_key = 'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCqin/jUpqM6+fgYP/oMqj9zcdHMM0mEZXLeTyixIJWP53lzJV2N2E3OP6BBpUmq2O1a9aLnTIbADBaTulTNiOnVGoNG58umBnupnbmmF8iARbDp2mTzdMMeEgLdrfXS6Y3VvazKYALP8EhEQykQVarexR78vRq7ltY3quXx7cgI0ROfZz5Sw3UOLQJ+VoWmwIxu9AMEZLVzFDQN93hzuzs3tNyHK6xspBGB7zGbwCg+TKi0JeqPDrXxYUpAz1cQ/MO+Da0WgvkXnvrry8NQROHejdLVOAslgr6vYthH9bKbsGyNY3H+P12kcxo9RAcVveONnZbcMyxjtF5dWblaernAgMBAAECggEAGdEHlSEPFmAr5PKqKrtoi6tYDHXdyHKHC5tZy4YV+Pp+a6gxxAiUJejx1hRqBcWSPYeKne35BM9dgn5JofgjI5SKzVsuGL6bxl3ayAOu+xXRHWM9f0t8NHoM5fdd0zC3g88dX3fb01geY2QSVtcxSJpEOpNH3twgZe6naT2pgiq1S4okpkpldJPo5GYWGKMCHSLnKGyhwS76gF8bTPLoay9Jxk70uv6BDUMlA4ICENjmsYtd3oirWwLwYMEJbSFMlyJvB7hjOjR/4RpT4FPnlSsIpuRtkCYXD4jdhxGlvpXREw97UF2wwnEUnfgiZJ2FT/MWmvGGoaV/CfboLsLZuQKBgQDTNZdJrs8dbijynHZuuRwvXvwC03GDpEJO6c1tbZ1s9wjRyOZjBbQFRjDgFeWs9/T1aNBLUrgsQL9c9nzgUziXjr1Nmu52I0Mwxi13Km/q3mT+aQfdgNdu6ojsI5apQQHnN/9yMhF6sNHg63YOpH+b+1bGRCtr1XubuLlumKKscwKBgQDOtQ2lQjMtwsqJmyiyRLiUOChtvQ5XI7B2mhKCGi8kZ+WEAbNQcmThPesVzW+puER6D4Ar4hgsh9gCeuTaOzbRfZ+RLn3Aksu2WJEzfs6UrGvm6DU1INn0z/tPYRAwPX7sxoZZGxqML/z+/yQdf2DREoPdClcDa2Lmf1KpHdB+vQKBgBXFCVHz7a8n4pqXG/HvrIMJdEpKRwH9lUQS/zSPPtGzaLpOzchZFyQQBwuh1imM6Te+VPHeldMh3VeUpGxux39/m+160adlnRBS7O7CdgSsZZZ/dusS06HAFNraFDZf1/VgJTk9BeYygX+AZYu+0tReBKSs9BjKSVJUqPBIVUQXAoGBAJcZ7J6oVMcXxHxwqoAeEhtvLcaCU9BJK36XQ/5M67ceJ72mjJC6/plUbNukMAMNyyi62gO6I9exearecRpB/OGIhjNXm99Ar59dAM9228X8gGfryLFMkWcO/fNZzb6lxXmJ6b2LPY3KqpMwqRLTAU/zy+ax30eFoWdDHYa4X6e1AoGAfa8asVGOJ8GL9dlWufEeFkDEDKO9ww5GdnpN+wqLwePWqeJhWCHad7bge6SnlylJp5aZXl1+YaBTtOskC4Whq9TP2J+dNIgxsaF5EFZQJr8Xv+lY9lu0CruYOh9nTNF9x3nubxJgaSid/7yRPfAGnsJRiknB5bsrCvgsFQFjJVs=';
         return RSA.encode(text, rsa_private_key, null);
     }
+};
+
+export const jsDecoder = {
+    aes_decrypt: function (data) {
+        let key = CryptoJS.enc.Hex.parse("686A64686E780A0A0A0A0A0A0A0A0A0A");
+        let iv = CryptoJS.enc.Hex.parse("647A797964730A0A0A0A0A0A0A0A0A0A");
+        let encrypted = CryptoJS.AES.decrypt({
+            ciphertext: CryptoJS.enc.Base64.parse(data)
+        }, key, {
+            iv: iv,
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        }).toString(CryptoJS.enc.Utf8);
+        return encrypted;
+    },
 };

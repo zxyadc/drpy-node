@@ -165,7 +165,7 @@ var rule = {
                     tsUrls.push(line)
                 }
             })
-            m3u8_text = tsUrls.join('\n')
+            let m3u8_text = tsUrls.join('\n')
             return [200,'application/vnd.apple.mpegurl', m3u8_text];
         }
     },

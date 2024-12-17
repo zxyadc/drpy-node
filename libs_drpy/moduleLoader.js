@@ -1,135 +1,122 @@
 import {readFileSync, existsSync} from 'fs';
 import path from "path";
 import {fileURLToPath} from "url";
-import axios from "./axios.min.js"; // 引入 axios
-// import deasync from "deasync"; // 使用 deasync 实现同步行为
+import axios from 'axios';
+import fetchSync from 'sync-fetch';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// 创建一个函数，接受一个回调来模拟同步行为
-function fetchModuleCodeSync(jsm_path) {
-    let result = null;
-    let error = null;
+// 公共函数：加载本地模块代码
+function loadLocalModule(jsm_path) {
+    const fullPath = path.join(__dirname, '../js', jsm_path);
 
-    // 返回一个 Promise，用于等待异步请求完成
-    return new Promise((resolve, reject) => {
-        axios.get(jsm_path)
-            .then((response) => {
-                result = response.data;  // 保存结果
-                resolve(result);  // 成功时 resolve
-            })
-            .catch((err) => {
-                error = new Error(`Error fetching module from URL: ${err.message}`);  // 错误信息
-                reject(error);  // 失败时 reject
-            });
-    });
+    if (!existsSync(fullPath)) {
+        throw new Error(`Module not found: ${fullPath}`);
+    }
+
+    const baseName = path.basename(fullPath);
+    if (!baseName.startsWith('_lib')) {
+        throw new Error(`Invalid module name: ${baseName}. Module names must start with "_lib".`);
+    }
+
+    return readFileSync(fullPath, 'utf8');
 }
 
-// 模拟同步的处理方法
-function requireModule(jsm_path) {
-    let result = null;
-    let error = null;
-
-    // 阻塞直到 Promise 完成
+// 公共函数：加载远程模块代码
+async function loadRemoteModule(jsm_path) {
     try {
-        result = fetchModuleCodeSync(jsm_path);  // 等待异步请求完成
-        result.then(data => {
-            console.log("Module Code:", data);
-        }).catch(err => {
-            throw err;
+        const response = await axios.get(jsm_path, {
+            headers: {
+                'user-agent': 'Mozilla/5.0',
+            },
+            timeout: 5000,
         });
-    } catch (err) {
-        error = err;
-        console.error(error.message);
+        return response.data;
+    } catch (error) {
+        throw new Error(`Failed to fetch remote module: ${error.message}`);
     }
-
-    return result;  // 返回模块内容
 }
 
-globalThis.$ = {
-    /**
-     * 加载指定的 JavaScript 模块
-     * @param {string} jsm_path - 模块路径或网络地址
-     * @returns {any} - 模块的导出内容
-     * @throws {Error} - 如果路径不存在或模块未导出内容，则抛出错误
-     */
-    require(jsm_path) {
-        let js_code;
-
-        // 检测是否为网络地址
-        const isURL = /^(https?:)?\/\//.test(jsm_path);
-
-        if (isURL) {
-            // 从网络同步获取模块代码
-            /*
-            let error = null;
-            let result = null;
-
-            axios.get(jsm_path)
-                .then((response) => {
-                    result = response.data;
-                })
-                .catch((err) => {
-                    error = new Error(`Error fetching module from URL: ${err.message}`);
-                });
-
-            // 等待 Promise 解决
-            deasync.loopWhile(() => !result && !error);
-
-            if (error) throw error;
-
-            js_code = result;
-            */
-            js_code = requireModule(jsm_path);
-        } else {
-            // 本地路径处理
-            jsm_path = path.join(__dirname, '../js', jsm_path);
-
-            // 检查文件是否存在
-            if (!existsSync(jsm_path)) {
-                throw new Error(`Module not found: ${jsm_path}`);
+// 执行模块代码并导出
+function executeModule(js_code, sandbox) {
+    const script = `
+        (function () {
+            try {
+                ${js_code}
+            } catch (err) {
+                throw new Error("Error executing module script: " + err.message);
             }
-
-            // 检查基本文件名是否以 "_lib" 开头
-            const baseName = path.basename(jsm_path);
-            if (!baseName.startsWith('_lib')) {
-                throw new Error(`Invalid module name: ${baseName}. Module names must start with "_lib".`);
-            }
-
-            // 读取文件内容
-            js_code = readFileSync(jsm_path, 'utf8');
+        })();
+    `;
+    // 如果下面沙箱代码执行后无法让模块正确继承原型链方法，还是用eval吧
+    // eval(script);
+    const scriptRunner = new Function('sandbox', `
+        with (sandbox) {
+            ${script}
         }
-
-        // 创建沙箱环境
-        const sandbox = {
-            console,
-            $,
-            exports: {},
-            module: {exports: {}}
-        };
-
-        try {
-            // 在沙箱中执行代码
-            const script = `
-                (function () {
-                    try {
-                        ${js_code}
-                    } catch (err) {
-                        throw new Error("Error executing module script: " + err.message);
-                    }
-                })();
-            `;
-            eval(script);
-        } catch (error) {
-            throw new Error(`Failed to execute script: ${error.message}`);
-        }
-
-        // 检查是否正确设置了 $.exports
-        if (!$.exports || Object.keys($.exports).length === 0) {
-            throw new Error(`Module did not export anything.`);
-        }
-
-        // 返回导出的内容
-        return $.exports;
+    `);
+    scriptRunner(sandbox);
+    if (!$.exports || Object.keys($.exports).length === 0) {
+        throw new Error(`Module did not export anything.`);
     }
-};
+    return $.exports;
+}
+
+// 全局 $ 对象
+(function () {
+    let currentSandbox = null; // 存储当前沙箱上下文
+
+    globalThis.$ = {
+        /**
+         * 设置当前沙箱
+         * @param {Object} sandbox - 沙箱上下文
+         */
+        setSandbox(sandbox) {
+            currentSandbox = sandbox;
+        },
+
+        /**
+         * 异步加载模块
+         * @param {string} jsm_path - 模块路径或网络地址
+         * @returns {Promise<any>} - 模块的导出内容
+         */
+        async import(jsm_path) {
+            if (!currentSandbox) {
+                throw new Error("No sandbox context set. Use $.setSandbox before calling $.import.");
+            }
+
+            const isURL = /^(https?:)?\/\//.test(jsm_path);
+            let js_code;
+
+            if (isURL) {
+                js_code = await loadRemoteModule(jsm_path);
+            } else {
+                js_code = loadLocalModule(jsm_path);
+            }
+
+            return executeModule(js_code, currentSandbox);
+        },
+
+        /**
+         * 同步加载模块
+         * @param {string} jsm_path - 模块路径或网络地址
+         * @returns {any} - 模块的导出内容
+         */
+        require(jsm_path) {
+            if (!currentSandbox) {
+                throw new Error("No sandbox context set. Use $.setSandbox before calling $.require.");
+            }
+
+            const isURL = /^(https?:)?\/\//.test(jsm_path);
+            let js_code;
+
+            if (isURL) {
+                js_code = fetchSync(jsm_path).text();
+            } else {
+                js_code = loadLocalModule(jsm_path);
+            }
+
+            return executeModule(js_code, currentSandbox);
+        },
+    };
+})();

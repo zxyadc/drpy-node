@@ -33,11 +33,13 @@ export default (fastify, options, done) => {
 
             if ('ac' in query && 't' in query) {
                 let ext = query.ext;
+                // console.log('ext:', ext);
                 let extend = {};
                 if (ext) {
                     try {
                         extend = JSON.parse(base64Decode(ext))
                     } catch (e) {
+                        fastify.log.error(`筛选参数错误:${e.message}`);
                     }
                 }
                 // 分类逻辑
@@ -70,18 +72,21 @@ export default (fastify, options, done) => {
             const filter = 'filter' in query ? query.filter : 1;
             const resultHome = await drpy.home(modulePath, env, filter);
             const resultHomeVod = await drpy.homeVod(modulePath, env);
-            const result = {
+            let result = {
                 ...resultHome,
-                list: resultHomeVod,
+                // list: resultHomeVod,
             };
+            if (Array.isArray(resultHomeVod) && resultHomeVod.length > 0) {
+                Object.assign(result, {list: resultHomeVod})
+            }
 
             reply.send(result);
 
         } catch (error) {
-            // console.error('Error processing request:', error);
+            // console.log('Error processing request:', error);
             // reply.status(500).send({error: `Failed to process request for module ${moduleName}: ${error.message}`});
 
-            fastify.log.error(`Error processing module ${moduleName}:`, error);
+            fastify.log.error(`Error api module ${moduleName}:${error.message}`);
             reply.status(500).send({error: `Failed to process module ${moduleName}: ${error.message}`});
         }
     });
@@ -94,22 +99,22 @@ export default (fastify, options, done) => {
             reply.status(404).send({error: `Module ${moduleName} not found`});
             return;
         }
-        const proxy_url = request.params['*']; // 捕获整个路径
-        fastify.log.info(`try proxy for ${moduleName} -> ${proxy_url}:`);
+        const proxyPath = request.params['*']; // 捕获整个路径
+        fastify.log.info(`try proxy for ${moduleName} -> ${proxyPath}: ${JSON.stringify(query)}`);
         const protocol = request.protocol;
         const hostname = request.hostname;
-        const proxyUrl = `${protocol}://${hostname}${request.url}`.split('?')[0].replace(proxy_url, '') + '?do=js';
+        const proxyUrl = `${protocol}://${hostname}${request.url}`.split('?')[0].replace(proxyPath, '') + '?do=js';
         // console.log(`proxyUrl:${proxyUrl}`);
         const env = {
-            proxyUrl, getProxyUrl: function () {
+            proxyUrl, proxyPath, getProxyUrl: function () {
                 return proxyUrl
-            }
+            },
         };
         try {
             const backRespList = await drpy.proxy(modulePath, env, query);
             const statusCode = backRespList[0];
-            const mediaType = backRespList[1];
-            let content = backRespList[2];
+            const mediaType = backRespList[1] || 'application/octet-stream';
+            let content = backRespList[2] || '';
             const headers = backRespList.length > 3 ? backRespList[3] : null;
             const toBytes = backRespList.length > 4 ? backRespList[4] : null;
             // 如果需要转换为字节内容
@@ -127,7 +132,7 @@ export default (fastify, options, done) => {
             // 根据媒体类型来决定如何设置字符编码
             if (typeof content === 'string') {
                 // 如果返回的是文本内容（例如 JSON 或字符串）
-                if (mediaType.includes('text') || mediaType === 'application/json') {
+                if (mediaType && (mediaType.includes('text') || mediaType === 'application/json')) {
                     // 对于文本类型，设置 UTF-8 编码
                     reply
                         .code(statusCode)
@@ -152,8 +157,62 @@ export default (fastify, options, done) => {
             }
 
         } catch (error) {
-            fastify.log.error(`Error proxy module ${moduleName}:`, error);
+            fastify.log.error(`Error proxy module ${moduleName}:${error.message}`);
             reply.status(500).send({error: `Failed to proxy module ${moduleName}: ${error.message}`});
+        }
+    });
+
+
+    fastify.get('/parse/:jx', async (request, reply) => {
+        let t1 = (new Date()).getTime();
+        const jxName = request.params.jx;
+        const query = request.query; // 获取 query 参数
+        const jxPath = path.join(options.jxDir, `${jxName}.js`);
+        if (!existsSync(jxPath)) {
+            return reply.status(404).send({error: `解析 ${jxName} not found`});
+        }
+        const protocol = request.protocol;
+        const hostname = request.hostname;
+        const proxyUrl = `${protocol}://${hostname}${request.url}`.split('?')[0].replace('/parse/', '/proxy/') + '/?do=js';
+        const env = {
+            proxyUrl, getProxyUrl: function () {
+                return proxyUrl
+            }
+        };
+        try {
+            const backResp = await drpy.jx(jxPath, env, query);
+            const statusCode = 200;
+            const mediaType = 'application/json; charset=utf-8';
+            if (typeof backResp === 'object') {
+                if (!backResp.code) {
+                    let statusCode = backResp.url && backResp.url !== query.url ? 200 : 404;
+                    backResp.code = statusCode
+                }
+                if (!backResp.msg) {
+                    let msgState = backResp.url && backResp.url !== query.url ? '成功' : '失败';
+                    backResp.msg = `${jxName}解析${msgState}`;
+                }
+                let t2 = (new Date()).getTime();
+                backResp.cost = t2 - t1;
+                return reply.code(statusCode).type(`${mediaType}; charset=utf-8`).send(JSON.stringify(backResp));
+            } else if (typeof backResp === 'string') {
+                let statusCode = backResp && backResp !== query.url ? 200 : 404;
+                let msgState = backResp && backResp !== query.url ? '成功' : '失败';
+                let t2 = (new Date()).getTime();
+                let result = {
+                    code: statusCode,
+                    url: backResp,
+                    msg: `${jxName}解析${msgState}`,
+                    cost: t2 - t1
+                }
+                return reply.code(statusCode).type(`${mediaType}; charset=utf-8`).send(JSON.stringify(result));
+            } else {
+                return reply.status(404).send({error: `${jxName}解析失败`});
+            }
+
+        } catch (error) {
+            fastify.log.error(`Error proxy jx ${jxName}:${error.message}`);
+            reply.status(500).send({error: `Failed to proxy jx ${jxName}: ${error.message}`});
         }
     });
     done();
