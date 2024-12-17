@@ -19,11 +19,11 @@ export default (fastify, options, done) => {
                 .send({error: `Text content exceeds the maximum size of ${options.MAX_TEXT_SIZE / 1024} KB`});
         }
 
-        const authFilePath = path.join(options.rootDir, 'nomedia.txt');
+        const authFilePath = path.join(options.rootDir, 'public/nomedia.txt');
 
         // 检查文件是否存在
         if (!existsSync(authFilePath)) {
-            return reply.status(404).send({error: 'nomedia.txt file not found'});
+            return reply.status(404).send({error: 'public/nomedia.txt file not found'});
         }
         try {
             const local_auto_code = readFileSync(authFilePath, 'utf-8').trim();
