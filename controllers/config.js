@@ -100,7 +100,7 @@ export default (fastify, options, done) => {
         console.log(cfg_path);
         try {
             // 获取主机名，协议及端口
-            const protocol = request.protocol;  // http 或 https
+            const protocol = request.headers['x-forwarded-proto'] || (request.socket.encrypted ? 'https' : 'http');  // http 或 https
             const hostname = request.hostname;  // 主机名，不包含端口
             const port = request.socket.localPort;  // 获取当前服务的端口
             console.log('port:', port);
