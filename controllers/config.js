@@ -3,9 +3,16 @@ import path from 'path';
 import * as drpy from '../libs/drpyS.js';
 
 // 工具函数：生成 JSON 数据
-async function generateSiteJSON(jsDir, requestHost) {
+async function generateSiteJSON(jsDir, requestHost, sub) {
     const files = readdirSync(jsDir);
-    const valid_files = files.filter((file) => file.endsWith('.js') && !file.startsWith('_')); // 筛选出不是 "_" 开头的 .js 文件
+    let valid_files = files.filter((file) => file.endsWith('.js') && !file.startsWith('_')); // 筛选出不是 "_" 开头的 .js 文件
+    if (sub) {
+        if (sub.mode === 0) {
+            valid_files = valid_files.filter(it => (new RegExp(sub.reg || '.*')).test(it));
+        } else if (sub.mode === 1) {
+            valid_files = valid_files.filter(it => !(new RegExp(sub.reg || '.*')).test(it));
+        }
+    }
     let sites = [];
     for (const file of valid_files) {
         const baseName = path.basename(file, '.js'); // 去掉文件扩展名
@@ -81,6 +88,17 @@ function generateParseJSON(jxDir, requestHost) {
     return {parses};
 }
 
+function getSubs(subFilePath) {
+    let subs = [];
+    try {
+        const subContent = readFileSync(subFilePath);
+        subs = JSON.parse(subContent)
+    } catch (e) {
+        log(`读取订阅失败:${e.message}`);
+    }
+    return subs
+}
+
 export default (fastify, options, done) => {
 
     fastify.get('/index', async (request, reply) => {
@@ -96,18 +114,30 @@ export default (fastify, options, done) => {
     // 接口：返回配置 JSON，同时写入 index.json
     fastify.get('/config*', async (request, reply) => {
         let t1 = (new Date()).getTime();
+        const query = request.query; // 获取 query 参数
+        const sub_code = query.sub || '';
         const cfg_path = request.params['*']; // 捕获整个路径
-        console.log(cfg_path);
         try {
             // 获取主机名，协议及端口
             const protocol = request.headers['x-forwarded-proto'] || (request.socket.encrypted ? 'https' : 'http');  // http 或 https
             const hostname = request.hostname;  // 主机名，不包含端口
             const port = request.socket.localPort;  // 获取当前服务的端口
-            console.log('port:', port);
+            console.log(`cfg_path:${cfg_path},port:${port}`);
             let requestHost = cfg_path === '/1' ? `${protocol}://${hostname}` : `http://127.0.0.1:${options.PORT}`; // 动态生成根地址
-            const siteJSON = await generateSiteJSON(options.jsDir, requestHost);
+            let sub = null;
+            if (sub_code) {
+                let subs = getSubs(options.subFilePath);
+                sub = subs.find(it => it.code === sub_code);
+                console.log('sub:', sub);
+                if (sub && sub.status === 0) {
+                    return reply.status(500).send({error: `此订阅码:【${sub_code}】已禁用`});
+                }
+            }
+
+            const siteJSON = await generateSiteJSON(options.jsDir, requestHost, sub);
             const parseJSON = generateParseJSON(options.jxDir, requestHost);
-            const configObj = {...siteJSON, ...parseJSON};
+            const configObj = {sites_count: siteJSON.sites.length, ...siteJSON, ...parseJSON};
+            // console.log(configObj);
             const configStr = JSON.stringify(configObj, null, 2);
             if (!process.env.VERCEL) { // Vercel 环境不支持写文件，关闭此功能
                 writeFileSync(options.indexFilePath, configStr, 'utf8'); // 写入 index.json

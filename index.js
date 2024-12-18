@@ -36,6 +36,7 @@ registerRoutes(fastify, {
     MAX_TEXT_SIZE,
     indexFilePath: path.join(__dirname, 'index.json'),
     customFilePath: path.join(__dirname, 'custom.json'),
+    subFilePath: path.join(__dirname, 'sub.json'),
 });
 
 // 启动服务

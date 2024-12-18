@@ -1,0 +1,23 @@
+[
+  {
+    "name": "29",
+    "code": "yellow",
+    "reg": "密",
+    "mode": 0,
+    "status": 1
+  },
+  {
+    "name": "不含29",
+    "code": "green",
+    "reg": "密",
+    "mode": 1,
+    "status": 1
+  },
+  {
+    "name": "电视用",
+    "code": "tv",
+    "reg": "\\[[画书密慢盘搜]\\]|jsapi|原始|直播转点播v2|密+",
+    "mode": 1,
+    "status": 1
+  }
+]
