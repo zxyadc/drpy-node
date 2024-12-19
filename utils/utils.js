@@ -63,7 +63,7 @@ export const urljoin = (fromPath, nowPath) => {
 export const urljoin2 = urljoin
 export const joinUrl = urljoin
 
-/*
+
 export function naturalSort(arr, key, customOrder = []) {
     return arr.sort((a, b) => {
         const aValue = a[key];
@@ -88,8 +88,9 @@ export function naturalSort(arr, key, customOrder = []) {
         return aValue.localeCompare(bValue, undefined, {numeric: true, sensitivity: 'base'});
     });
 }
- */
 
+// 海阔不支持Intl.Collator
+/*
 export function naturalSort(arr, key, customOrder = []) {
     const collator = new Intl.Collator('zh-Hans-CN', {
         numeric: true,
@@ -114,6 +115,7 @@ export function naturalSort(arr, key, customOrder = []) {
         return collator.compare(x, y);
     });
 }
+*/
 
 export function naturalSortAny(arr, key, customOrder = []) {
     return arr.sort((a, b) => {
