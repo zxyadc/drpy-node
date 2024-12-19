@@ -2,7 +2,7 @@
 // http://localhost:5757/api/番薯动漫?ac=detail&ids=/voddetail/USJJJJJk.html
 // http://localhost:5757/api/番薯动漫?wd=我的&pg=1
 // http://localhost:5757/api/番薯动漫?play=/vodplay/USJJJJJk-2-1.html&flag=由qq倾情打造
-const {getHtml} = $.require('./_lib.request.js')
+const { getHtml } = $.require('./_lib.request.js')
 
 var rule = {
     类型: '影视',
@@ -20,6 +20,7 @@ var rule = {
     headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0',
         'Referer': 'https://www.fsdm02.com',
+        'cookie': ''
     },
     class_parse: async () => {
         return {
@@ -50,7 +51,7 @@ var rule = {
         return []
     },
     一级: async function (tid, pg, filter, extend) {
-        let {MY_CATE, input} = this;
+        let { MY_CATE, input } = this;
         if (pg <= 0) pg = 1;
         const html = (await _req(`${rule.host}/vodshow/${tid}--------${pg}---.html`)).content;
         const $ = pq(html);
@@ -70,7 +71,7 @@ var rule = {
         return videos
     },
     二级: async function (ids) {
-        let {input} = this;
+        let { input } = this;
         const html = (await _req(rule.host + ids[0])).content
         const $ = pq(html);
         let vod = {
@@ -79,7 +80,6 @@ var rule = {
             vod_remarks: $(".module-info-item-title:contains(更新)+p").text(),
             vod_content: $(".show-desc").text().trim()
         };
-        log(`加载二级:${input}`);
         vod.vod_play_from = $("#y-playList span").map((_, i) => $(i).text()).get().join('$$$');
         vod.vod_play_url = $(".module-play-list-content").map((_, item) => {
             return $(item).find("a").map((_, i) => {
@@ -89,7 +89,7 @@ var rule = {
         return vod
     },
     搜索: async function (wd, quick, pg) {
-        let {input} = this;
+        let { input } = this;
         let ck = await verifyCode(
             rule.host + "/index.php/verify/index.html?",
             {
@@ -103,7 +103,6 @@ var rule = {
             },
             3
         )
-        rule.headers.cookie += ";" + ck;
         const searchResp = await _req(input);
         // console.log(searchResp.content);
         // console.log(searchResp.content.length);
@@ -129,7 +128,7 @@ var rule = {
         return videos
     },
     lazy: async function (flag, id, flags) {
-        let {input} = this;
+        let { input } = this;
         const html = (await _req(rule.host + id)).content;
         eval(html.match(/player_aaaa[\s\S]*?(?=<\/script>)/)[0])
         let purl = "https://api.bytegooty.com//?url=" + player_aaaa.url
@@ -139,11 +138,10 @@ var rule = {
         let play_url;
         try {
             const sortByKey = (_0x2df378, _0x5d56c7, _0x3a5216) => _0x5d56c7.sort(({
-                                                                                       [_0x2df378]: _0x258bb0
-                                                                                   }, {
-                                                                                       [_0x2df378]: _0x58eebd
-                                                                                   }) => _0x3a5216(_0x258bb0, _0x58eebd))
-
+                [_0x2df378]: _0x258bb0
+            }, {
+                [_0x2df378]: _0x58eebd
+            }) => _0x3a5216(_0x258bb0, _0x58eebd))
             function decrypt(_0x29c3c3) {
                 let _0x9d66e = $("meta[name=\"viewport\"]").attr("id").replace("now_", ""),
                     _0x165aac = $("meta[charset=\"UTF-8\"]").attr("id").replace("now_", ""),
@@ -170,21 +168,20 @@ var rule = {
                     });
                 return _0x477cb9.toString(CryptoJS.enc.Utf8);
             }
-
             play_url = decrypt(config.url)
         } catch (error) {
             console.log(error)
         }
-        return {parse: 0, url: play_url}
+        return { parse: 0, url: play_url }
     },
 };
 
 const expire = 60 * 5 * 1000;  // 设置cookie过期时间，单位毫秒
 let timeA = new Date().getTime();
-
 async function _req(url, opt) {
     let timeB = new Date().getTime();
     if (!rule.headers.cookie || timeB - timeA > expire) {
+        rule.headers.cookie = "";
         rule.headers.cookie = "sl-challenge-jwt=" + await getJwt()
         console.log(`番薯动漫: 获取cookie成功 ${rule.headers.cookie}`);
         timeA = timeB;
@@ -192,14 +189,19 @@ async function _req(url, opt) {
     opt = opt || {};
     opt.headers = Object.assign(rule.headers, opt.headers || {})
     let resp = await req(url, opt);
-    if (resp.headers?.["set-cookie"]) {
-        console.log(resp.headers["set-cookie"]);
-        rule.headers.cookie = resp.headers["set-cookie"].map(it => it.replace(/;.*/, "")).join(";");
+    // console.log(url, resp.code);
+    // console.log(JSON.stringify(opt.headers, null, 4));
+    if (resp.headers["set-cookie"]) {
+        let cookie = [];
+        if (typeof resp.headers["set-cookie"] === "string") {
+            cookie = [resp.headers["set-cookie"]]
+        } else {
+            cookie = resp.headers["set-cookie"]
+        }
+        rule.headers.cookie = cookie.map(it => it.replace(/;.*/, "")).join(";");
+        console.log(rule.headers.cookie);
         console.log("设置ck成功");
     }
-    // if (resp.code > 200) {
-    //     rule.headers.cookie = "";
-    // }
     return resp;
 }
 
@@ -217,8 +219,8 @@ async function getJwt() {
             height: 864
         };
 
-        const wasmBuffer = await axios.get("https://challenge.rivers.chaitin.cn/challenge/v2/calc.wasm", {responseType: 'arraybuffer'});
-        const rootResp = await axios.get("https://www.fsdm02.com/", {headers: {"User-Agent": UA}}).catch(error => error.response);
+        const wasmBuffer = await axios.get("https://challenge.rivers.chaitin.cn/challenge/v2/calc.wasm", { responseType: 'arraybuffer' });
+        const rootResp = await axios.get("https://www.fsdm02.com/", { headers: { "User-Agent": UA } }).catch(error => error.response);
         const cookie = rootResp?.headers?.['set-cookie']?.map(it => it.replace(/;.*/, "")).join(";");
         const html = rootResp.data;
         const clientId = html.match(/SafeLineChallenge\("(.*?)"/)[1];
@@ -226,7 +228,7 @@ async function getJwt() {
         const issueJson = (await axios.post("https://challenge.rivers.chaitin.cn/challenge/v2/api/issue", {
             client_id: clientId,
             level
-        }, {headers: {"Content-Type": "application/json"}})).data;
+        }, { headers: { "Content-Type": "application/json" } })).data;
 
         function u(e, t) {
             return ({
@@ -236,7 +238,7 @@ async function getJwt() {
             })
         }
 
-        WebAssembly.instantiate(wasmBuffer.data).then(({instance}) => {
+        WebAssembly.instantiate(wasmBuffer.data).then(({ instance }) => {
             let n = {};
             n.data = (u(function (e) {
                 return instance.exports.reset(),
@@ -247,7 +249,6 @@ async function getJwt() {
                         return instance.exports.ret()
                     })
             }, issueJson.data))
-
             function generateRandomString(length) {
                 const characters = '0123456789abcdefghijklmnopqrstuvwxyz';
                 let result = '';
@@ -260,7 +261,6 @@ async function getJwt() {
 
                 return result;
             }
-
             const visitorId = generateRandomString(32);
             axios.post("https://challenge.rivers.chaitin.cn/challenge/v2/api/verify", {
                 issue_id: n.data.issue_id,
@@ -329,12 +329,13 @@ async function verifyCode(imgUrl, verifyUrlOpt, num = 1) {
             setCookie = [setCookie];
         }
         cookie = setCookie.map(it => it.replace(/;.*/, '')).join(";");
-        let {url: vurl, ...vopt} = JSON.parse(JSON.stringify(verifyUrlOpt)
+        let { url: vurl, ...vopt } = JSON.parse(JSON.stringify(verifyUrlOpt)
             .replace(/\$cookie/g, cookie)
             .replace(/\$code/g, validate)
         )
         let verifyResp = await req(vurl, vopt)
         console.log(`ocr第${count}次 识别结果: ${validate}`);
+        console.log("验证结果: " + verifyResp.content);
         if (verifyResp.content.match(/"ok"/)) {
             break;
         }
@@ -344,3 +345,26 @@ async function verifyCode(imgUrl, verifyUrlOpt, num = 1) {
     }
     return cookie;
 }
+
+
+(function () {
+    'use strict';
+    var cookieTemp = "";
+    Object.defineProperty(rule.headers, 'cookie', {
+        set: function (val) {
+            if ((val || "").trim() === "") {
+                cookieTemp = "";
+                return cookieTemp;
+            }
+            const updateCK = cookieToJson(val);
+            const cacheCK = cookieToJson(cookieTemp);
+            cookieTemp = jsonToCookie(
+                Object.assign(cacheCK, updateCK)
+            );
+            return cookieTemp;
+        },
+        get: function () {
+            return cookieTemp;
+        }
+    });
+})();

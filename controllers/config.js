@@ -1,16 +1,29 @@
 import {readdirSync, readFileSync, writeFileSync, existsSync} from 'fs';
 import path from 'path';
 import * as drpy from '../libs/drpyS.js';
+import {naturalSort} from '../utils/utils.js'
 
 // 工具函数：生成 JSON 数据
-async function generateSiteJSON(jsDir, requestHost, sub) {
+async function generateSiteJSON(jsDir, requestHost, sub, subFilePath) {
     const files = readdirSync(jsDir);
     let valid_files = files.filter((file) => file.endsWith('.js') && !file.startsWith('_')); // 筛选出不是 "_" 开头的 .js 文件
+    let sort_list = [];
     if (sub) {
         if (sub.mode === 0) {
             valid_files = valid_files.filter(it => (new RegExp(sub.reg || '.*')).test(it));
         } else if (sub.mode === 1) {
             valid_files = valid_files.filter(it => !(new RegExp(sub.reg || '.*')).test(it));
+        }
+        let sort_file = path.join(path.dirname(subFilePath), `./order_common.txt`);
+        if (sub.sort) {
+            sort_file = path.join(path.dirname(subFilePath), `./${sub.sort}.txt`);
+        }
+        if (existsSync(sort_file)) {
+            console.log('sort_file:', sort_file);
+            let sort_file_content = readFileSync(sort_file, 'utf-8');
+            // console.log(sort_file_content)
+            sort_list = sort_file_content.split('\n').filter(it => it.trim()).map(it => it.trim());
+            // console.log(sort_list);
         }
     }
     let sites = [];
@@ -26,9 +39,9 @@ async function generateSiteJSON(jsDir, requestHost, sub) {
         };
         try {
             ruleObject = await drpy.getRuleObject(path.join(jsDir, file));
-            // log(file, ruleObject.title);
+            // console.log(file, ruleObject.title);
         } catch (e) {
-            log(`file:${file} error:${e.message}`);
+            console.log(`file:${file} error:${e.message}`);
         }
         const site = {
             key,
@@ -42,6 +55,7 @@ async function generateSiteJSON(jsDir, requestHost, sub) {
         };
         sites.push(site);
     }
+    sites = naturalSort(sites, 'name', sort_list);
     return {sites};
 }
 
@@ -91,10 +105,10 @@ function generateParseJSON(jxDir, requestHost) {
 function getSubs(subFilePath) {
     let subs = [];
     try {
-        const subContent = readFileSync(subFilePath);
+        const subContent = readFileSync(subFilePath, 'utf-8');
         subs = JSON.parse(subContent)
     } catch (e) {
-        log(`读取订阅失败:${e.message}`);
+        console.log(`读取订阅失败:${e.message}`);
     }
     return subs
 }
@@ -128,13 +142,13 @@ export default (fastify, options, done) => {
             if (sub_code) {
                 let subs = getSubs(options.subFilePath);
                 sub = subs.find(it => it.code === sub_code);
-                console.log('sub:', sub);
+                // console.log('sub:', sub);
                 if (sub && sub.status === 0) {
                     return reply.status(500).send({error: `此订阅码:【${sub_code}】已禁用`});
                 }
             }
 
-            const siteJSON = await generateSiteJSON(options.jsDir, requestHost, sub);
+            const siteJSON = await generateSiteJSON(options.jsDir, requestHost, sub, options.subFilePath);
             const parseJSON = generateParseJSON(options.jxDir, requestHost);
             const configObj = {sites_count: siteJSON.sites.length, ...siteJSON, ...parseJSON};
             // console.log(configObj);

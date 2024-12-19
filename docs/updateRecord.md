@@ -1,4 +1,19 @@
 # drpyS更新记录
+
+### 20241220
+
+更新至V1.0.16
+
+注意事项:`axiosX` 用于请求返回的headers一般没有set-cookie或者是个字符串,因为它是esm实现
+`axios` `req` `request` `fetch` 等node实现的函数返回headers才能获取到set-cookie
+
+1. drpyS源增加可使用的函数`jsonToCookie` `cookieToJson` `axiosX`
+2. 修复素白白搜索(若网站允许),修复番薯动漫
+3. 增加 `COOKIE`对象，可以像`JSON`一样使用 `COOKIE.parse` `COOKIE.stringify`
+4. 生成的源增加自然排序
+5. 移除对海阔等环境的eval注入。最新版本的so已经支持eval了
+6. 增加订阅码自定义排序功能
+
 ### 20241219
 
 更新至V1.0.15

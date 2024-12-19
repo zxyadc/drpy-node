@@ -8,9 +8,9 @@ var rule = {
     title: '素白白',
     desc: '素白白纯js版本',
     host: 'https://www.subaibaiys.com',
-    homeUrl:'',
+    homeUrl: '',
     url: '',
-    searchUrl: '',
+    searchUrl: '/page/fypage?s=**',
     searchable: 2,
     quickSearch: 0,
     timeout: 5000,
@@ -61,10 +61,10 @@ var rule = {
     },
     一级: async function (tid, pg, filter, extend) {
         let {MY_CATE, input} = this;
-        if(pg <= 0) pg = 1;
+        if (pg <= 0) pg = 1;
         const html = (await getHtml({
-            url:rule.host + "/" + (extend.class || tid) + (extend.area || "") + (extend.year || "")  + (extend.catedd || "") + "/page/" + pg,
-            headers:rule.headers
+            url: rule.host + "/" + (extend.class || tid) + (extend.area || "") + (extend.year || "") + (extend.catedd || "") + "/page/" + pg,
+            headers: rule.headers
         })).data
         const $ = pq(html);
         let videos = []
@@ -85,8 +85,8 @@ var rule = {
     二级: async function (ids) {
         let {input} = this;
         const html = (await getHtml({
-            url:rule.host + "/movie/" + ids[0] + ".html",
-            headers:rule.headers
+            url: rule.host + "/movie/" + ids[0] + ".html",
+            headers: rule.headers
         })).data
         const $ = pq(html);
         const html_js = $("ul.moviedteail_list > li");
@@ -94,7 +94,7 @@ var rule = {
             vod_id: ids[0],
             vod_pic: $("div.dyimg img:first").attr("src"),
             vod_remarks: "",
-            vod_content: stripHtmlTag($("div.yp_context").html()).trim()
+            vod_content: misc.stripHtmlTag($("div.yp_context").html()).trim()
         };
         const playlist = $('div.paly_list_btn > a').map((_, a) => {
             return a.children[0].data + '$' + a.attribs.href.replace(/.*?\/v_play\/(.*).html/g, '$1');
@@ -107,12 +107,7 @@ var rule = {
     },
     搜索: async function (wd, quick, pg) {
         let {input} = this
-        let page = pg || 1;
-        if (page === 0) page = 1;
-        const html = (await getHtml({
-            url:rule.host + "/page/1?s=" + wd,
-            headers:rule.headers
-        })).data;
+        const html = await request(input);
         const $ = pq(html);
         let videos = []
         for (const item of $("div.search_list > ul > li")) {
@@ -133,18 +128,14 @@ var rule = {
         let {input} = this;
         const link = rule.host + "/v_play/" + id + ".html"
         const html = (await getHtml({
-            url:link,
-            headers:rule.headers
+            url: link,
+            headers: rule.headers
         })).data
         const $ = pq(html)
         const js = $('script:contains(window.wp_nonce)').html();
         const group = js.match(/(var.*)eval\((\w*\(\w*\))\)/);
-        const result = eval('md5 = CryptoJS;'+group[1] + group[2]);
+        const result = eval('md5 = CryptoJS;' + group[1] + group[2]);
         const play_url = result.match(/url:.*?['"](.*?)['"]/)[1];
         return {parse: 0, url: play_url}
     },
 };
-
-function stripHtmlTag(src) {
-    return src.replace(/<\/?[^>]+(>|$)/g, "").replace(/&.{1,5};/g, "").replace(/\s{2,}/g, " ")
-}

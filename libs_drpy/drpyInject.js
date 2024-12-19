@@ -1,5 +1,5 @@
 import axios, {toFormData} from 'axios';
-// import axios, {toFormData} from './axios.min.js';
+import axiosX from './axios.min.js';
 import crypto from 'crypto';
 import https from 'https';
 import fs from 'node:fs';
@@ -16,6 +16,7 @@ import {batchFetch3} from './hikerBatchFetch.js';
 
 globalThis.batchFetch = batchFetch3;
 globalThis.axios = axios;
+globalThis.axiosX = axiosX;
 globalThis.hlsParser = hlsParser;
 globalThis.qs = qs;
 
@@ -579,5 +580,24 @@ globalThis.log = console.log;
 globalThis.print = console.log;
 globalThis.jsonpath = jsonpath;
 globalThis.jsoup = jsoup;
+
+// 将 JSON 对象转换为 cookie 字符串
+function jsonToCookie(json) {
+    return qs.stringify(json, {
+        delimiter: ';',
+        encoder: value => String(value).trim()
+    });
+}
+
+// 将 cookie 字符串转换回 JSON 对象
+function cookieToJson(cookieString) {
+    return qs.parse(cookieString, {
+        delimiter: ';',
+        decoder: value => value.trim()
+    });
+}
+
+globalThis.jsonToCookie = jsonToCookie;
+globalThis.cookieToJson = cookieToJson;
 
 export default {};

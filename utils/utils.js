@@ -62,3 +62,29 @@ export const urljoin = (fromPath, nowPath) => {
 
 export const urljoin2 = urljoin
 export const joinUrl = urljoin
+
+
+export function naturalSort(arr, key, customOrder = []) {
+    return arr.sort((a, b) => {
+        const aValue = a[key];
+        const bValue = b[key];
+
+        // 检查是否在自定义排序列表中
+        const aIndex = customOrder.findIndex((item) => aValue.startsWith(item));
+        const bIndex = customOrder.findIndex((item) => bValue.startsWith(item));
+
+        if (aIndex !== -1 && bIndex !== -1) {
+            // 如果都在自定义列表中，按自定义顺序排序
+            return aIndex - bIndex;
+        } else if (aIndex !== -1) {
+            // 如果只有a在自定义列表中，a优先
+            return -1;
+        } else if (bIndex !== -1) {
+            // 如果只有b在自定义列表中，b优先
+            return 1;
+        }
+
+        // 如果都不在自定义列表中，按自然顺序排序
+        return aValue.localeCompare(bValue, undefined, {numeric: true, sensitivity: 'base'});
+    });
+}

@@ -6,6 +6,7 @@ import vm from 'vm';
 import '../libs_drpy/es6-extend.js'
 import * as utils from '../utils/utils.js';
 import * as misc from '../utils/misc.js';
+import COOKIE from '../utils/cookieManager.js';
 // const { req } = await import('../utils/req.js');
 import {gbkTool} from '../libs_drpy/gbk.js'
 // import {atob, btoa, base64Encode, base64Decode, md5} from "../libs_drpy/crypto-util.js";
@@ -30,6 +31,7 @@ const _data_path = path.join(__dirname, '../data');
 
 globalThis.misc = misc;
 globalThis.utils = utils;
+globalThis.COOKIE = COOKIE;
 globalThis.pathLib = {
     basename: path.basename,
     extname: path.extname,
@@ -134,6 +136,8 @@ export async function getSandbox(env = {}) {
         js2Proxy,
         log,
         print,
+        jsonToCookie,
+        cookieToJson,
     };
     const drpyCustomSanbox = {
         MOBILE_UA,
@@ -197,11 +201,13 @@ export async function getSandbox(env = {}) {
         jsonpath,
         hlsParser,
         axios,
+        axiosX,
         URL,
         pathLib,
         qs,
         Buffer,
         URLSearchParams,
+        COOKIE,
     };
 
     // 创建一个沙箱上下文，注入需要的全局变量和函数
@@ -233,12 +239,14 @@ export async function getSandbox(env = {}) {
 
     // 设置沙箱到全局 $
     sandbox.$.setSandbox(sandbox);
+    /*
     if (typeof fetchByHiker !== 'undefined') { // 临时解决海阔不支持eval问题，但是这个eval存在作用域问题，跟非海阔环境的有很大区别，属于残废版本
         sandbox.eval = function (code) {
             const evalScript = new vm.Script(code);
             return evalScript.runInContext(context);
         };
     }
+    */
     return {
         sandbox,
         context

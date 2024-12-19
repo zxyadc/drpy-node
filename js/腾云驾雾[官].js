@@ -126,8 +126,8 @@ var rule = {
                 log(`批量请求二级 ${detailUrl} 耗时${t2 - t1}毫秒:`);
                 htmls.forEach((ht) => {
                     if (ht) {
-                        // eval(ht);
-                        QZOutputJson = JSON5.parse(ht.split('QZOutputJson=')[1].slice(0, -1));
+                        eval(ht);
+                        // QZOutputJson = JSON5.parse(ht.split('QZOutputJson=')[1].slice(0, -1));
                         // log(QZOutputJson)
                         QZOutputJson.results.forEach(function (it1) {
                             it1 = it1.fields;
