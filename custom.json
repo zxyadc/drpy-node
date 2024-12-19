@@ -1,66 +1,6 @@
 {
-  "sites_count": 24,
+  "sites_count": 5,
   "sites": [
-    {
-      "key": "drpyS_草榴社区[密]",
-      "name": "草榴社区[密](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/草榴社区[密]",
-      "searchable": 2,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_大象影视",
-      "name": "大象影视(DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/大象影视",
-      "searchable": 2,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_动漫巴士[漫]",
-      "name": "动漫巴士[漫](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/动漫巴士[漫]",
-      "searchable": 2,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_番茄小说[书]",
-      "name": "番茄小说[书](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/番茄小说[书]",
-      "searchable": 2,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_番薯动漫",
-      "name": "番薯动漫(DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/番薯动漫",
-      "searchable": 2,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_瓜子H5",
-      "name": "瓜子H5(DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/瓜子H5",
-      "searchable": 2,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
     {
       "key": "drpyS_黑料不打烊[密]",
       "name": "黑料不打烊[密](DS)",
@@ -72,50 +12,10 @@
       "ext": ""
     },
     {
-      "key": "drpyS_荐片",
-      "name": "荐片(DS)",
+      "key": "drpyS_草榴社区[密]",
+      "name": "草榴社区[密](DS)",
       "type": 4,
-      "api": "http://localhost:5757/api/荐片",
-      "searchable": 2,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_金牌影院",
-      "name": "金牌影院(DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/金牌影院",
-      "searchable": 2,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_蓝莓短剧",
-      "name": "蓝莓短剧(DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/蓝莓短剧",
-      "searchable": 2,
-      "filterable": 1,
-      "quickSearch": 1,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_老白故事[听]",
-      "name": "老白故事[听](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/老白故事[听]",
-      "searchable": 2,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_人人视频",
-      "name": "人人视频(DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/人人视频",
+      "api": "http://localhost:5757/api/草榴社区[密]",
       "searchable": 2,
       "filterable": 1,
       "quickSearch": 0,
@@ -136,96 +36,6 @@
       "name": "色花堂[密+](DS)",
       "type": 4,
       "api": "http://localhost:5757/api/色花堂[密+]",
-      "searchable": 2,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_素白白",
-      "name": "素白白(DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/素白白",
-      "searchable": 2,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_腾云驾雾[官]",
-      "name": "腾云驾雾[官](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/腾云驾雾[官]",
-      "searchable": 2,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_星芽短剧",
-      "name": "星芽短剧(DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/星芽短剧",
-      "searchable": 2,
-      "filterable": 1,
-      "quickSearch": 1,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_兄弟影视",
-      "name": "兄弟影视(DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/兄弟影视",
-      "searchable": 2,
-      "filterable": 0,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_雪糕TV",
-      "name": "雪糕TV(DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/雪糕TV",
-      "searchable": 2,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_央视大全[官]",
-      "name": "央视大全[官](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/央视大全[官]",
-      "searchable": 0,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_ikanbot",
-      "name": "ikanbot(DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/ikanbot",
-      "searchable": 2,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_OmoFun[漫]",
-      "name": "OmoFun[漫](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/OmoFun[漫]",
-      "searchable": 2,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_PTT[优]",
-      "name": "PTT[优](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/PTT[优]",
       "searchable": 2,
       "filterable": 1,
       "quickSearch": 0,
