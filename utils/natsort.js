@@ -61,7 +61,8 @@ function naturalCompareFactory(options) {
             if (isNaN(tokenA) !== isNaN(tokenB)) return isNaN(tokenA) ? ascending : descending;
 
             if (unicodeRegex.test(tokenA + tokenB) && tokenA.localeCompare) {
-                const localeComparison = tokenA.localeCompare(tokenB);
+                // const localeComparison = tokenA.localeCompare(tokenB);
+                const localeComparison = tokenA.localeCompare(tokenB, 'zh-CN', {numeric: true, sensitivity: 'base'});
                 if (localeComparison !== 0) return localeComparison * ascending;
             }
 

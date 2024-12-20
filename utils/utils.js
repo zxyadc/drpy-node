@@ -86,9 +86,8 @@ export function naturalSort(arr, key, customOrder = []) {
         }
 
         // 如果都不在自定义列表中，按自然顺序排序
-        // return aValue.localeCompare(bValue, undefined, {numeric: true, sensitivity: 'base'});
-
-        return naturalCompare(aValue, bValue)
+        // return aValue.localeCompare(bValue, 'zh-CN', {numeric: true, sensitivity: 'base'});
+        return naturalCompare(aValue, bValue);
     });
 }
 
