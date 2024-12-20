@@ -7,6 +7,7 @@ import '../libs_drpy/es6-extend.js'
 import * as utils from '../utils/utils.js';
 import * as misc from '../utils/misc.js';
 import COOKIE from '../utils/cookieManager.js';
+import {ENV} from '../utils/env.js';
 // const { req } = await import('../utils/req.js');
 import {gbkTool} from '../libs_drpy/gbk.js'
 // import {atob, btoa, base64Encode, base64Decode, md5} from "../libs_drpy/crypto-util.js";
@@ -32,6 +33,7 @@ const _data_path = path.join(__dirname, '../data');
 globalThis.misc = misc;
 globalThis.utils = utils;
 globalThis.COOKIE = COOKIE;
+globalThis.ENV = ENV;
 globalThis.pathLib = {
     basename: path.basename,
     extname: path.extname,
@@ -50,7 +52,7 @@ globalThis.pathLib = {
         return readFileSync(resolvedPath, 'utf8')
     },
 };
-const {sleep, sleepSync, computeHash, deepCopy, urljoin, urljoin2, joinUrl} = utils;
+const {sleep, sleepSync, computeHash, deepCopy, urljoin, urljoin2, joinUrl, naturalSort} = utils;
 const es6JsPath = path.join(__dirname, '../libs_drpy/es6-extend.js');
 // 读取扩展代码
 const es6_extend_code = readFileSync(es6JsPath, 'utf8');
@@ -108,6 +110,7 @@ export async function getSandbox(env = {}) {
         urljoin,
         urljoin2,
         joinUrl,
+        naturalSort,
         $,
         pupWebview,
         getProxyUrl,
@@ -208,6 +211,7 @@ export async function getSandbox(env = {}) {
         Buffer,
         URLSearchParams,
         COOKIE,
+        ENV,
     };
 
     // 创建一个沙箱上下文，注入需要的全局变量和函数

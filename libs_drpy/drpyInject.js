@@ -140,7 +140,11 @@ async function request(url, opt = {}) {
         resp = error.response
         console.log(`req error: ${error.message}`);
         try {
-            return {code: resp.status, headers: resp.headers, content: JSON.stringify(resp.data)};
+            return {
+                code: resp.status,
+                headers: resp.headers,
+                content: typeof resp.data === "object" ? JSON.stringify(resp.data) : resp.data
+            };
         } catch (err) {
             return {headers: {}, content: ''};
         }

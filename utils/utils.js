@@ -1,6 +1,7 @@
 // utils.js: 存放工具类方法
 import pkg from 'lodash';
 import crypto from 'crypto';
+import {naturalCompare} from './natsort.js';
 
 const {cloneDeep} = pkg;
 
@@ -85,7 +86,9 @@ export function naturalSort(arr, key, customOrder = []) {
         }
 
         // 如果都不在自定义列表中，按自然顺序排序
-        return aValue.localeCompare(bValue, undefined, {numeric: true, sensitivity: 'base'});
+        // return aValue.localeCompare(bValue, undefined, {numeric: true, sensitivity: 'base'});
+
+        return naturalCompare(aValue, bValue)
     });
 }
 

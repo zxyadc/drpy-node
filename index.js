@@ -32,6 +32,7 @@ registerRoutes(fastify, {
     jsDir: path.join(__dirname, 'js'),
     jxDir: path.join(__dirname, 'jx'),
     viewsDir: path.join(__dirname, 'views'),
+    configDir: path.join(__dirname, 'config'),
     PORT,
     MAX_TEXT_SIZE,
     indexFilePath: path.join(__dirname, 'index.json'),

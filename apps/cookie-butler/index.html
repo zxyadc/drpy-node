@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Cookie管理</title>
-    <link rel="stylesheet" href="./static/css/style.css" />
-    <link rel="stylesheet" href="./static/css/daisyui.min.css" />
+    <link rel="stylesheet" href="./static/css/style.css"/>
+    <link rel="stylesheet" href="./static/css/daisyui.min.css"/>
     <script src="./static/js/tailwindcss.min.js"></script>
     <script src="./static/js/axios.min.js"></script>
     <script src="./static/js/qrcode.min.js"></script>
@@ -24,7 +24,7 @@
 
     <!-- QR Code -->
     <div class="qrcode-container text-center mb-4">
-        <img id="qrcode" src="./static/img/qrcode_expired.jpg" alt="二维码" class="mx-auto" />
+        <img id="qrcode" src="./static/img/qrcode_expired.jpg" alt="二维码" class="mx-auto"/>
     </div>
 
     <!-- Divider -->
@@ -35,7 +35,6 @@
             id="cookie-res"
             class="textarea textarea-bordered w-full h-40 p-4 bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="扫码确认后将在此处展示cookie"
-            readonly
     ></textarea>
 
     <!-- Buttons with improved design -->
@@ -85,8 +84,39 @@
 
     // Store cookie (just an alert for now)
     function storeCookie() {
-        alert("入库功能暂未实现！");
+        // 获取当前激活的 li
+        const activeLi = document.querySelector("ul.menu a.active");
+        if (activeLi) {
+            const textValue = document.getElementById("cookie-res").value || '';
+            const active_name = activeLi.textContent.trim();
+            const active_key = activeLi.getAttribute('data-platform').trim() + '_cookie';
+            console.log(`准备入库cookie:${active_name} ${active_key},值为:${textValue}`);
+
+            const cookie_auth_code = prompt('cookie入库功能需要管理员授权码,请你正确输入后继续');
+            if (cookie_auth_code) {
+                // 使用 axios 发送 POST 请求
+                axios.post('/admin/cookie-set', {
+                    cookie_auth_code: cookie_auth_code,
+                    key: active_key,
+                    value: textValue
+                })
+                    .then(response => {
+                        if (response.data.success) {
+                            alert(`Cookie 入库成功：${active_name} (${active_key})`);
+                        } else {
+                            alert(`入库失败：${response.data.message}`);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('请求失败:', error);
+                        alert(`入库失败，服务器出现问题，请稍后再试。\n${error.response.data.message}`);
+                    });
+            }
+        } else {
+            alert('至少选中一个cookie入库项目');
+        }
     }
+
 
     // Initialize the page
     initializePage();

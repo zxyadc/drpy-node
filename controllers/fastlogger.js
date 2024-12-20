@@ -10,8 +10,10 @@ dotenv.config();  //加载 .env 文件
 
 const LOG_WITH_FILE = process.env.LOG_WITH_FILE;
 const LOG_LEVEL = process.env.LOG_LEVEL && ['trace', 'debug', 'info', 'warn', 'error', 'fatal'].includes(process.env.LOG_LEVEL) ? process.env.LOG_LEVEL : 'info';
+const COOKIE_AUTH_CODE = process.env.COOKIE_AUTH_CODE || 'drpys';
 console.log('LOG_WITH_FILE:', LOG_WITH_FILE);
 console.log('LOG_LEVEL:', LOG_LEVEL);
+console.log('COOKIE_AUTH_CODE:', COOKIE_AUTH_CODE);
 let _logger = true;
 
 // 自定义时间戳函数，格式为 YYYY-MM-DD HH:mm:ss
