@@ -8,6 +8,8 @@ import * as utils from '../utils/utils.js';
 import * as misc from '../utils/misc.js';
 import COOKIE from '../utils/cookieManager.js';
 import {ENV} from '../utils/env.js';
+import {Quark} from "../utils/quark.js";
+import {UC} from "../utils/uc.js";
 // const { req } = await import('../utils/req.js');
 import {gbkTool} from '../libs_drpy/gbk.js'
 // import {atob, btoa, base64Encode, base64Decode, md5} from "../libs_drpy/crypto-util.js";
@@ -34,6 +36,8 @@ globalThis.misc = misc;
 globalThis.utils = utils;
 globalThis.COOKIE = COOKIE;
 globalThis.ENV = ENV;
+globalThis.Quark = Quark;
+globalThis.UC = UC;
 globalThis.pathLib = {
     basename: path.basename,
     extname: path.extname,
@@ -212,6 +216,8 @@ export async function getSandbox(env = {}) {
         URLSearchParams,
         COOKIE,
         ENV,
+        Quark,
+        UC,
     };
 
     // 创建一个沙箱上下文，注入需要的全局变量和函数

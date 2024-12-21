@@ -1,10 +1,20 @@
 import path from "path";
 import {fileURLToPath} from "url";
 import {existsSync, readFileSync, writeFileSync, unlinkSync} from "fs";
+import {LRUCache} from "lru-cache";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const _envPath = path.join(__dirname, "../config/env.json");
 const _lockPath = `${_envPath}.lock`;
+
+// 创建 LRU 缓存实例
+const cache = new LRUCache({
+    max: 100, // 最大缓存条目数
+    ttl: 1000 * 60 * 5, // 缓存时间（毫秒），例如 5 分钟
+});
+
+// 定义用于缓存整个对象的特殊键
+const FULL_ENV_CACHE_KEY = "__FULL_ENV__";
 
 export const ENV = {
     _envPath,
@@ -59,13 +69,35 @@ export const ENV = {
     },
 
     /**
-     * 获取环境变量
-     * @param {string} [key] 可选，获取特定键的值
+     * 获取环境变量（支持缓存）
+     * @param {string} [key] 可选，获取特定键的值或完整对象
      * @returns {string|Object} 环境变量值或完整对象
      */
     get(key) {
+        if (!key) {
+            // 不传参时获取整个对象
+            if (cache.has(FULL_ENV_CACHE_KEY)) {
+                return cache.get(FULL_ENV_CACHE_KEY);
+            }
+
+            const envObj = this._readEnvFile();
+            cache.set(FULL_ENV_CACHE_KEY, envObj);
+            return envObj;
+        }
+
+        // 传参时获取特定键
+        if (cache.has(key)) {
+            // console.log(`从内存缓存中读取: ${key}`);
+            return cache.get(key);
+        }
+        console.log(`从文件中读取: ${key}`);
         const envObj = this._readEnvFile();
-        return key ? envObj[key] || "" : envObj;
+        const value = envObj[key] || "";
+
+        // 写入缓存
+        cache.set(key, value);
+
+        return value;
     },
 
     /**
@@ -81,6 +113,10 @@ export const ENV = {
         const envObj = this._readEnvFile();
         envObj[key] = value;
         this._writeEnvFile(envObj);
+
+        // 清除对应键和整个对象的缓存
+        cache.delete(key);
+        cache.delete(FULL_ENV_CACHE_KEY);
     },
 
     /**
@@ -96,6 +132,10 @@ export const ENV = {
         if (key in envObj) {
             delete envObj[key];
             this._writeEnvFile(envObj);
+
+            // 清除对应键和整个对象的缓存
+            cache.delete(key);
+            cache.delete(FULL_ENV_CACHE_KEY);
         } else {
             console.warn(`Key "${key}" does not exist in env file.`);
         }

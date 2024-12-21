@@ -98,7 +98,7 @@
                 axios.post('/admin/cookie-set', {
                     cookie_auth_code: cookie_auth_code,
                     key: active_key,
-                    value: textValue
+                    value: textValue.trim().replaceAll('\n', '')
                 })
                     .then(response => {
                         if (response.data.success) {

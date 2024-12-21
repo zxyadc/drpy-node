@@ -1,6 +1,16 @@
 {
-  "sites_count": 26,
+  "sites_count": 28,
   "sites": [
+    {
+      "key": "drpyS_哔哩直播[官]",
+      "name": "哔哩直播[官](DS)",
+      "type": 4,
+      "api": "http://127.0.0.1:5757/api/哔哩直播[官]",
+      "searchable": 2,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
     {
       "key": "drpyS_大象影视",
       "name": "大象影视(DS)",
@@ -208,6 +218,16 @@
       "api": "http://127.0.0.1:5757/api/伊甸园[密]",
       "searchable": 1,
       "filterable": 0,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_至臻[盘]",
+      "name": "至臻[盘](DS)",
+      "type": 4,
+      "api": "http://127.0.0.1:5757/api/至臻[盘]",
+      "searchable": 1,
+      "filterable": 1,
       "quickSearch": 0,
       "ext": ""
     },

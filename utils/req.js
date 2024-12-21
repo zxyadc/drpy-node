@@ -1,8 +1,10 @@
-export async function req(param) {
-    // 模拟异步请求
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(`Response for ${param}`);
-        }, 1000);
-    });
-}
+import _axios from 'axios';
+import https from 'https';
+import http from 'http';
+
+const req = _axios.create({
+    httpsAgent: new https.Agent({keepAlive: true, rejectUnauthorized: false}),
+    httpAgent: new http.Agent({keepAlive: true}),
+});
+
+export default req;
