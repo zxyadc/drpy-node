@@ -19,9 +19,11 @@ const rule = {
         log(ck);
         // log(cookieToJson(ck));
         let ck_obj = COOKIE.parse(ck[0]);
+        let ck_obj1 = COOKIE.parse(ck);
         log(ck_obj);
+        log(ck_obj1);
         log(ck_obj.BAIDUID);
-        log(COOKIE.stringify("name", 'echo', {
+        log(COOKIE.serialize("name", 'echo', {
             httpOnly: true,
             maxAge: 60 * 60 * 24 * 7, // 1 week
         }));

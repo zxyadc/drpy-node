@@ -76,34 +76,47 @@ const NullObject = (() => {
  * Parse the given cookie header string into an object
  * The object has the various cookies as keys(names) => values
  */
-export function parse(str, options) {
+export function parse(input, options) {
     const obj = new NullObject();
-    const len = str.length;
-    if (len < 2) return obj;
     const dec = options?.decode || decode;
-    let index = 0;
-    do {
-        const eqIdx = str.indexOf("=", index);
-        if (eqIdx === -1) break;
-        const colonIdx = str.indexOf(";", index);
-        const endIdx = colonIdx === -1 ? len : colonIdx;
-        if (eqIdx > endIdx) {
-            index = str.lastIndexOf(";", eqIdx - 1) + 1;
-            continue;
-        }
-        const keyStartIdx = startIndex(str, index, eqIdx);
-        const keyEndIdx = endIndex(str, eqIdx, keyStartIdx);
-        const key = str.slice(keyStartIdx, keyEndIdx);
-        if (obj[key] === undefined) {
+
+    // If input is an array, process each string
+    const headers = Array.isArray(input) ? input : [input];
+
+    for (const str of headers) {
+        const len = str.length;
+        if (len < 2) continue;
+
+        let index = 0;
+        do {
+            const eqIdx = str.indexOf("=", index);
+            if (eqIdx === -1) break;
+            const colonIdx = str.indexOf(";", index);
+            const endIdx = colonIdx === -1 ? len : colonIdx;
+
+            if (eqIdx > endIdx) {
+                index = str.lastIndexOf(";", eqIdx - 1) + 1;
+                continue;
+            }
+
+            const keyStartIdx = startIndex(str, index, eqIdx);
+            const keyEndIdx = endIndex(str, eqIdx, keyStartIdx);
+            const key = str.slice(keyStartIdx, keyEndIdx); // Keep original case
+
             let valStartIdx = startIndex(str, eqIdx + 1, endIdx);
             let valEndIdx = endIndex(str, endIdx, valStartIdx);
             const value = dec(str.slice(valStartIdx, valEndIdx));
+
+            // Always overwrite with the latest value for the same key
             obj[key] = value;
-        }
-        index = endIdx + 1;
-    } while (index < len);
+
+            index = endIdx + 1;
+        } while (index < len);
+    }
+
     return obj;
 }
+
 
 function startIndex(str, index, max) {
     do {
@@ -226,6 +239,13 @@ function isDate(val) {
     return __toString.call(val) === "[object Date]";
 }
 
+export function stringify(obj, encode = 0) {
+    return Object.entries(obj)
+        .map(([key, value]) => encode ? serialize(key, value) : decodeURIComponent(serialize(key, value)))
+        .join("; ")
+}
+
+
 // Export as default object for named and default usage
-const COOKIE = {parse, serialize, stringify: serialize};
+const COOKIE = {parse, serialize, stringify};
 export default COOKIE;

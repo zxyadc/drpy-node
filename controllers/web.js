@@ -1,6 +1,7 @@
 import {readFileSync, existsSync} from 'fs';
 import path from 'path';
 import {ENV} from '../utils/env.js';
+import COOKIE from '../utils/cookieManager.js';
 
 const COOKIE_AUTH_CODE = process.env.COOKIE_AUTH_CODE || 'drpys';
 
@@ -45,8 +46,19 @@ export default (fastify, options, done) => {
                 });
             }
 
+            let cookie_obj = COOKIE.parse(value);
+            let cookie_str = value;
+
+            if (key === 'quark_cookie') {
+                // console.log(cookie_obj);
+                cookie_str = COOKIE.stringify({
+                    __pus: cookie_obj.__pus || '',
+                    __puus: cookie_obj.__puus || '',
+                });
+                console.log(cookie_str);
+            }
             // 调用 ENV.set 设置环境变量
-            ENV.set(key, value);
+            ENV.set(key, cookie_str);
 
             // 返回成功响应
             return reply.code(200).send({
