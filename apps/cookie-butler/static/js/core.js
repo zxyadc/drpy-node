@@ -1,8 +1,3 @@
-// import axios from 'axios';
-// import QRCode from 'qrcode';
-// import { Buffer } from 'buffer';
-// import { v4 as uuidv4 } from 'uuid';
-
 class QRCodeHandler {
     // 状态常量
     static STATUS_NEW = "NEW";            // 待扫描
@@ -44,6 +39,52 @@ class QRCodeHandler {
                 resolve(res);
             });
         });
+    }
+
+    formatCookiesToList(cookieString) {
+        const result = [];
+        let currentCookie = '';
+        let inExpires = false;
+        
+        for (let i = 0; i < cookieString.length; i++) {
+            const char = cookieString[i];
+        
+            // 判断是否进入或退出 `expires` 属性
+            if (cookieString.slice(i, i + 8).toLowerCase() === 'expires=') {
+            inExpires = true;
+            }
+            if (inExpires && char === ';') {
+            inExpires = false;
+            }
+        
+            // 检测到逗号分隔符并且不在 `expires` 属性中，表示一个 Cookie 条目结束
+            if (char === ',' && !inExpires) {
+            result.push(currentCookie.trim());
+            currentCookie = '';
+            } else {
+            currentCookie += char;
+            }
+        }
+        
+        // 添加最后一个 Cookie 条目
+        if (currentCookie.trim()) {
+            result.push(currentCookie.trim());
+        }
+        
+        return result;
+    };
+
+    formatCookie(cookies) {
+        if (!Array.isArray(cookies)) cookies = [cookies];
+        if (cookies.length === 0) return '';
+
+        let mainCookies = [];
+        for (const cookie of cookies) {
+            if (cookie && typeof cookie === 'string' && cookie.trim()) {
+                mainCookies.push(cookie.split('; ')[0]);
+            }
+        }
+        return mainCookies.join(';');
     }
 
     async startScan(platform) {
@@ -158,10 +199,30 @@ class QRCodeHandler {
                     }
                 });
                 const cookieResData = cookieRes.data;
-                const cookies = Array.isArray(cookieResData.headers['set-cookie']) ? cookieResData.headers['set-cookie'].join('; '):cookieResData.headers['set-cookie'];
+                const cookies = Array.isArray(cookieResData.headers['set-cookie']) ? cookieResData.headers['set-cookie'].join('; ') : cookieResData.headers['set-cookie'];
+                const cookies2array = this.formatCookiesToList(cookies);
+                let mainCookies = this.formatCookie(cookies2array);
+                const cookieSelfRes = await axios({
+                    url: "/http",
+                    method: "POST",
+                    data: {
+                        url: "https://drive-pc.quark.cn/1/clouddrive/file/sort?pr=ucpro&fr=pc&uc_param_str=&pdir_fid=0&_page=1&_size=50&_fetch_total=1&_fetch_sub_dirs=0&_sort=file_type:asc,updated_at:desc",
+                        headers: {
+                            ...QRCodeHandler.HEADERS,
+                            Origin: 'https://pan.quark.cn',
+                            Referer: 'https://pan.quark.cn/',
+                            Cookie: mainCookies
+                        }
+                    }
+                });
+                const cookieResDataSelf = cookieSelfRes.data;
+                const cookiesSelf = Array.isArray(cookieResDataSelf.headers['set-cookie']) ? cookieResDataSelf.headers['set-cookie'].join('; ') : cookieResDataSelf.headers['set-cookie'];
+                const cookies2arraySelf = this.formatCookiesToList(cookiesSelf);
+                const mainCookiesSelf = this.formatCookie(cookies2arraySelf);
+                if (mainCookiesSelf) mainCookies += ';' + mainCookiesSelf;
                 return {
                     status: QRCodeHandler.STATUS_CONFIRMED,
-                    cookie: cookies
+                    cookie: mainCookies
                 };
             } else if (resData.data.status === 50004002) { // token过期
                 this.platformStates[QRCodeHandler.PLATFORM_QUARK] = null;
@@ -370,11 +431,13 @@ class QRCodeHandler {
                     }
                 });
                 const cookieResData = cookieRes.data;
-                const cookies = Array.isArray(cookieResData.headers['set-cookie']) ? cookieResData.headers['set-cookie'].join('; '):cookieResData.headers['set-cookie'];
+                const cookies = cookieResData.headers['set-cookie'];
+                const cookies2array = this.formatCookiesToList(cookies);
+                const mainCookies = this.formatCookie(cookies2array);
                 this.platformStates[QRCodeHandler.PLATFORM_UC] = null;
                 return {
                     status: QRCodeHandler.STATUS_CONFIRMED,
-                    cookie: cookies
+                    cookie: mainCookies
                 };
             } else if (resData.data.status === 50004002) { // token过期
                 this.platformStates[QRCodeHandler.PLATFORM_UC] = null;
