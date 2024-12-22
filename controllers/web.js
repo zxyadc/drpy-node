@@ -49,7 +49,7 @@ export default (fastify, options, done) => {
             let cookie_obj = COOKIE.parse(value);
             let cookie_str = value;
 
-            if (key === 'quark_cookie') {
+            if (['quark_cookie', 'uc_cookie'].includes(key)) {
                 // console.log(cookie_obj);
                 cookie_str = COOKIE.stringify({
                     __pus: cookie_obj.__pus || '',

@@ -34,6 +34,9 @@ class UCHandler {
 
     getShareData(url) {
         let matches = this.regex.exec(url);
+        if (matches[1].indexOf("?") > 0) {
+            matches[1] = matches[1].split('?')[0];
+        }
         if (matches) {
             return {
                 shareId: matches[1],
@@ -152,15 +155,10 @@ class UCHandler {
 
 
     async api(url, data, headers, method, retry) {
-
         headers = headers || {};
-
         Object.assign(headers, this.baseHeader);
-
         Object.assign(headers, {
-
             Cookie: this.cookie || '',
-
         });
         method = method || 'post';
         const resp =
@@ -233,7 +231,6 @@ class UCHandler {
             const shareToken = await this.api(`share/sharepage/token?${this.pr}`, {
                 pwd_id: shareData.shareId,
                 passcode: shareData.sharePwd || '',
-
             });
             if (shareToken.data && shareToken.data.stoken) {
                 this.shareTokenCache[shareData.shareId] = shareToken.data;

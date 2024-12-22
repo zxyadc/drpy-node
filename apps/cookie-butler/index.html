@@ -89,20 +89,21 @@
         if (activeLi) {
             const textValue = document.getElementById("cookie-res").value || '';
             const active_name = activeLi.textContent.trim();
-            const active_key = activeLi.getAttribute('data-platform').trim() + '_cookie';
-            console.log(`准备入库cookie:${active_name} ${active_key},值为:${textValue}`);
+            const active_key = activeLi.getAttribute('data-platform').trim();
+            const save_key = active_key === 'ali' ? active_key + '_token' : active_key + '_cookie';
+            console.log(`准备入库cookie:${active_name} ${save_key},值为:${textValue}`);
 
             const cookie_auth_code = prompt('cookie入库功能需要管理员授权码,请你正确输入后继续');
             if (cookie_auth_code) {
                 // 使用 axios 发送 POST 请求
                 axios.post('/admin/cookie-set', {
                     cookie_auth_code: cookie_auth_code,
-                    key: active_key,
+                    key: save_key,
                     value: textValue.trim().replaceAll('\n', '')
                 })
                     .then(response => {
                         if (response.data.success) {
-                            alert(`Cookie 入库成功：${active_name} (${active_key})`);
+                            alert(`Cookie 入库成功：${active_name} (${save_key})`);
                         } else {
                             alert(`入库失败：${response.data.message}`);
                         }

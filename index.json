@@ -1,5 +1,5 @@
 {
-  "sites_count": 28,
+  "sites_count": 30,
   "sites": [
     {
       "key": "drpyS_哔哩直播[官]",
@@ -152,6 +152,16 @@
       "ext": ""
     },
     {
+      "key": "drpyS_闪电优汐[盘]",
+      "name": "闪电优汐[盘](DS)",
+      "type": 4,
+      "api": "http://127.0.0.1:5757/api/闪电优汐[盘]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
       "key": "drpyS_素白白",
       "name": "素白白(DS)",
       "type": 4,
@@ -237,6 +247,16 @@
       "type": 4,
       "api": "http://127.0.0.1:5757/api/ikanbot",
       "searchable": 2,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_MP4电影[磁]",
+      "name": "MP4电影[磁](DS)",
+      "type": 4,
+      "api": "http://127.0.0.1:5757/api/MP4电影[磁]",
+      "searchable": 1,
       "filterable": 1,
       "quickSearch": 0,
       "ext": ""

@@ -38,9 +38,9 @@ class QRCodeHandler {
         } else {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
                 const r = (Math.random() * 16) | 0,
-                  v = c == 'x' ? r : (r & 0x3) | 0x8;
+                    v = c == 'x' ? r : (r & 0x3) | 0x8;
                 return v.toString(16);
-              });
+            });
         }
     }
 
@@ -57,32 +57,32 @@ class QRCodeHandler {
         const result = [];
         let currentCookie = '';
         let inExpires = false;
-        
+
         for (let i = 0; i < cookieString.length; i++) {
             const char = cookieString[i];
-        
+
             // 判断是否进入或退出 `expires` 属性
             if (cookieString.slice(i, i + 8).toLowerCase() === 'expires=') {
-            inExpires = true;
+                inExpires = true;
             }
             if (inExpires && char === ';') {
-            inExpires = false;
+                inExpires = false;
             }
-        
+
             // 检测到逗号分隔符并且不在 `expires` 属性中，表示一个 Cookie 条目结束
             if (char === ',' && !inExpires) {
-            result.push(currentCookie.trim());
-            currentCookie = '';
+                result.push(currentCookie.trim());
+                currentCookie = '';
             } else {
-            currentCookie += char;
+                currentCookie += char;
             }
         }
-        
+
         // 添加最后一个 Cookie 条目
         if (currentCookie.trim()) {
             result.push(currentCookie.trim());
         }
-        
+
         return result;
     };
 
@@ -172,7 +172,7 @@ class QRCodeHandler {
     async _checkQuarkStatus() {
         const state = this.platformStates[QRCodeHandler.PLATFORM_QUARK];
         if (!state) {
-            return { status: QRCodeHandler.STATUS_EXPIRED };
+            return {status: QRCodeHandler.STATUS_EXPIRED};
         }
 
         try {
@@ -238,9 +238,9 @@ class QRCodeHandler {
                 };
             } else if (resData.data.status === 50004002) { // token过期
                 this.platformStates[QRCodeHandler.PLATFORM_QUARK] = null;
-                return { status: QRCodeHandler.STATUS_EXPIRED };
+                return {status: QRCodeHandler.STATUS_EXPIRED};
             } else {
-                return { status: QRCodeHandler.STATUS_NEW };
+                return {status: QRCodeHandler.STATUS_NEW};
             }
         } catch (e) {
             this.platformStates[QRCodeHandler.PLATFORM_QUARK] = null;
@@ -291,7 +291,7 @@ class QRCodeHandler {
     async _checkAliStatus() {
         const state = this.platformStates[QRCodeHandler.PLATFORM_ALI];
         if (!state) {
-            return { status: QRCodeHandler.STATUS_EXPIRED };
+            return {status: QRCodeHandler.STATUS_EXPIRED};
         }
 
         try {
@@ -325,7 +325,7 @@ class QRCodeHandler {
             const resData = res.data;
 
             if (!resData.data.content || !resData.data.content.data) {
-                return { status: QRCodeHandler.STATUS_EXPIRED };
+                return {status: QRCodeHandler.STATUS_EXPIRED};
             }
 
             const status = resData.data.content.data.qrCodeStatus;
@@ -333,21 +333,22 @@ class QRCodeHandler {
             if (status === "CONFIRMED") {
                 if (resData.data.content.data.bizExt) {
                     const bizExt = JSON.parse(atob(resData.data.content.data.bizExt));
+                    console.log(bizExt.pds_login_result);
                     return {
                         status: QRCodeHandler.STATUS_CONFIRMED,
                         token: bizExt.pds_login_result.refreshToken
                     };
                 }
-                return { status: QRCodeHandler.STATUS_EXPIRED };
+                return {status: QRCodeHandler.STATUS_EXPIRED};
             } else if (status === "SCANED") {
-                return { status: QRCodeHandler.STATUS_SCANED };
+                return {status: QRCodeHandler.STATUS_SCANED};
             } else if (status === "CANCELED") {
                 this.platformStates[QRCodeHandler.PLATFORM_ALI] = null;
-                return { status: QRCodeHandler.STATUS_CANCELED };
+                return {status: QRCodeHandler.STATUS_CANCELED};
             } else if (status === "NEW") {
-                return { status: QRCodeHandler.STATUS_NEW };
+                return {status: QRCodeHandler.STATUS_NEW};
             } else {
-                return { status: QRCodeHandler.STATUS_EXPIRED };
+                return {status: QRCodeHandler.STATUS_EXPIRED};
             }
         } catch (e) {
             this.platformStates[QRCodeHandler.PLATFORM_ALI] = null;
@@ -401,7 +402,7 @@ class QRCodeHandler {
     async _checkUCStatus() {
         const state = this.platformStates[QRCodeHandler.PLATFORM_UC];
         if (!state) {
-            return { status: QRCodeHandler.STATUS_EXPIRED };
+            return {status: QRCodeHandler.STATUS_EXPIRED};
         }
 
         try {
@@ -445,7 +446,25 @@ class QRCodeHandler {
                 const cookieResData = cookieRes.data;
                 const cookies = cookieResData.headers['set-cookie'];
                 const cookies2array = this.formatCookiesToList(cookies);
-                const mainCookies = this.formatCookie(cookies2array);
+                let mainCookies = this.formatCookie(cookies2array);
+                const cookieSelfRes = await axios({
+                    url: "/http",
+                    method: "POST",
+                    data: {
+                        url: "https://pc-api.uc.cn/1/clouddrive/config?pr=UCBrowser&fr=pc",
+                        headers: {
+                            ...QRCodeHandler.HEADERS,
+                            Origin: 'https://drive.uc.cn',
+                            Referer: 'https://drive.uc.cn/',
+                            Cookie: mainCookies
+                        }
+                    }
+                });
+                const cookieResDataSelf = cookieSelfRes.data;
+                const cookiesSelf = Array.isArray(cookieResDataSelf.headers['set-cookie']) ? cookieResDataSelf.headers['set-cookie'].join('; ') : cookieResDataSelf.headers['set-cookie'];
+                const cookies2arraySelf = this.formatCookiesToList(cookiesSelf);
+                const mainCookiesSelf = this.formatCookie(cookies2arraySelf);
+                if (mainCookiesSelf) mainCookies += ';' + mainCookiesSelf;
                 this.platformStates[QRCodeHandler.PLATFORM_UC] = null;
                 return {
                     status: QRCodeHandler.STATUS_CONFIRMED,
@@ -453,9 +472,9 @@ class QRCodeHandler {
                 };
             } else if (resData.data.status === 50004002) { // token过期
                 this.platformStates[QRCodeHandler.PLATFORM_UC] = null;
-                return { status: QRCodeHandler.STATUS_EXPIRED };
+                return {status: QRCodeHandler.STATUS_EXPIRED};
             } else {
-                return { status: QRCodeHandler.STATUS_NEW };
+                return {status: QRCodeHandler.STATUS_NEW};
             }
         } catch (e) {
             this.platformStates[QRCodeHandler.PLATFORM_UC] = null;
@@ -505,7 +524,7 @@ class QRCodeHandler {
     async _checkBiliStatus() {
         const state = this.platformStates[QRCodeHandler.PLATFORM_BILI];
         if (!state) {
-            return { status: QRCodeHandler.STATUS_EXPIRED };
+            return {status: QRCodeHandler.STATUS_EXPIRED};
         }
 
         try {
@@ -530,9 +549,9 @@ class QRCodeHandler {
             }
 
             if (resData.data.data.code === 86101) { // 未扫码
-                return { status: QRCodeHandler.STATUS_NEW };
+                return {status: QRCodeHandler.STATUS_NEW};
             } else if (resData.data.data.code === 86090) { // 已扫码未确认
-                return { status: QRCodeHandler.STATUS_SCANED };
+                return {status: QRCodeHandler.STATUS_SCANED};
             } else if (resData.data.data.code === 0) { // 已确认
                 const url = resData.data.data.url;
                 let cookie = "";
@@ -547,7 +566,7 @@ class QRCodeHandler {
                 };
             } else { // 二维码过期
                 this.platformStates[QRCodeHandler.PLATFORM_BILI] = null;
-                return { status: QRCodeHandler.STATUS_EXPIRED };
+                return {status: QRCodeHandler.STATUS_EXPIRED};
             }
         } catch (e) {
             this.platformStates[QRCodeHandler.PLATFORM_BILI] = null;

@@ -34,6 +34,9 @@ class QuarkHandler {
 
     getShareData(url) {
         let matches = this.regex.exec(url);
+        if(matches.indexOf("?")>0) {
+            matches = matches.split('?')[0];
+        }
         if (matches) {
             return {
                 shareId: matches[1],
@@ -152,15 +155,10 @@ class QuarkHandler {
 
 
     async api(url, data, headers, method, retry) {
-
         headers = headers || {};
-
         Object.assign(headers, this.baseHeader);
-
         Object.assign(headers, {
-
             Cookie: this.cookie || '',
-
         });
         method = method || 'post';
         const resp =

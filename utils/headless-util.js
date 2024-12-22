@@ -15,8 +15,30 @@ class PuppeteerHelper {
         await this.page.setExtraHTTPHeaders(config.headers || {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36',
         })
-        await this.page.goto(config.url, config.options);
-        return await this.page.content()
+        let content = ''
+        if (config.isJSON || config.isReq) {
+            return await this.page.evaluate(async (url, mth, headers, data) => {
+                const requestOptions = {
+                    method: mth || 'GET',
+                    headers: headers || {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36',
+                        'Content-Type': 'application/json'
+                    },
+                };
+                if (mth !== 'GET' && (data !== '' && data !== undefined)) {
+                    requestOptions.body = JSON.stringify(data);
+                }
+                const response = await fetch(url, requestOptions);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return await response.text();
+            }, config.url, config.method, config.headers, config.data);
+        } else {
+            await this.page.goto(config.url, config.options);
+            content = await this.page.content()
+            return content
+        }
     }
 
     async gotoCookie(config) {
