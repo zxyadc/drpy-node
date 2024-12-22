@@ -60,13 +60,13 @@ async function scanCode(platform) {
     if (timeoutTimer) clearTimeout(timeoutTimer);
 
     const qrcode_expired = './static/img/qrcode_expired.jpg';
+    const img = document.getElementById('qrcode');
 
     try {
         // 获取二维码
         const qrData = await qrcode_handler.startScan(platform);
         
         // 显示二维码
-        const img = document.getElementById('qrcode');
         img.src = qrData.qrcode;
         
         // 开始轮询扫码结果
@@ -116,10 +116,10 @@ async function scanCode(platform) {
         }, 30000);
         
     } catch (error) {
+        console.log(error)
         if (pollInterval) clearInterval(pollInterval);
         if (timeoutTimer) clearTimeout(timeoutTimer);
         img.src = qrcode_expired;
         showToast(`获取二维码失败：${error.message}`, 'error');
     }
 }
-
