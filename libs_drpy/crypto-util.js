@@ -90,3 +90,160 @@ export function base64Decode(text) {
 export function md5(text) {
     return CryptoJS.MD5(text).toString();
 }
+
+export function rc4Encrypt(word, key) {
+    return CryptoJS.RC4.encrypt(word, CryptoJS.enc.Utf8.parse(key)).toString()
+}
+
+export function rc4Decrypt(word, key) {
+    const ciphertext = CryptoJS.enc.Hex.parse(word);
+    const key_data = CryptoJS.enc.Utf8.parse(key)
+    const decrypted = CryptoJS.RC4.decrypt({ciphertext: ciphertext}, key_data, {
+        mode: CryptoJS.mode.ECB,
+        padding: CryptoJS.pad.Pkcs7
+    });
+    return decrypted.toString(CryptoJS.enc.Utf8);
+}
+
+export function rc4_decode(data, key, t) {
+    let pwd = key || 'ffsirllq';
+    let cipher = '';
+    key = [];
+    let box = [];
+    let pwd_length = pwd.length;
+    if (t === 1) {
+        data = atob(data);
+    } else {
+        data = encodeURIComponent(data);
+    }
+    let data_length = data.length;
+    for (let i = 0; i < 256; i++) {
+        key[i] = pwd[i % pwd_length].charCodeAt();
+        box[i] = i;
+    }
+    for (let j = 0, i = 0; i < 256; i++) {
+        j = (j + box[i] + key[i]) % 256;
+        let tmp = box[i];
+        box[i] = box[j];
+        box[j] = tmp;
+    }
+    for (let a = 0, j = 0, i = 0; i < data_length; i++) {
+        a = (a + 1) % 256;
+        j = (j + box[a]) % 256;
+        let tmp = box[a];
+        box[a] = box[j];
+        box[j] = tmp;
+        let k = box[((box[a] + box[j]) % 256)];
+        cipher += String.fromCharCode(data[i].charCodeAt() ^ k);
+    }
+    if (t === 1) {
+        return decodeURIComponent(cipher);
+    } else {
+        return btoa(cipher);
+    }
+}
+
+// https://github.com/Hiram-Wong/ZyPlayer/blob/main/src/renderer/src/utils/crypto.ts
+const hex = {
+    decode: function (val) {
+        return Buffer.from(val, 'hex').toString('utf-8');
+    },
+    encode: function (val) {
+        return Buffer.from(val, 'utf-8').toString('hex');
+    },
+};
+
+const parseEncode = function (value, encoding) {
+    switch (encoding) {
+        case 'base64':
+            return CryptoJS.enc.Base64.parse(value);
+        case 'hex':
+            return CryptoJS.enc.Hex.parse(value);
+        case 'latin1':
+            return CryptoJS.enc.Latin1.parse(value);
+        case 'utf8':
+            return CryptoJS.enc.Utf8.parse(value);
+        default:
+            return CryptoJS.enc.Utf8.parse(value);
+    }
+};
+
+const formatEncode = function (value, encoding) {
+    switch (encoding.toLowerCase()) {
+        case 'base64':
+            return value.toString(); // 整个CipherParams对象(含原数据), 默认输出 Base64
+        case 'hex':
+            return value.ciphertext.toString(); // ciphertext属性(仅密文), 默认输出 Hex
+    }
+};
+
+const formatDecode = function (value, encoding) {
+    switch (encoding.toLowerCase()) {
+        case 'utf8':
+            return value.toString(CryptoJS.enc.Utf8);
+        case 'base64':
+            return value.toString(CryptoJS.enc.Base64);
+        case 'hex':
+            return value.toString(CryptoJS.enc.Hex);
+        default:
+            return value.toString(CryptoJS.enc.Utf8);
+    }
+};
+
+const getMode = function (mode) {
+    switch (mode.toLowerCase()) {
+        case 'cbc':
+            return CryptoJS.mode.CBC;
+        case 'cfb':
+            return CryptoJS.mode.CFB;
+        case 'ofb':
+            return CryptoJS.mode.OFB;
+        case 'ctr':
+            return CryptoJS.mode.CTR;
+        case 'ecb':
+            return CryptoJS.mode.ECB;
+        default:
+            return CryptoJS.mode.CBC;
+    }
+};
+
+const getPad = function (padding) {
+    switch (padding.toLowerCase()) {
+        case 'zeropadding':
+            return CryptoJS.pad.ZeroPadding;
+        case 'pkcs5padding':
+        case 'pkcs7padding':
+            return CryptoJS.pad.Pkcs7;
+        case 'ansix923':
+            return CryptoJS.pad.AnsiX923;
+        case 'iso10126':
+            return CryptoJS.pad.Iso10126;
+        case 'iso97971':
+            return CryptoJS.pad.Iso97971;
+        case 'nopadding':
+            return CryptoJS.pad.NoPadding;
+        default:
+            return CryptoJS.pad.ZeroPadding;
+    }
+};
+
+export const rc4 = {
+    encode: function (val, key, encoding = 'utf8', keyEncoding = 'utf8', outputEncode = 'base64') {
+        if (!['base64', 'hex'].includes(outputEncode.toLowerCase())) return '';
+        if (!key || !val) return '';
+
+        const plaintext = parseEncode(val, encoding);
+        const v = parseEncode(key, keyEncoding);
+
+        return formatEncode(CryptoJS.RC4.encrypt(plaintext, v), outputEncode);
+    },
+    decode: function (val, key, encoding = 'utf8', keyEncoding = 'utf8', outputEncode = 'base64') {
+        if (!['base64', 'hex'].includes(encoding.toLowerCase())) return '';
+        if (!key || !val) return '';
+
+        const plaintext = parseEncode(val, encoding);
+        const v = parseEncode(key, keyEncoding);
+
+        return formatDecode(CryptoJS.RC4.toString(plaintext, v), outputEncode);
+    },
+};

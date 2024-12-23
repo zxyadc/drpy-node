@@ -13,8 +13,9 @@ import {UC} from "../utils/uc.js";
 // const { req } = await import('../utils/req.js');
 import {gbkTool} from '../libs_drpy/gbk.js'
 // import {atob, btoa, base64Encode, base64Decode, md5} from "../libs_drpy/crypto-util.js";
-import {base64Decode, base64Encode, md5} from "../libs_drpy/crypto-util.js";
+import {base64Decode, base64Encode, md5, rc4Decrypt, rc4Encrypt, rc4, rc4_decode} from "../libs_drpy/crypto-util.js";
 import {getContentType, getMimeType} from "../utils/mime-type.js";
+import "../utils/random-http-ua.js";
 import template from '../libs_drpy/template.js'
 import '../libs_drpy/abba.js'
 import '../libs_drpy/drpyInject.js'
@@ -205,6 +206,11 @@ export async function getSandbox(env = {}) {
         base64Encode,
         base64Decode,
         md5,
+        rc4Encrypt,
+        rc4Decrypt,
+        rc4,
+        rc4_decode,
+        randomUa,
         jsonpath,
         hlsParser,
         axios,
@@ -441,7 +447,17 @@ async function invokeWithInjectVars(rule, method, injectVars, args) {
     // return await moduleObject[method].apply(Object.assign(injectVars, moduleObject), args);
     // 这里不使用 bind 或者直接修改原方法，而是通过 apply 临时注入 injectVars 作为 `this` 上下文
     // 这样每次调用时，方法内部的 `this` 会指向 `injectVars`，避免了共享状态，确保数据的隔离性。
-    let result = await method.apply(injectVars, args);  // 使用 apply 临时注入 injectVars 作为上下文，并执行方法
+    let thisProxy = new Proxy(injectVars, {
+        get(injectVars, key) {
+            return injectVars[key] || rule[key]
+        },
+        set(injectVars, key, value) {
+            rule[key] = value;
+            injectVars[key] = value;
+        }
+    });
+    let result = await method.apply(thisProxy, args);
+    // let result = await method.apply(injectVars, args);  // 使用 apply 临时注入 injectVars 作为上下文，并执行方法
     switch (injectVars['method']) {
         case 'class_parse':
             result = await homeParseAfter(result, rule.类型, rule.hikerListCol, rule.hikerClassListCol, injectVars);
@@ -530,11 +546,24 @@ async function invokeMethod(filePath, env, method, args = [], injectVars = {}) {
         const tmpClassFunction = async function () {
         };
         return await invokeWithInjectVars(moduleObject, tmpClassFunction, injectVars, args);
+    } else if (!moduleObject[method] && method === 'lazy') { // 新增特性，可以不写lazy属性
+        const tmpLazyFunction = async function () {
+            let {input} = this;
+            return input
+        };
+        return await invokeWithInjectVars(moduleObject, tmpLazyFunction, injectVars, args);
     } else {
         if (['推荐', '一级', '搜索'].includes(method)) {
             return []
-        } else if (['二级', 'lazy'].includes(method)) {
+        } else if (['二级'].includes(method)) {
             return {}
+        } else if (['lazy'].includes(method)) {
+            // console.log(injectVars);
+            return {
+                parse: 1,
+                url: injectVars.input,
+                header: moduleObject.headers && Object.keys(moduleObject.headers).length > 0 ? moduleObject.headers : undefined
+            }
         } else {  // class_parse一定要有，这样即使不返回数据都能自动取class_name和class_url的内容
             throw new Error(`Method ${method} not found in module ${filePath}`);
         }

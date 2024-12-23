@@ -1,5 +1,20 @@
 # drpyS更新记录
 
+### 20241224
+
+更新至V1.0.20
+
+1. 环境变量 `/config/env.json` 不再提交到github
+2. 修改规则内各个函数的this指向，使this可以获取到rule对象的属性，也能设置属性到rule上
+3. 增加lives配置
+4. 增加drpyS可用的全局函数 `rc4Encrypt` `rc4Decrypt` `rc4` `rc4_decode`
+5. 增加随机ua生成函数 `randomUa.generateUa()`
+6. 增加一个漫画源
+7. batchFetch增加16个一组分组同步请求逻辑
+8. tv订阅允许[盘]类源
+9. 源不定义lazy默认表示嗅探选集链接
+10. 增加 `player.json` 配置一些box所需的播放器参数
+
 ### 20241223
 
 更新至V1.0.19

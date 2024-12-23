@@ -1,5 +1,5 @@
 {
-  "sites_count": 30,
+  "sites_count": 31,
   "sites": [
     {
       "key": "drpyS_哔哩直播[官]",
@@ -242,6 +242,16 @@
       "ext": ""
     },
     {
+      "key": "drpyS_ACG漫画网",
+      "name": "ACG漫画网(DS)",
+      "type": 4,
+      "api": "http://192.168.31.49:5757/api/ACG漫画网",
+      "searchable": 2,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
       "key": "drpyS_ikanbot",
       "name": "ikanbot(DS)",
       "type": 4,
@@ -334,6 +344,17 @@
       "header": {
         "User-Agent": "Mozilla/5.0"
       }
+    }
+  ],
+  "lives": [
+    {
+      "name": "直播",
+      "type": 0,
+      "url": "http://192.168.31.49:5757/public/lives/tv.m3u",
+      "playerType": 1,
+      "ua": "okhttp/3.12.13",
+      "epg": "https://epg.mxdyeah.top/api/diyp/?ch={name}&date={date}",
+      "logo": "https://live.mxdyeah.top/logo/{name}.png"
     }
   ]
 }

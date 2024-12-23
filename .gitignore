@@ -131,3 +131,4 @@ dist
 /local/
 !README.md
 .idea
+/config/env.json
