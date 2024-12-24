@@ -1,8 +1,11 @@
 import os
 import datetime
 
-# 要排除的目录列表，可以根据需要自行添加
-EXCLUDE_DIRS = ['.git', '.idea','soft','drop_code','jstest','local','logs','对话1.txt']
+# 要排除的目录列表
+EXCLUDE_DIRS = ['.git', '.idea', 'soft', 'drop_code', 'jstest', 'local', 'logs', '对话1.txt']
+
+# 要排除的文件列表
+EXCLUDE_FILES = ['config/env.json', '.env', '/js/玩偶哥哥[盘].js']
 
 def compress_directory():
     # 获取当前目录名
@@ -20,12 +23,24 @@ def compress_directory():
 
     # 构建 7z 压缩命令
     exclude_params = []
-    for exclude_dir in EXCLUDE_DIRS:
-        exclude_params.extend(["-xr!", exclude_dir])
 
-    command = (
-        f"7z a \"{archive_path}\" ./ -r " + " ".join(f"-xr!{dir}" for dir in EXCLUDE_DIRS)
-    )
+    # 排除目录
+    for exclude_dir in EXCLUDE_DIRS:
+        exclude_params.append(f"-xr!{exclude_dir}")
+
+    # 排除文件
+    for exclude_file in EXCLUDE_FILES:
+        # 使用相对路径来确保文件的准确性
+        if os.path.exists(exclude_file):
+            exclude_params.append(f"-xr!{exclude_file}")
+        else:
+            print(f"警告: {exclude_file} 不存在!")
+
+    # 构建命令
+    command = f"7z a \"{archive_path}\" ./ -r " + " ".join(exclude_params)
+
+    # 打印构建的命令进行调试
+    print(f"构建的 7z 命令: {command}")
 
     try:
         # 执行压缩命令
