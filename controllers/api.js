@@ -5,89 +5,105 @@ import * as drpy from '../libs/drpyS.js';
 
 export default (fastify, options, done) => {
     // 动态加载模块并根据 query 执行不同逻辑
-    fastify.get('/api/:module', async (request, reply) => {
-        const moduleName = request.params.module;
-        const query = request.query; // 获取 query 参数
-        const modulePath = path.join(options.jsDir, `${moduleName}.js`);
-        if (!existsSync(modulePath)) {
-            reply.status(404).send({error: `Module ${moduleName} not found`});
-            return;
-        }
-        const protocol = request.protocol;
-        const hostname = request.hostname;
-        const proxyUrl = `${protocol}://${hostname}${request.url}`.split('?')[0].replace('/api/', '/proxy/') + '/?do=js';
-        // console.log(`proxyUrl:${proxyUrl}`);
-        const env = {
-            proxyUrl, getProxyUrl: function () {
-                return proxyUrl
+    fastify.route({
+        method: ['GET', 'POST'], // 同时支持 GET 和 POST
+        url: '/api/:module',
+        schema: {
+            consumes: ['application/json', 'application/x-www-form-urlencoded'], // 声明支持的内容类型
+        },
+        handler: async (request, reply) => {
+            const moduleName = request.params.module;
+            const modulePath = path.join(options.jsDir, `${moduleName}.js`);
+            if (!existsSync(modulePath)) {
+                reply.status(404).send({error: `Module ${moduleName} not found`});
+                return;
             }
-        };
-        const pg = Number(query.pg) || 1;
-        try {
-            // 根据 query 参数决定执行逻辑
-            if ('play' in query) {
-                // 处理播放逻辑
-                const result = await drpy.play(modulePath, env, query.flag, query.play);
-                return reply.send(result);
-            }
-
-            if ('ac' in query && 't' in query) {
-                let ext = query.ext;
-                // console.log('ext:', ext);
-                let extend = {};
-                if (ext) {
-                    try {
-                        extend = JSON.parse(base64Decode(ext))
-                    } catch (e) {
-                        fastify.log.error(`筛选参数错误:${e.message}`);
-                    }
+            // 根据请求方法选择参数来源
+            const query = request.method === 'GET' ? request.query : request.body;
+            const protocol = request.protocol;
+            const hostname = request.hostname;
+            const proxyUrl = `${protocol}://${hostname}${request.url}`.split('?')[0].replace('/api/', '/proxy/') + '/?do=js';
+            const publicUrl = `${protocol}://${hostname}/public/`;
+            // console.log(`proxyUrl:${proxyUrl}`);
+            const env = {
+                proxyUrl, publicUrl, getProxyUrl: function () {
+                    return proxyUrl
                 }
-                // 分类逻辑
-                const result = await drpy.cate(modulePath, env, query.t, pg, 1, extend);
-                return reply.send(result);
-            }
-
-            if ('ac' in query && 'ids' in query) {
-                // 详情逻辑
-                const result = await drpy.detail(modulePath, env, query.ids.split(','));
-                return reply.send(result);
-            }
-
-            if ('wd' in query) {
-                // 搜索逻辑
-                const quick = 'quick' in query ? query.quick : 0;
-                const result = await drpy.search(modulePath, env, query.wd, quick, pg);
-                return reply.send(result);
-            }
-
-            if ('refresh' in query) {
-                // 强制刷新初始化逻辑
-                const refreshedObject = await drpy.init(modulePath, env, true);
-                return reply.send(refreshedObject);
-            }
-            if (!('filter' in query)) {
-                query.filter = 1
-            }
-            // 默认逻辑，返回 home + homeVod 接口
-            const filter = 'filter' in query ? query.filter : 1;
-            const resultHome = await drpy.home(modulePath, env, filter);
-            const resultHomeVod = await drpy.homeVod(modulePath, env);
-            let result = {
-                ...resultHome,
-                // list: resultHomeVod,
             };
-            if (Array.isArray(resultHomeVod) && resultHomeVod.length > 0) {
-                Object.assign(result, {list: resultHomeVod})
+            const pg = Number(query.pg) || 1;
+            try {
+                // 根据 query 参数决定执行逻辑
+                if ('play' in query) {
+                    // 处理播放逻辑
+                    const result = await drpy.play(modulePath, env, query.flag, query.play);
+                    return reply.send(result);
+                }
+
+                if ('ac' in query && 't' in query) {
+                    let ext = query.ext;
+                    // console.log('ext:', ext);
+                    let extend = {};
+                    if (ext) {
+                        try {
+                            extend = JSON.parse(base64Decode(ext))
+                        } catch (e) {
+                            fastify.log.error(`筛选参数错误:${e.message}`);
+                        }
+                    }
+                    // 分类逻辑
+                    const result = await drpy.cate(modulePath, env, query.t, pg, 1, extend);
+                    return reply.send(result);
+                }
+
+                if ('ac' in query && 'ids' in query) {
+                    // 详情逻辑
+                    const result = await drpy.detail(modulePath, env, query.ids.split(','));
+                    return reply.send(result);
+                }
+
+                if ('ac' in query && 'action' in query) {
+                    // 处理动作逻辑
+                    const result = await drpy.action(modulePath, env, query.action, query.value);
+                    return reply.send(result);
+                }
+
+
+                if ('wd' in query) {
+                    // 搜索逻辑
+                    const quick = 'quick' in query ? query.quick : 0;
+                    const result = await drpy.search(modulePath, env, query.wd, quick, pg);
+                    return reply.send(result);
+                }
+
+                if ('refresh' in query) {
+                    // 强制刷新初始化逻辑
+                    const refreshedObject = await drpy.init(modulePath, env, true);
+                    return reply.send(refreshedObject);
+                }
+                if (!('filter' in query)) {
+                    query.filter = 1
+                }
+                // 默认逻辑，返回 home + homeVod 接口
+                const filter = 'filter' in query ? query.filter : 1;
+                const resultHome = await drpy.home(modulePath, env, filter);
+                const resultHomeVod = await drpy.homeVod(modulePath, env);
+                let result = {
+                    ...resultHome,
+                    // list: resultHomeVod,
+                };
+                if (Array.isArray(resultHomeVod) && resultHomeVod.length > 0) {
+                    Object.assign(result, {list: resultHomeVod})
+                }
+
+                reply.send(result);
+
+            } catch (error) {
+                // console.log('Error processing request:', error);
+                // reply.status(500).send({error: `Failed to process request for module ${moduleName}: ${error.message}`});
+
+                fastify.log.error(`Error api module ${moduleName}:${error.message}`);
+                reply.status(500).send({error: `Failed to process module ${moduleName}: ${error.message}`});
             }
-
-            reply.send(result);
-
-        } catch (error) {
-            // console.log('Error processing request:', error);
-            // reply.status(500).send({error: `Failed to process request for module ${moduleName}: ${error.message}`});
-
-            fastify.log.error(`Error api module ${moduleName}:${error.message}`);
-            reply.status(500).send({error: `Failed to process module ${moduleName}: ${error.message}`});
         }
     });
 

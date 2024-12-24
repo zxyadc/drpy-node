@@ -2,6 +2,7 @@ import {readdirSync, readFileSync, writeFileSync, existsSync} from 'fs';
 import path from 'path';
 import * as drpy from '../libs/drpyS.js';
 import {naturalSort, urljoin} from '../utils/utils.js'
+import {ENV} from "../utils/env.js";
 
 // 工具函数：生成 JSON 数据
 async function generateSiteJSON(jsDir, requestHost, sub, subFilePath) {
@@ -27,6 +28,10 @@ async function generateSiteJSON(jsDir, requestHost, sub, subFilePath) {
         }
     }
     let sites = [];
+    // console.log('hide_adult:', ENV.get('hide_adult'));
+    if (ENV.get('hide_adult') === '1') {
+        valid_files = valid_files.filter(it => !(new RegExp('\\[[密]\\]|密+')).test(it));
+    }
     for (const file of valid_files) {
         const baseName = path.basename(file, '.js'); // 去掉文件扩展名
         const key = `drpyS_${baseName}`;

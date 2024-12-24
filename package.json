@@ -1,6 +1,6 @@
 {
   "name": "drpy-node",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -17,9 +17,11 @@
   "author": "晚风拂柳颜 <434857005@qq.com>",
   "license": "MIT",
   "dependencies": {
+    "@fastify/formbody": "^7.4.0",
     "@fastify/static": "7.0.4",
     "axios": "^1.7.9",
     "cheerio": "^1.0.0",
+    "dayjs": "^1.11.13",
     "dotenv": "^16.4.7",
     "fastify": "^4.15.0",
     "fastq": "^1.17.1",

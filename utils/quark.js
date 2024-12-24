@@ -1,5 +1,6 @@
 import req from './req.js';
 import {ENV} from './env.js';
+import COOKIE from './cookieManager.js';
 import '../libs_drpy/crypto-js.js';
 import {join} from 'path';
 import fs from 'fs';
@@ -34,7 +35,7 @@ class QuarkHandler {
 
     getShareData(url) {
         let matches = this.regex.exec(url);
-        if(matches.indexOf("?")>0) {
+        if (matches.indexOf("?") > 0) {
             matches = matches.split('?')[0];
         }
         if (matches) {
@@ -334,6 +335,31 @@ class QuarkHandler {
         return true;
     }
 
+    async refreshQuarkCookie() {
+        const cookieSelfRes = await axios({
+            url: "https://drive-pc.quark.cn/1/clouddrive/file/sort?pr=ucpro&fr=pc&uc_param_str=&pdir_fid=0&_page=1&_size=50&_fetch_total=1&_fetch_sub_dirs=0&_sort=file_type:asc,updated_at:desc",
+            method: "GET",
+            headers: {
+                "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch',
+                Origin: 'https://pan.quark.cn',
+                Referer: 'https://pan.quark.cn/',
+                Cookie: this.cookie
+            }
+        });
+        const cookieResDataSelf = cookieSelfRes.headers;
+        const cookieObject = COOKIE.parse(cookieResDataSelf['set-cookie']);
+        // console.log(cookieObject);
+        if (cookieObject.__puus) {
+            const oldCookie = COOKIE.parse(this.cookie);
+            const newCookie = COOKIE.stringify({
+                __pus: oldCookie.__pus,
+                __puus: cookieObject.__puus,
+            });
+            console.log('自动更新夸克 cookie:', newCookie);
+            ENV.set('quark_cookie', newCookie);
+        }
+    }
+
     async getLiveTranscoding(shareId, stoken, fileId, fileToken) {
         if (!this.saveFileIdCaches[fileId]) {
             const saveFileId = await this.save(shareId, stoken, fileId, fileToken, true);
@@ -348,6 +374,23 @@ class QuarkHandler {
 
         });
         if (transcoding.data && transcoding.data.video_list) {
+            const low_url = transcoding.data.video_list.slice(-1)[0].video_info.url;
+            const low_headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+                'origin': 'https://pan.quark.cn',
+                'referer': 'https://pan.quark.cn/',
+                'Cookie': this.cookie
+            };
+            // console.log('low_url:', low_url);
+            const test_result = await this.testSupport(low_url, low_headers);
+            // console.log(test_result);
+            if (!test_result[0]) {
+                try {
+                    await this.refreshQuarkCookie();
+                } catch (e) {
+                    console.log(`自动刷新夸克cookie失败:${e.message}`)
+                }
+            }
             return transcoding.data.video_list;
         }
         return null;
@@ -406,7 +449,8 @@ class QuarkHandler {
 
             .catch((err) => {
 
-                console.error(err);
+                // console.error(err);
+                console.error(err.message);
 
                 return err.response || {status: 500, data: {}};
 

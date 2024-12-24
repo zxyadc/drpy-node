@@ -1,5 +1,6 @@
 import req from './req.js';
 import {ENV} from './env.js';
+import COOKIE from './cookieManager.js';
 import '../libs_drpy/crypto-js.js';
 import {join} from 'path';
 import fs from 'fs';
@@ -353,6 +354,31 @@ class UCHandler {
 
     }
 
+    async refreshUcCookie() {
+        const cookieSelfRes = await axios({
+            url: "https://pc-api.uc.cn/1/clouddrive/config?pr=UCBrowser&fr=pc",
+            method: "GET",
+            headers: {
+                "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch',
+                Origin: 'https://drive.uc.cn',
+                Referer: 'https://drive.uc.cn/',
+                Cookie: this.cookie
+            }
+        });
+        const cookieResDataSelf = cookieSelfRes.headers;
+        const cookieObject = COOKIE.parse(cookieResDataSelf['set-cookie']);
+        // console.log(cookieObject);
+        if (cookieObject.__puus) {
+            const oldCookie = COOKIE.parse(this.cookie);
+            const newCookie = COOKIE.stringify({
+                __pus: oldCookie.__pus,
+                __puus: cookieObject.__puus,
+            });
+            console.log('自动更新UC cookie:', newCookie);
+            ENV.set('uc_cookie', newCookie);
+        }
+    }
+
 
     async getDownload(shareId, stoken, fileId, fileToken, clean) {
 
@@ -373,7 +399,22 @@ class UCHandler {
         });
 
         if (down.data) {
-
+            const low_url = down.data[0].download_url;
+            const low_headers = {
+                "Referer": "https://drive.uc.cn/",
+                "cookie": this.cookie,
+                "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch'
+            };
+            // console.log('low_url:', low_url);
+            const test_result = await this.testSupport(low_url, low_headers);
+            // console.log('test_result:', test_result);
+            if (!test_result[0]) {
+                try {
+                    await this.refreshUcCookie();
+                } catch (e) {
+                    console.log(`自动刷新UC cookie失败:${e.message}`)
+                }
+            }
             return down.data[0];
 
         }
@@ -405,7 +446,8 @@ class UCHandler {
 
             .catch((err) => {
 
-                console.error(err);
+                // console.error(err);
+                console.error(err.message);
 
                 return err.response || {status: 500, data: {}};
 

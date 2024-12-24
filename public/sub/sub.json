@@ -1,5 +1,13 @@
 [
   {
+    "name": "全部",
+    "code": "all",
+    "reg": ".*",
+    "mode": 0,
+    "sort": "",
+    "status": 1
+  },
+  {
     "name": "29",
     "code": "yellow",
     "reg": "密",

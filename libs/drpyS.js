@@ -10,6 +10,7 @@ import COOKIE from '../utils/cookieManager.js';
 import {ENV} from '../utils/env.js';
 import {Quark} from "../utils/quark.js";
 import {UC} from "../utils/uc.js";
+import {Ali} from "../utils/ali.js";
 // const { req } = await import('../utils/req.js');
 import {gbkTool} from '../libs_drpy/gbk.js'
 // import {atob, btoa, base64Encode, base64Decode, md5} from "../libs_drpy/crypto-util.js";
@@ -37,8 +38,10 @@ globalThis.misc = misc;
 globalThis.utils = utils;
 globalThis.COOKIE = COOKIE;
 globalThis.ENV = ENV;
+globalThis._ENV = process.env;
 globalThis.Quark = Quark;
 globalThis.UC = UC;
+globalThis.Ali = Ali;
 globalThis.pathLib = {
     basename: path.basename,
     extname: path.extname,
@@ -222,8 +225,10 @@ export async function getSandbox(env = {}) {
         URLSearchParams,
         COOKIE,
         ENV,
+        _ENV,
         Quark,
         UC,
+        Ali,
     };
 
     // 创建一个沙箱上下文，注入需要的全局变量和函数
@@ -1096,6 +1101,14 @@ export async function proxy(filePath, env, params) {
         });
     } catch (e) {
         return [500, 'text/plain', '代理规则错误:' + e.message]
+    }
+}
+
+export async function action(filePath, env, action, value) {
+    try {
+        return await invokeMethod(filePath, env, 'action', [action, value], {});
+    } catch (e) {
+        return '动作规则错误:' + e.message
     }
 }
 

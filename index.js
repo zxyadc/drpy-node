@@ -3,6 +3,7 @@ import * as fastlogger from './controllers/fastlogger.js'
 import path from 'path';
 import os from 'os';
 import {fileURLToPath} from 'url';
+import formBody from '@fastify/formbody';
 
 const {fastify} = fastlogger;
 
@@ -22,6 +23,9 @@ fastify.register(fastifyStatic, {
     prefix: '/apps/', // 新的访问路径前缀
     decorateReply: false, // 禁用 sendFile
 });
+
+// 注册插件以支持 application/x-www-form-urlencoded
+fastify.register(formBody);
 
 // 注册控制器
 import {registerRoutes} from './controllers/index.js';
