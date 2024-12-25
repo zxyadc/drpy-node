@@ -9,8 +9,8 @@ var rule = {
         return action_data;
     },
     host: 'http://empty',
-    class_name: '夸克&UC&阿里&哔哩&青少年模式',
-    class_url: 'quark&uc&ali&bili&adult',
+    class_name: '夸克&UC&阿里&哔哩&青少年模式&测试',
+    class_url: 'quark&uc&ali&bili&adult&test',
     url: '/fyclass',
     action: async function (action, value) {
         if (action === 'set-cookie') {
@@ -125,6 +125,7 @@ var rule = {
             'ali': urljoin(publicUrl, './images/icon_cookie/阿里.png'),
             'bili': urljoin(publicUrl, './images/icon_cookie/哔哩.png'),
             'adult': urljoin(publicUrl, './images/icon_cookie/chat.webp'),
+            'test': urljoin(publicUrl, './icon.svg'),
         };
         let d = [];
         switch (MY_CATE) {
@@ -148,9 +149,50 @@ var rule = {
                 d.push(genMultiInput('hide_adult', '设置青少年模式', '把值设置为1将会在全部接口隐藏18+源，其他值不过滤，跟随订阅', images.adult));
                 d.push(getInput('get_hide_adult', '查看青少年模式', images.adult));
                 break;
+            case 'test':
+                d.push({
+                    vod_id: "proxyStream",
+                    vod_name: "测试本地代理流",
+                    vod_pic: images.test,
+                    vod_desc: "流式代理mp4等视频"
+                });
+                break;
         }
         return d
-    }
+    },
+    二级: async function (ids) {
+        let {input, orId, getProxyUrl} = this;
+        log(input, orId);
+        if (orId === 'proxyStream') {
+            let media_url = 'https://vdse.bdstatic.com//628ca08719cef5987ea2ae3c6f0d2386.mp4';
+            return {
+                vod_id: 'proxyStream',
+                vod_name: '测试代理流',
+                vod_play_from: 'drpyS本地流代理',
+                vod_play_url: '测试播放流$' + getProxyUrl().replace('?do=js', media_url)
+            }
+        }
+    },
+    play_parse: true,
+    lazy: async function () {
+        let {input} = this;
+        return {parse: 0, url: input}
+    },
+    proxy_rule: async function () {
+        let {input, proxyPath} = this;
+        const url = proxyPath;
+        log('start proxy:', url);
+        try {
+            const headers = {
+                'user-agent': PC_UA,
+            }
+            return [200, null, url, headers, 2]
+        } catch (e) {
+            log('proxy error:', e.message);
+            return [500, 'text/plain', e.message]
+        }
+    },
+
 };
 
 

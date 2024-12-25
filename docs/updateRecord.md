@@ -23,6 +23,7 @@ console.log('typeof getPublicIp2:', typeof getPublicIp2);
 ```
 
 6. drpyS源初始化增加30秒超时返回机制(但不会中断后台任务，请确保代码不要含有死循环等操作)
+7. 研究本地代理流但是没成功，代码保留了
 
 ### 20241225
 

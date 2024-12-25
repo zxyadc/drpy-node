@@ -2,6 +2,15 @@ import path from 'path';
 import {existsSync} from 'fs';
 import {base64Decode} from '../libs_drpy/crypto-util.js';
 import * as drpy from '../libs/drpyS.js';
+// 创建 Agent 实例以复用 TCP 连接
+import http from 'http';
+import https from 'https';
+
+// const AgentOption = { keepAlive: true, maxSockets: 100,timeout: 60000 }; // 最大连接数100,60秒定期清理空闲连接
+const AgentOption = {keepAlive: true};
+const httpAgent = new http.Agent(AgentOption);
+const httpsAgent = new https.Agent(AgentOption);
+
 
 export default (fastify, options, done) => {
     // 动态加载模块并根据 query 执行不同逻辑
@@ -117,6 +126,7 @@ export default (fastify, options, done) => {
         }
         const proxyPath = request.params['*']; // 捕获整个路径
         fastify.log.info(`try proxy for ${moduleName} -> ${proxyPath}: ${JSON.stringify(query)}`);
+        const rangeHeader = request.headers.range; // 获取客户端的 Range 请求头
         const protocol = request.protocol;
         const hostname = request.hostname;
         const proxyUrl = `${protocol}://${hostname}${request.url}`.split('?')[0].replace(proxyPath, '') + '?do=js';
@@ -133,8 +143,8 @@ export default (fastify, options, done) => {
             let content = backRespList[2] || '';
             const headers = backRespList.length > 3 ? backRespList[3] : null;
             const toBytes = backRespList.length > 4 ? backRespList[4] : null;
-            // 如果需要转换为字节内容
-            if (toBytes) {
+            // 如果需要转换为字节内容(尝试base64转bytes)
+            if (toBytes === 1) {
                 try {
                     if (content.includes('base64,')) {
                         content = unescape(content.split("base64,")[1]);
@@ -143,6 +153,14 @@ export default (fastify, options, done) => {
                 } catch (e) {
                     fastify.log.error(`Local Proxy toBytes error: ${e}`);
                 }
+            }
+            // 流代理
+            else if (toBytes === 2 && content.startsWith('http')) {
+                const new_headers = {
+                    ...(headers ? headers : {}),
+                    ...(rangeHeader ? {Range: rangeHeader} : {}), // 添加 Range 请求头
+                }
+                return proxyStreamMedia(content, new_headers, reply); // 走  流式代理
             }
 
             // 根据媒体类型来决定如何设置字符编码
@@ -233,3 +251,65 @@ export default (fastify, options, done) => {
     });
     done();
 };
+
+// 媒体文件 流式代理
+function proxyStreamMedia(videoUrl, headers, reply) {
+    console.log(`进入了流式代理: ${videoUrl} | headers: ${JSON.stringify(headers)}`);
+
+    const protocol = videoUrl.startsWith('https') ? https : http;
+    const agent = videoUrl.startsWith('https') ? httpsAgent : httpAgent;
+
+    // 发起请求
+    const proxyRequest = protocol.request(videoUrl, {headers, agent}, (videoResponse) => {
+        console.log('videoResponse.statusCode:', videoResponse.statusCode);
+        console.log('videoResponse.headers:', videoResponse.headers);
+
+        if (videoResponse.statusCode === 200 || videoResponse.statusCode === 206) {
+            const resp_headers = {
+                'Content-Type': videoResponse.headers['content-type'] || 'application/octet-stream',
+                'Content-Length': videoResponse.headers['content-length'],
+                ...(videoResponse.headers['content-range'] ? {'Content-Range': videoResponse.headers['content-range']} : {}),
+            };
+            console.log('Response headers:', resp_headers);
+            reply.headers(resp_headers).status(videoResponse.statusCode);
+
+            // 将响应流直接管道传输给客户端
+            videoResponse.pipe(reply.raw);
+
+            videoResponse.on('data', (chunk) => {
+                console.log('Data chunk received, size:', chunk.length);
+            });
+
+            videoResponse.on('end', () => {
+                console.log('Video data transmission complete.');
+            });
+
+            videoResponse.on('error', (err) => {
+                console.error('Error during video response:', err.message);
+                reply.code(500).send({error: 'Error streaming video', details: err.message});
+            });
+
+            reply.raw.on('finish', () => {
+                console.log('Data fully sent to client');
+            });
+
+            // 监听关闭事件，销毁视频响应流
+            reply.raw.on('close', () => {
+                console.log('Response stream closed.');
+                videoResponse.destroy();
+            });
+        } else {
+            console.error(`Unexpected status code: ${videoResponse.statusCode}`);
+            reply.code(videoResponse.statusCode).send({error: 'Failed to fetch video'});
+        }
+    });
+
+    // 监听错误事件
+    proxyRequest.on('error', (err) => {
+        console.error('Proxy request error:', err.message);
+        reply.code(500).send({error: 'Error fetching video', details: err.message});
+    });
+
+    // 必须调用 .end() 才能发送请求
+    proxyRequest.end();
+}
