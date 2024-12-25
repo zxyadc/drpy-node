@@ -1,6 +1,7 @@
 import {readFile} from 'fs/promises';
 import {existsSync, readFileSync} from 'fs';
 import {fileURLToPath} from "url";
+import {createRequire} from 'module';
 import path from "path";
 import vm from 'vm';
 import '../libs_drpy/es6-extend.js'
@@ -42,6 +43,7 @@ globalThis._ENV = process.env;
 globalThis.Quark = Quark;
 globalThis.UC = UC;
 globalThis.Ali = Ali;
+globalThis.require = createRequire(import.meta.url);
 globalThis.pathLib = {
     basename: path.basename,
     extname: path.extname,
@@ -229,6 +231,7 @@ export async function getSandbox(env = {}) {
         Quark,
         UC,
         Ali,
+        require,
     };
 
     // 创建一个沙箱上下文，注入需要的全局变量和函数
@@ -309,8 +312,33 @@ export async function init(filePath, env, refresh) {
     })();
     `;
         const ruleScript = new vm.Script(js_code_wrapper);
-        ruleScript.runInContext(context);
-        sandbox.rule = await sandbox._asyncGetRule;
+        // ruleScript.runInContext(context);
+        // const result = await ruleScript.runInContext(context);
+        const executeWithTimeout = (script, context, timeout) => {
+            return Promise.race([
+                new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Code execution timed out')), timeout)
+                ),
+                new Promise((resolve, reject) => {
+                    try {
+                        const result = script.runInContext(context); // 同步运行脚本
+                        if (result && typeof result.then === 'function') {
+                            // 如果结果是 Promise，则等待其解析
+                            result.then(resolve).catch(reject);
+                        } else {
+                            // 如果结果是非异步值，直接返回
+                            resolve(result);
+                        }
+                    } catch (error) {
+                        reject(error);
+                    }
+                })
+            ]);
+        };
+        const result = await executeWithTimeout(ruleScript, context, 30000);
+        // console.log('result:', result);
+        // sandbox.rule = await sandbox._asyncGetRule;
+        sandbox.rule = result;
 
         // rule注入完毕后添加自定义req扩展request方法进入规则,这个代码里可以直接获取rule的任意对象，而且还是独立隔离的
         const reqExtendScript = new vm.Script(req_extend_code);

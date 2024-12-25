@@ -1,4 +1,14 @@
 const {getIp} = await $.import('http://127.0.0.1:5757/public/ip.js');
+const fs = require('fs');
+const path = require('path');
+const absolutePath = path.resolve('./');
+console.log(absolutePath);
+const data = fs.readFileSync('./js/_360.js', 'utf8');
+console.log(data);
+
+const {getPublicIp1, getPublicIp2} = require('../js/_lib.request.cjs');
+console.log('typeof getPublicIp1:', typeof getPublicIp1);
+console.log('typeof getPublicIp2:', typeof getPublicIp2);
 
 function test_rc4() {
     /*
@@ -27,7 +37,34 @@ function test_rc4() {
 function test_ua() {
     let ua = randomUa.generateUa();
     log('ua:', ua);
+    log(['1'] instanceof Array);
+    let uas = randomUa.generateUa(10, {
+        device: ['pc', '70^mobile'],
+        pcOs: ['macos'],
+        mobileOs: ['android', '90^ios'],
+    });
+    log(uas);
+    log(typeof setTimeout);
+    log(typeof setInterval);
+    log(typeof require);
 }
+
+// 下面这个代码放哪儿都是可以后端持续执行任务，比如放class_parse里
+// (async ()=>{
+//     for (let i = 1; i <= 100; i++) {
+//         console.log('模拟扫码检测，第' + i + '次');
+//         await sleep(1000);
+//     }
+// })();
+
+// 这个可以超时返回但无法结束任务
+/*
+for (let i = 1; i <= 100; i++) {
+    console.log('模拟扫码检测，第' + i + '次');
+    await sleep(1000);
+}
+
+ */
 
 const rule = {
     类型: '小说',
@@ -37,8 +74,21 @@ const rule = {
     homeUrl: 'https://fanqienovel.com/api/author/book/category_list/v0/',
     url: '/api/author/library/book_list/v0/?page_count=18&page_index=(fypage-1)&gender=-1&category_id=fyclass&creation_status=-1&word_count=-1&sort=0#fyfilter',
     class_parse: async () => {
+        // let ip = await getPublicIp1();
+        let ip = await getPublicIp2();
+        log('ip:', ip);
         test_ua();
-        test_rc4()
+        // test_rc4()
+
+        /*
+        (async ()=>{
+            for (let i = 1; i <= 100; i++) {
+                console.log('模拟扫码检测，第' + i + '次');
+                await sleep(1000);
+            }
+        })();
+         */
+
     },
     class_parse1: async () => {
         log('env:', ENV.get());

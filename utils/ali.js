@@ -28,7 +28,7 @@ class AliDrive {
     // 初始化方法，加载本地配置
     async init() {
         if (this.token) {
-            log('阿里token获取成功：' + this.token)
+            console.log('阿里token获取成功：' + this.token)
         }
         if (this.ali_refresh_token === '') {
             this.oauth.access_token = null
@@ -37,22 +37,22 @@ class AliDrive {
             let now = Math.floor(Date.now() / 1000)
             if (exp.exp < now) {
                 this.oauth.access_token = null
-                log('阿里ali_refresh_token已过期')
+                console.log('阿里ali_refresh_token已过期')
             } else {
                 this.oauth.access_token = this.ali_refresh_token
-                log('阿里ali_refresh_token未过期，继续使用,可使用时间截止到：' + (new Date(exp.exp * 1000)).toLocaleString())
-                log('阿里ali_refresh_token获取成功：' + this.ali_refresh_token)
+                console.log('阿里ali_refresh_token未过期，继续使用,可使用时间截止到：' + (new Date(exp.exp * 1000)).toLocaleString())
+                console.log('阿里ali_refresh_token获取成功：' + this.ali_refresh_token)
             }
         }
     }
 
     get token() {
-        // log('env.cookie.quark:',ENV.get('quark_cookie'));
+        // console.log('env.cookie.quark:',ENV.get('quark_cookie'));
         return ENV.get('ali_token');
     }
 
     get ali_refresh_token() {
-        // log('env.cookie.quark:',ENV.get('quark_cookie'));
+        // console.log('env.cookie.quark:',ENV.get('quark_cookie'));
         return ENV.get('ali_refresh_token');
     }
 
@@ -171,20 +171,15 @@ class AliDrive {
             });
         if (resp.status === 401) {
             console.error('请求未授权，尝试刷新 Token 并重试');
-            if (auth) {
-                await this.refreshAccessToken();
-                Object.assign(headers, {
-                    Authorization: this.user.auth,
-                });
-            } else {
-                await this.refreshOAuthToken();
-                Object.assign(headers, {
-                    Authorization: this.oauth.auth,
-                });
-            }
+            await this.refreshAccessToken();
+            Object.assign(headers, {
+                Authorization: this.user.auth,
+            });
             return await this.api(url, data, headers, retry - 1);
         } else if (resp.status === 429 && retry > 0) {
+            console.error('请求频繁，请稍后再试');
             await this.delay(1000);
+            await this.refreshAccessToken();
             return await this.api(url, data, headers, retry - 1);
         }
         return resp.data || {};
@@ -278,7 +273,7 @@ class AliDrive {
     //                     this.oauth.auth = `${this.oauth.token_type} ${this.oauth.access_token}`;
     //                     await ENV.set('ali_refresh_token', this.oauth.access_token);
     //                     // await ENV.set('oauth_cache', this.oauth);
-    //                     log("授权成功")
+    //                     console.log("授权成功")
     //                 }
     //         } catch(err){
     //             if(err.status === '429'){
@@ -290,7 +285,7 @@ class AliDrive {
     //         }
     //
     //     }else {
-    //         log("已授权")
+    //         console.log("已授权")
     //     }
     // }
 
@@ -362,11 +357,11 @@ class AliDrive {
                     this.oauth.auth = `${this.oauth.token_type} ${this.oauth.access_token}`;
                     await ENV.set('ali_refresh_token', this.oauth.access_token);
                     // await ENV.set('oauth_cache', this.oauth);
-                    log("授权成功")
+                    console.log("授权成功")
                 }
             }
         } else {
-            log("已授权，无需再授权")
+            console.log("已授权，无需再授权")
         }
     }
 
@@ -637,7 +632,7 @@ class AliDrive {
         if (resp.status === 200) {
             return resp.data
         } else {
-            log("获取用户信息失败")
+            console.log("获取用户信息失败")
             return null
         }
     }

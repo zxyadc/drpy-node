@@ -69,7 +69,7 @@ var rule = {
         let vod = {
             "vod_name": $('h1.page-title').text(),
             "vod_id": input,
-            "vod_remarks": $('.video-info-item').text(),
+            "vod_remarks": $(' div.video-info-main div:nth-child(4) div.video-info-item').text(),
             "vod_pic": $('.lazyload').attr('data-src'),
             "vod_content": $('p.sqjj_a').text(),
         }
@@ -140,6 +140,8 @@ var rule = {
         let UCTranscodingCache = {};
         if (flag.startsWith('Quark-')) {
             console.log("夸克网盘解析开始")
+            const down = await Quark.getDownload(ids[0], ids[1], ids[2], ids[3], true);
+            urls.push("原画", down.download_url + '#fastPlayMode##threads=10#')
             const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
             transcoding.forEach((t) => {
                 urls.push(t.resolution === 'low' ? "流畅" : t.resolution === 'high' ? "高清" : t.resolution === 'super' ? "超清" : t.resolution, t.video_info.url)

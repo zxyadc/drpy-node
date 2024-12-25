@@ -1,8 +1,29 @@
 "use strict";
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+function _objectSpread(target) {
+    for (var i = 1; i < arguments.length; i++) {
+        var source = arguments[i] != null ? arguments[i] : {};
+        var ownKeys = Object.keys(source);
+        if (typeof Object.getOwnPropertySymbols === 'function') {
+            ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
+                return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+            }));
+        }
+        ownKeys.forEach(function (key) {
+            _defineProperty(target, key, source[key]);
+        });
+    }
+    return target;
+}
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _defineProperty(obj, key, value) {
+    if (key in obj) {
+        Object.defineProperty(obj, key, {value: value, enumerable: true, configurable: true, writable: true});
+    } else {
+        obj[key] = value;
+    }
+    return obj;
+}
 
 /**
  * 随机生成http的user-agent
@@ -42,11 +63,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
     var rML = function rML(list) {
-        if (!(list instanceof Array)) list = [list];
+        if (!(Array.isArray(list))) list = [list];
         var listNoRate = [];
         var listWithRate = [];
         list.forEach(function (data) {
-            if (data.indexOf('^') !== -1) listWithRate.push(data);else listNoRate.push(data);
+            if (data.indexOf('^') !== -1) listWithRate.push(data); else listNoRate.push(data);
         });
 
         if (listWithRate.length) {
@@ -116,7 +137,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
     var cL = function cL(list) {
-        if (!(list instanceof Array)) list = [list];
+        if (!(Array.isArray(list))) list = [list];
         return list.filter(function (item) {
             return ['', ';'].indexOf(item) === -1;
         }).join(' ');

@@ -82,7 +82,7 @@ export function parse(input, options) {
 
     // If input is an array, process each string
     const headers = Array.isArray(input) ? input : [input];
-
+    // console.log(headers);
     for (const str of headers) {
         const len = str.length;
         if (len < 2) continue;
