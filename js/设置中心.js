@@ -169,7 +169,7 @@ var rule = {
                 vod_id: 'proxyStream',
                 vod_name: '测试代理流',
                 vod_play_from: 'drpyS本地流代理',
-                vod_play_url: '测试播放流$' + getProxyUrl().replace('?do=js', media_url)
+                vod_play_url: '测试播放流$' + getProxyUrl().replace('?do=js', media_url) + '#不代理直接播$' + media_url
             }
         }
     },
