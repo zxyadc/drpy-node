@@ -12,6 +12,9 @@ var rule = {
     cate_exclude: '网址|专题|全部影片',
     // tab_rename: {'KUAKE1': '夸克1', 'KUAKE11': '夸克2', 'YOUSEE1': 'UC1', 'YOUSEE11': 'UC2',},
     play_parse: true,
+    searchable: 1,
+    filterable: 1,
+    quickSearch: 0,
     class_parse: async () => {
         let classes = [{
             type_id: '1',
@@ -85,7 +88,7 @@ var rule = {
                         }).join('#'))
                     } else {
                         playform.push('UC-' + shareData.shareId);
-                        playurls.push("资源已经失效，请访问其他资源" + "$" + "")
+                        playurls.push("资源已经失效，请访问其他资源")
                     }
                 }
             }
@@ -101,7 +104,7 @@ var rule = {
                         }).join('#'))
                     } else {
                         playform.push('Quark-' + shareData.shareId);
-                        playurls.push("资源已经失效，请访问其他资源" + "$" + "")
+                        playurls.push("资源已经失效，请访问其他资源")
                     }
                 }
             }
@@ -135,7 +138,9 @@ var rule = {
         let UCDownloadingCache = {};
         let UCTranscodingCache = {};
         if (flag.startsWith('Quark-')) {
-            console.log("夸克网盘解析开始");
+            console.log("夸克网盘解析开始")
+            const down = await Quark.getDownload(ids[0], ids[1], ids[2], ids[3], true);
+            urls.push("原画", down.download_url + '#fastPlayMode##threads=10#')
             const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
             transcoding.forEach((t) => {
                 urls.push(t.resolution === 'low' ? "流畅" : t.resolution === 'high' ? "高清" : t.resolution === 'super' ? "超清" : t.resolution, t.video_info.url)

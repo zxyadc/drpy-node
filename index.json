@@ -1,5 +1,5 @@
 {
-  "sites_count": 34,
+  "sites_count": 36,
   "sites": [
     {
       "key": "drpyS_哔哩直播[官]",
@@ -17,7 +17,7 @@
       "type": 4,
       "api": "http://localhost:5757/api/大象影视",
       "searchable": 2,
-      "filterable": 1,
+      "filterable": 0,
       "quickSearch": 0,
       "ext": ""
     },
@@ -36,8 +36,8 @@
       "name": "动作交互(DS)",
       "type": 4,
       "api": "http://localhost:5757/api/动作交互",
-      "searchable": 1,
-      "filterable": 1,
+      "searchable": 0,
+      "filterable": 0,
       "quickSearch": 0,
       "ext": ""
     },
@@ -107,6 +107,16 @@
       "type": 4,
       "api": "http://localhost:5757/api/金牌影院",
       "searchable": 2,
+      "filterable": 0,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_蜡笔[盘]",
+      "name": "蜡笔[盘](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/蜡笔[盘]",
+      "searchable": 1,
       "filterable": 1,
       "quickSearch": 0,
       "ext": ""
@@ -117,7 +127,7 @@
       "type": 4,
       "api": "http://localhost:5757/api/蓝莓短剧",
       "searchable": 2,
-      "filterable": 1,
+      "filterable": 0,
       "quickSearch": 1,
       "ext": ""
     },
@@ -137,7 +147,7 @@
       "type": 4,
       "api": "http://localhost:5757/api/人人视频",
       "searchable": 2,
-      "filterable": 1,
+      "filterable": 0,
       "quickSearch": 0,
       "ext": ""
     },
@@ -147,7 +157,7 @@
       "type": 4,
       "api": "http://localhost:5757/api/色花堂[密]",
       "searchable": 2,
-      "filterable": 1,
+      "filterable": 0,
       "quickSearch": 0,
       "ext": ""
     },
@@ -157,7 +167,7 @@
       "type": 4,
       "api": "http://localhost:5757/api/色花堂[密+]",
       "searchable": 2,
-      "filterable": 1,
+      "filterable": 0,
       "quickSearch": 0,
       "ext": ""
     },
@@ -176,8 +186,8 @@
       "name": "设置中心(DS)",
       "type": 4,
       "api": "http://localhost:5757/api/设置中心",
-      "searchable": 1,
-      "filterable": 1,
+      "searchable": 0,
+      "filterable": 0,
       "quickSearch": 0,
       "ext": ""
     },
@@ -198,6 +208,16 @@
       "api": "http://localhost:5757/api/腾云驾雾[官]",
       "searchable": 2,
       "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "push_agent",
+      "name": "推送(DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/push_agent",
+      "searchable": 0,
+      "filterable": 0,
       "quickSearch": 0,
       "ext": ""
     },
@@ -237,7 +257,7 @@
       "type": 4,
       "api": "http://localhost:5757/api/雪糕TV",
       "searchable": 2,
-      "filterable": 1,
+      "filterable": 0,
       "quickSearch": 0,
       "ext": ""
     },
@@ -246,7 +266,7 @@
       "name": "央视大全[官](DS)",
       "type": 4,
       "api": "http://localhost:5757/api/央视大全[官]",
-      "searchable": 0,
+      "searchable": 1,
       "filterable": 1,
       "quickSearch": 0,
       "ext": ""
@@ -277,7 +297,7 @@
       "type": 4,
       "api": "http://localhost:5757/api/ACG漫画网",
       "searchable": 2,
-      "filterable": 1,
+      "filterable": 0,
       "quickSearch": 0,
       "ext": ""
     },
@@ -287,7 +307,7 @@
       "type": 4,
       "api": "http://localhost:5757/api/ikanbot",
       "searchable": 2,
-      "filterable": 1,
+      "filterable": 0,
       "quickSearch": 0,
       "ext": ""
     },
@@ -307,7 +327,7 @@
       "type": 4,
       "api": "http://localhost:5757/api/OmoFun[漫]",
       "searchable": 2,
-      "filterable": 1,
+      "filterable": 0,
       "quickSearch": 0,
       "ext": ""
     },
@@ -327,7 +347,7 @@
       "type": 4,
       "api": "http://localhost:5757/api/x草榴社区[密]",
       "searchable": 2,
-      "filterable": 1,
+      "filterable": 0,
       "quickSearch": 0,
       "ext": ""
     },
@@ -337,7 +357,7 @@
       "type": 4,
       "api": "http://localhost:5757/api/xvideos[密]",
       "searchable": 1,
-      "filterable": 1,
+      "filterable": 0,
       "quickSearch": 0,
       "ext": ""
     }

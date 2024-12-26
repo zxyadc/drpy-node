@@ -98,7 +98,7 @@ async function request(url, obj, ocr_flag) {
     }
 }
 
-const fetch = request;
+var fetch = request;
 
 /**
  *  快捷post请求

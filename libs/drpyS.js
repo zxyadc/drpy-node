@@ -2,6 +2,7 @@ import {readFile} from 'fs/promises';
 import {existsSync, readFileSync} from 'fs';
 import {fileURLToPath} from "url";
 import {createRequire} from 'module';
+import {XMLHttpRequest} from 'xmlhttprequest';
 import path from "path";
 import vm from 'vm';
 import '../libs_drpy/es6-extend.js'
@@ -44,6 +45,8 @@ globalThis.Quark = Quark;
 globalThis.UC = UC;
 globalThis.Ali = Ali;
 globalThis.require = createRequire(import.meta.url);
+globalThis._fetch = fetch;
+globalThis.XMLHttpRequest = XMLHttpRequest;
 globalThis.pathLib = {
     basename: path.basename,
     extname: path.extname,
@@ -143,6 +146,8 @@ export async function getSandbox(env = {}) {
         aesX,
         desX,
         req,
+        _fetch,
+        XMLHttpRequest,
         batchFetch,
         JSProxyStream,
         JSFile,
@@ -402,8 +407,8 @@ export async function getRuleObject(filePath, env, refresh) {
         let t2 = utils.getNowTime();
         const ruleObject = deepCopy(rule);
         // 设置可搜索、可筛选、可快搜等属性
-        ruleObject.searchable = ruleObject.hasOwnProperty('searchable') ? Number(ruleObject.searchable) : 1;
-        ruleObject.filterable = ruleObject.hasOwnProperty('filterable') ? Number(ruleObject.filterable) : 1;
+        ruleObject.searchable = ruleObject.hasOwnProperty('searchable') ? Number(ruleObject.searchable) : 0;
+        ruleObject.filterable = ruleObject.hasOwnProperty('filterable') ? Number(ruleObject.filterable) : 0;
         ruleObject.quickSearch = ruleObject.hasOwnProperty('quickSearch') ? Number(ruleObject.quickSearch) : 0;
         ruleObject.cost = t2 - t1;
         // console.log(`${filePath} headers:`, moduleObject.headers);

@@ -1,5 +1,26 @@
 # drpyS更新记录
 
+### 20241227
+
+更新至V1.0.23
+
+1. 更新 `searchable` `filterable` `quickSearch` 默认全部为0
+2. 优化网盘源二级失效资源处理
+3. 新增 `push_agent.js` 推送专用源，支持 各大网盘，官链，直链，待嗅探，多列表等场景推送
+4. 修复已有源三个属性没正确设置问题
+5. 增加 `蜡笔[盘].js`
+6. 设置中心支持推送
+7. drpyS新增可用函数 `XMLHttpRequest` `_fetch`,由于`fetch`是drpy2内置函数等同于`request`,新增的`_fetch`是nodejs原生函数。示例:
+
+```javascript
+const xhr = new XMLHttpRequest();
+log(xhr);
+```
+
+8. 环境this增加 `httpUrl`
+9. 设置中心增加夸克扫码功能与真实可用的逻辑
+10. action动作交互升级至最新标准，完美适配最新装逼壳
+
 ### 20241226
 
 更新至V1.0.22

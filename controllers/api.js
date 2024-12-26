@@ -33,9 +33,10 @@ export default (fastify, options, done) => {
             const hostname = request.hostname;
             const proxyUrl = `${protocol}://${hostname}${request.url}`.split('?')[0].replace('/api/', '/proxy/') + '/?do=js';
             const publicUrl = `${protocol}://${hostname}/public/`;
+            const httpUrl = `${protocol}://${hostname}/http`;
             // console.log(`proxyUrl:${proxyUrl}`);
             const env = {
-                proxyUrl, publicUrl, getProxyUrl: function () {
+                proxyUrl, publicUrl, httpUrl, getProxyUrl: function () {
                     return proxyUrl
                 }
             };

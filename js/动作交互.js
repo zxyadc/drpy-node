@@ -1,4 +1,4 @@
-const {action_data} = $.require('./_lib.action.js');
+const {action_data, generateUUID} = $.require('./_lib.action.js');
 
 // 访问测试 http://127.0.0.1:5757/api/动作交互?ac=action&action=set-cookie
 // 访问测试 http://127.0.0.1:5757/api/动作交互?ac=action&action=quarkCookieConfig&value={"cookie":"我是cookie"}
@@ -26,22 +26,92 @@ var rule = {
             try {
                 const obj = JSON.parse(value);
                 const val = obj.cookie;
-                return "我收到了：" + value + " cookie为:" + val;
+                return "我收到了：" + value;
             } catch (e) {
                 return '发生错误：' + e;
             }
         }
+
         if (action === '连续对话') {
-            let retMsg = value + "\nHello";
+            let content = JSON.parse(value);
+            try {
+                a = b;
+            } catch (e) {
+                console.error('测试出错捕获：', e);
+            }
+            console.error('对象日志测试:', 0, '==== ', content, ' ====', true);
+            if (content.talk.indexOf('http') > -1) {
+                return JSON.stringify({
+                    action: {
+                        actionId: '__detail__',
+                        skey: 'push_agent',
+                        ids: content.talk,
+                    },
+                    toast: '你要去看视频了'
+                });
+            }
             return JSON.stringify({
                 action: {
-                    actionId: '连续对话',
-                    id: 'talk',
+                    actionId: '__keep__',
+                    msg: '回音：' + content.talk,
+                    reset: true
+                },
+                toast: '你有新的消息'
+            });
+        }
+
+        if (action === '夸克扫码') {
+            let requestId = generateUUID();
+            console.log('request_id:', requestId);
+            let data = await post('https://uop.quark.cn/cas/ajax/getTokenForQrcodeLogin', {
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Linux; Android 11; M2012K10C Build/RP1A.200720.011; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/87.0.4280.141 Mobile Safari/537.36',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Accept': 'application/json, text/plain, */*'
+                },
+                data: {
+                    request_id: requestId,
+                    client_id: "532",
+                    v: "1.2"
+                }
+            });
+            console.log('data:', data);
+            let qcToken = JSON.parse(data).data.members.token;
+            let qrcodeUrl = `https://su.quark.cn/4_eMHBJ?token=${qcToken}&client_id=532&ssb=weblogin&uc_param_str=&uc_biz_str=S%3Acustom%7COPT%3ASAREA%400%7COPT%3AIMMERSIVE%401%7COPT%3ABACK_BTN_STYLE%400`;
+            return JSON.stringify({
+                action: {
+                    actionId: 'quarkScanCookie',
+                    id: 'quarkScanCookie',
+                    canceledOnTouchOutside: false,
                     type: 'input',
-                    title: '连续对话',
-                    tip: '请输入消息',
-                    value: '',
-                    msg: retMsg
+                    title: '夸克扫码Cookie',
+                    msg: '请使用夸克APP扫码登录获取',
+                    width: 500,
+                    button: true,
+                    timeout: 40,
+                    qrcode: qrcodeUrl,
+                    qrcodeSize: '400',
+                    initAction: 'quarkScanCheck'
+                }
+            });
+        }
+        if (action === 'quarkScanCheck') {
+            for (let i = 1; i < 15; i++) {
+                console.log('模拟扫码检测，第' + i + '次');
+                await sleep(1000);
+            }
+
+            return JSON.stringify({
+                action: {
+                    actionId: 'quarkCookieError',
+                    id: 'cookie',
+                    type: 'input',
+                    title: '夸克Cookie',
+                    width: 300,
+                    button: false,
+                    imageUrl: 'https://preview.qiantucdn.com/agency/dp/dp_thumbs/1014014/15854479/staff_1024.jpg!w1024_new_small_1',
+                    imageHeight: 200,
+                    msg: '扫码超时,请重进'
                 }
             });
         }

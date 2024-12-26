@@ -3,8 +3,8 @@ const {
     formatPlayUrl,
 } = misc;
 var rule = {
-    title: '至臻[盘]',
-    host: 'https://mihdr.top',
+    title: '蜡笔[盘]',
+    host: 'https://duopan.fun',
     url: '/index.php/vod/show/id/fyclass/page/fypage.html',
     filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
     searchUrl: '/index.php/vod/search/page/fypage/wd/**.html',
@@ -18,23 +18,27 @@ var rule = {
     class_parse: async () => {
         let classes = [{
             type_id: '1',
-            type_name: '至臻电影',
+            type_name: '蜡笔电影',
         }, {
             type_id: '2',
-            type_name: '至臻剧集',
+            type_name: '蜡笔剧集',
         }, {
             type_id: '3',
-            type_name: '至臻动漫',
+            type_name: '蜡笔动漫',
         }, {
             type_id: '4',
-            type_name: '至臻综艺',
+            type_name: '蜡笔综艺',
         }, {
             type_id: '5',
-            type_name: '至臻短剧',
+            type_name: '蜡笔短剧',
         }, {
-            type_id: '25',
-            type_name: '臻彩视觉',
-        }
+            type_id: '24',
+            type_name: '蜡笔4K',
+        },
+            {
+                type_id: '29',
+                type_name: '蜡笔真彩',
+            }
         ];
         return {
             class: classes,

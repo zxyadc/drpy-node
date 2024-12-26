@@ -7,6 +7,7 @@ const data = fs.readFileSync('./js/_360.js', 'utf8');
 console.log(data);
 
 const {getPublicIp1, getPublicIp2} = require('../js/_lib.request.cjs');
+const {XMLHttpRequest} = require("xmlhttprequest");
 console.log('typeof getPublicIp1:', typeof getPublicIp1);
 console.log('typeof getPublicIp2:', typeof getPublicIp2);
 
@@ -47,6 +48,11 @@ function test_ua() {
     log(typeof setTimeout);
     log(typeof setInterval);
     log(typeof require);
+    log(typeof _fetch);
+    log('XMLHttpRequest:', typeof XMLHttpRequest)
+    const xhr = new XMLHttpRequest();
+    log(xhr);
+
 }
 
 // 下面这个代码放哪儿都是可以后端持续执行任务，比如放class_parse里

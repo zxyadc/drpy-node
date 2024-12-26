@@ -1,8 +1,26 @@
 const action_data = [
     {
-        vod_id: '连续对话',
+        vod_id: JSON.stringify({
+            actionId: '连续对话',
+            id: 'talk',
+            type: 'input',
+            title: '连续对话',
+            tip: '请输入消息',
+            value: '',
+            msg: '开始新的对话',
+            imageUrl: 'https://pic.imgdb.cn/item/667ce9f4d9c307b7e9f9d052.webp',
+            imageHeight: 200,
+            keep: true,
+        }),
         vod_name: '连续对话',
         vod_pic: 'https://img2.baidu.com/it/u=1206278833,3265480730&fm=253&fmt=auto&app=120&f=JPEG?w=800&h=800',
+        vod_tag: 'action'
+    },
+    {
+        vod_id: '夸克扫码',
+        vod_name: '夸克扫码',
+        vod_pic: 'https://pic.qisuidc.cn/s/2024/10/23/6718c212f1fdd.webp',
+        vod_remarks: '夸克',
         vod_tag: 'action'
     },
     {
@@ -42,7 +60,7 @@ const action_data = [
             button: false,
             timeout: 20,
             qrcode: 'https://www.alipan.com/',
-            //initActiona: 'initAction'
+            //initAction: 'initAction'
         }),
         vod_name: '扫码初始动作',
         vod_tag: 'action'
@@ -192,6 +210,15 @@ const action_data = [
     },
 ];
 
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        const r = (Math.random() * 16) | 0,
+            v = c === 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
+}
+
 $.exports = {
-    action_data
+    action_data,
+    generateUUID
 }
