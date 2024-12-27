@@ -1,8 +1,15 @@
-// http://localhost:5757/api/番薯动漫?ac=list&t=1&pg=1
-// http://localhost:5757/api/番薯动漫?ac=detail&ids=/voddetail/USJJJJJk.html
-// http://localhost:5757/api/番薯动漫?wd=我的&pg=1
-// http://localhost:5757/api/番薯动漫?play=/vodplay/USJJJJJk-2-1.html&flag=由qq倾情打造
+// http://localhost:5757/api/番薯动漫[漫]?ac=list&t=1&pg=1
+// http://localhost:5757/api/番薯动漫[漫]?ac=detail&ids=/voddetail/USJJJJJk.html
+// http://localhost:5757/api/番薯动漫[漫]?wd=我的&pg=1
+// http://localhost:5757/api/番薯动漫[漫]?play=/vodplay/USJJJJJk-2-1.html&flag=由qq倾情打造
 const { getHtml } = $.require('./_lib.request.js')
+
+
+const UA = randomUa.generateUa(1, {
+    device: ['pc'],            // 设备类型为PC
+    pcOs: ['windows'],         // 操作系统为Windows
+    windowsApp: ['edge']       // 浏览器应用为Edge
+});
 
 var rule = {
     类型: '影视',
@@ -14,11 +21,12 @@ var rule = {
     searchUrl: '/vodsearch/-------------.html?wd=**',
     searchable: 2,
     quickSearch: 0,
-    timeout: 10000,
+    timeout: 3000,
     play_parse: true,
     filterable: 1,
     headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0',
+        // 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0',
+        'User-Agent': UA,
         'Referer': 'https://www.fsdm02.com',
         'cookie': ''
     },
@@ -41,7 +49,286 @@ var rule = {
                     "type_id": "21",
                     "type_name": "欧美动漫"
                 }
-            ]
+            ],
+            filters: {
+                "1": [
+                    {
+                        "name": "年份",
+                        "key": "year",
+                        "value": [
+                            {
+                                "n": "全部",
+                                "v": ""
+                            },
+                            {
+                                "n": "2024",
+                                "v": "2024"
+                            },
+                            {
+                                "n": "2023",
+                                "v": "2023"
+                            },
+                            {
+                                "n": "2022",
+                                "v": "2022"
+                            },
+                            {
+                                "n": "2021",
+                                "v": "2021"
+                            },
+                            {
+                                "n": "2020",
+                                "v": "2020"
+                            },
+                            {
+                                "n": "2019",
+                                "v": "2019"
+                            },
+                            {
+                                "n": "2018",
+                                "v": "2018"
+                            },
+                            {
+                                "n": "2017",
+                                "v": "2017"
+                            },
+                            {
+                                "n": "2016",
+                                "v": "2016"
+                            },
+                            {
+                                "n": "2015",
+                                "v": "2015"
+                            },
+                            {
+                                "n": "2014",
+                                "v": "2014"
+                            },
+                            {
+                                "n": "2013",
+                                "v": "2013"
+                            },
+                            {
+                                "n": "2012",
+                                "v": "2012"
+                            },
+                            {
+                                "n": "2011",
+                                "v": "2011"
+                            },
+                            {
+                                "n": "2010",
+                                "v": "2010"
+                            },
+                            {
+                                "n": "2009",
+                                "v": "2009"
+                            },
+                            {
+                                "n": "2008",
+                                "v": "2008"
+                            },
+                            {
+                                "n": "2007",
+                                "v": "2007"
+                            },
+                            {
+                                "n": "2006",
+                                "v": "2006"
+                            },
+                            {
+                                "n": "2005",
+                                "v": "2005"
+                            },
+                            {
+                                "n": "2004",
+                                "v": "2004"
+                            },
+                            {
+                                "n": "2003",
+                                "v": "2003"
+                            },
+                            {
+                                "n": "2002",
+                                "v": "2002"
+                            },
+                            {
+                                "n": "2001",
+                                "v": "2001"
+                            },
+                            {
+                                "n": "2000",
+                                "v": "2000"
+                            }
+                        ],
+                        "init": ""
+                    },
+                    {
+                        "name": "排序",
+                        "key": "order",
+                        "value": [
+                            {
+                                "n": "时间排序",
+                                "v": "time"
+                            },
+                            {
+                                "n": "人气排序",
+                                "v": "hits"
+                            },
+                            {
+                                "n": "评分排序",
+                                "v": "score"
+                            }
+                        ]
+                    }
+                ],
+                "3": [
+                    {
+                        "name": "地区",
+                        "key": "area",
+                        "value": [
+                            {
+                                "n": "全部",
+                                "v": ""
+                            },
+                            {
+                                "n": "日本",
+                                "v": "%E6%97%A5%E6%9C%AC"
+                            }
+                        ],
+                        "init": ""
+                    },
+                    {
+                        "name": "年份",
+                        "key": "year",
+                        "value": [
+                            {
+                                "n": "全部",
+                                "v": ""
+                            },
+                            {
+                                "n": "2024",
+                                "v": "2024"
+                            },
+                            {
+                                "n": "2023",
+                                "v": "2023"
+                            },
+                            {
+                                "n": "2022",
+                                "v": "2022"
+                            },
+                            {
+                                "n": "2021",
+                                "v": "2021"
+                            },
+                            {
+                                "n": "2020",
+                                "v": "2020"
+                            },
+                            {
+                                "n": "2019",
+                                "v": "2019"
+                            },
+                            {
+                                "n": "2018",
+                                "v": "2018"
+                            },
+                            {
+                                "n": "2017",
+                                "v": "2017"
+                            },
+                            {
+                                "n": "2016",
+                                "v": "2016"
+                            },
+                            {
+                                "n": "2015",
+                                "v": "2015"
+                            },
+                            {
+                                "n": "2014",
+                                "v": "2014"
+                            },
+                            {
+                                "n": "2013",
+                                "v": "2013"
+                            },
+                            {
+                                "n": "2012",
+                                "v": "2012"
+                            },
+                            {
+                                "n": "2011",
+                                "v": "2011"
+                            },
+                            {
+                                "n": "2010",
+                                "v": "2010"
+                            },
+                            {
+                                "n": "2009",
+                                "v": "2009"
+                            },
+                            {
+                                "n": "2008",
+                                "v": "2008"
+                            },
+                            {
+                                "n": "2007",
+                                "v": "2007"
+                            },
+                            {
+                                "n": "2006",
+                                "v": "2006"
+                            },
+                            {
+                                "n": "2005",
+                                "v": "2005"
+                            },
+                            {
+                                "n": "2004",
+                                "v": "2004"
+                            },
+                            {
+                                "n": "2003",
+                                "v": "2003"
+                            },
+                            {
+                                "n": "2002",
+                                "v": "2002"
+                            },
+                            {
+                                "n": "2001",
+                                "v": "2001"
+                            },
+                            {
+                                "n": "2000",
+                                "v": "2000"
+                            }
+                        ],
+                        "init": ""
+                    },
+                    {
+                        "name": "排序",
+                        "key": "order",
+                        "value": [
+                            {
+                                "n": "时间排序",
+                                "v": "time"
+                            },
+                            {
+                                "n": "人气排序",
+                                "v": "hits"
+                            },
+                            {
+                                "n": "评分排序",
+                                "v": "score"
+                            }
+                        ]
+                    }
+                ],
+            }
         }
     },
     预处理: async () => {
@@ -52,8 +339,14 @@ var rule = {
     },
     一级: async function (tid, pg, filter, extend) {
         let { MY_CATE, input } = this;
-        if (pg <= 0) pg = 1;
-        const html = (await _req(`${rule.host}/vodshow/${tid}--------${pg}---.html`)).content;
+        let html;
+        if (extend.class === "20" || extend.class === "21") {
+            html = (await _req(`${rule.host}/vodshow/${tid}--------${pg}---.html`)).content;
+        } else {
+            // https://www.fsdm02.com/vodshow/1--------2---2022.html
+            // https://www.fsdm02.com/vodshow/3--hits---------2023.html                        
+            html = (await _req(`${rule.host}/vodshow/${tid}-${extend.area || ""}-${extend.order || ""}------${pg}---${extend.year || ""}.html`)).content;
+        }
         const $ = pq(html);
         let videos = [];
         for (const item of $(".module>a")) {
@@ -75,6 +368,7 @@ var rule = {
         const html = (await _req(rule.host + ids[0])).content
         const $ = pq(html);
         let vod = {
+            vod_name: $(".module-info-heading>h1").text(),
             vod_id: ids[0],
             vod_pic: $(".lazyload:first").attr("data-original"),
             vod_remarks: $(".module-info-item-title:contains(更新)+p").text(),
@@ -104,8 +398,6 @@ var rule = {
             3
         )
         const searchResp = await _req(input);
-        // console.log(searchResp.content);
-        // console.log(searchResp.content.length);
         if (searchResp.code > 200) {
             rule.headers.cookie = "";
             throw new Error("搜索错误");
@@ -135,7 +427,7 @@ var rule = {
         let phtml = (await getHtml(purl)).data;
         const $ = pq(phtml);
         config = eval(phtml.match(/config\s*=[\s\S]*?(?=player)/)[0]);
-        let play_url;
+        let play_url = "";
         try {
             const sortByKey = (_0x2df378, _0x5d56c7, _0x3a5216) => _0x5d56c7.sort(({
                 [_0x2df378]: _0x258bb0
@@ -176,38 +468,46 @@ var rule = {
     },
 };
 
-const expire = 60 * 5 * 1000;  // 设置cookie过期时间，单位毫秒
+const expireTime = 60 * 5 * 1000;  // 设置cookie过期时间，单位毫秒
 let timeA = new Date().getTime();
 async function _req(url, opt) {
     let timeB = new Date().getTime();
-    if (!rule.headers.cookie || timeB - timeA > expire) {
+    if (!rule.headers.cookie || timeB - timeA > expireTime) {
         rule.headers.cookie = "";
         rule.headers.cookie = "sl-challenge-jwt=" + await getJwt()
         console.log(`番薯动漫: 获取cookie成功 ${rule.headers.cookie}`);
         timeA = timeB;
     }
     opt = opt || {};
-    opt.headers = Object.assign(rule.headers, opt.headers || {})
-    let resp = await req(url, opt);
-    // console.log(url, resp.code);
-    // console.log(JSON.stringify(opt.headers, null, 4));
+    opt.headers = Object.assign(rule.headers || {}, opt.headers || {})
+    opt.timeout = rule.timeout || 5000;
+    let resp = await retryRequest(url, opt, resp => {
+        if (resp.code === void 0) return true
+    }, 4);
     if (resp.headers["set-cookie"]) {
-        let cookie = [];
-        if (typeof resp.headers["set-cookie"] === "string") {
-            cookie = [resp.headers["set-cookie"]]
-        } else {
-            cookie = resp.headers["set-cookie"]
-        }
+        const cookie = [resp.headers["set-cookie"]].flat(); // string或者array最终生成array
         rule.headers.cookie = cookie.map(it => it.replace(/;.*/, "")).join(";");
-        console.log(rule.headers.cookie);
-        console.log("设置ck成功");
+        console.log("设置ck成功", rule.headers.cookie);
+    }
+    return resp;
+}
+
+// 重复请求
+async function retryRequest(url, opt, cb, num = 1) {
+    let resp = {};
+    for (let i = 1; i <= num; i++) {
+        resp = await req(url, opt);
+        if (await cb(resp)) {
+            console.log(`retryRequest: ${url} 重复请求 ${i}次`);
+            continue;
+        }
+        break;
     }
     return resp;
 }
 
 async function getJwt() {
     return new Promise(async (resolve, reject) => {
-        const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0";
         const navigator = {
             userAgent: UA,
             platform: "Win32",
@@ -215,14 +515,15 @@ async function getJwt() {
             vendor: "Google Inc.",
         };
         const screen = {
-            width: 1536,
-            height: 864
+            width: misc.rand(1536, 1536 + 300),
+            height: + misc.rand(864, 864 + 300),
         };
-
         const wasmBuffer = await axios.get("https://challenge.rivers.chaitin.cn/challenge/v2/calc.wasm", { responseType: 'arraybuffer' });
-        const rootResp = await axios.get("https://www.fsdm02.com/", { headers: { "User-Agent": UA } }).catch(error => error.response);
-        const cookie = rootResp?.headers?.['set-cookie']?.map(it => it.replace(/;.*/, "")).join(";");
-        const html = rootResp.data;
+        const rootResp = await retryRequest("https://www.fsdm02.com/", { headers: { "User-Agent": UA } }, async resp => {
+            await sleep(500);
+            if (resp.content.match(/502 Bad Gatewa/)) return true
+        }, 3);
+        const html = rootResp.content;
         const clientId = html.match(/SafeLineChallenge\("(.*?)"/)[1];
         const level = parseInt(html.match(/SafeLineChallenge.*?level:\s*"(\d+)"/)[1], 10);
         const issueJson = (await axios.post("https://challenge.rivers.chaitin.cn/challenge/v2/api/issue", {
@@ -319,16 +620,12 @@ async function verifyCode(imgUrl, verifyUrlOpt, num = 1) {
     while (true) {
         count++;
         rule.headers.cookie = "";
-        // 获取验证码图片base64
         let imgResp = await _req(imgUrl, {
             buffer: 2,
         });
         let validate = (await ocrByb64(imgResp.content)).response.content;
         let setCookie = imgResp.headers["set-cookie"];
-        if (typeof (setCookie) === "string") {
-            setCookie = [setCookie];
-        }
-        cookie = setCookie.map(it => it.replace(/;.*/, '')).join(";");
+        cookie = [setCookie].flat().map(it => it.replace(/;.*/, '')).join(";");
         let { url: vurl, ...vopt } = JSON.parse(JSON.stringify(verifyUrlOpt)
             .replace(/\$cookie/g, cookie)
             .replace(/\$code/g, validate)
@@ -346,7 +643,6 @@ async function verifyCode(imgUrl, verifyUrlOpt, num = 1) {
     return cookie;
 }
 
-
 (function () {
     'use strict';
     var cookieTemp = "";
@@ -354,14 +650,13 @@ async function verifyCode(imgUrl, verifyUrlOpt, num = 1) {
         set: function (val) {
             if ((val || "").trim() === "") {
                 cookieTemp = "";
-                return cookieTemp;
+            } else {
+                const updateCK = cookieToJson(val);
+                const cacheCK = cookieToJson(cookieTemp);
+                cookieTemp = jsonToCookie(
+                    Object.assign(cacheCK, updateCK)
+                );
             }
-            const updateCK = cookieToJson(val);
-            const cacheCK = cookieToJson(cookieTemp);
-            cookieTemp = jsonToCookie(
-                Object.assign(cacheCK, updateCK)
-            );
-            return cookieTemp;
         },
         get: function () {
             return cookieTemp;

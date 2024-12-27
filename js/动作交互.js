@@ -61,6 +61,11 @@ var rule = {
         }
 
         if (action === '夸克扫码') {
+            if (rule.quarkScanCheck) {
+                console.log('请等待上个扫码任务完成：' + rule.quarkScanCheck);
+                return '请等待上个扫码任务完成';
+            }
+
             let requestId = generateUUID();
             console.log('request_id:', requestId);
             let data = await post('https://uop.quark.cn/cas/ajax/getTokenForQrcodeLogin', {
@@ -87,19 +92,30 @@ var rule = {
                     title: '夸克扫码Cookie',
                     msg: '请使用夸克APP扫码登录获取',
                     width: 500,
-                    button: true,
-                    timeout: 40,
+                    button: 1,
+                    timeout: 20,
                     qrcode: qrcodeUrl,
                     qrcodeSize: '400',
-                    initAction: 'quarkScanCheck'
+                    initAction: 'quarkScanCheck',
+                    initValue: requestId,
+                    cancelAction: 'quarkScanCancel',
+                    cancelValue: requestId,
                 }
             });
         }
         if (action === 'quarkScanCheck') {
+            rule.quarkScanCheck = value;
             for (let i = 1; i < 15; i++) {
-                console.log('模拟扫码检测，第' + i + '次');
+                console.log('模拟扫码检测：' + value + '，第' + i + '次');
                 await sleep(1000);
+
+                if (!rule.quarkScanCheck) {
+                    console.log('退出扫码检测：' + value);
+                    rule.quarkScanCheck = null;
+                    return '扫码取消';
+                }
             }
+            rule.quarkScanCheck = null;
 
             return JSON.stringify({
                 action: {
@@ -108,12 +124,17 @@ var rule = {
                     type: 'input',
                     title: '夸克Cookie',
                     width: 300,
-                    button: false,
+                    button: 0,
                     imageUrl: 'https://preview.qiantucdn.com/agency/dp/dp_thumbs/1014014/15854479/staff_1024.jpg!w1024_new_small_1',
                     imageHeight: 200,
                     msg: '扫码超时,请重进'
                 }
             });
+        }
+        if (action === 'quarkScanCancel') {
+            console.log('用户取消扫码：' + value);
+            rule.quarkScanCheck = null;
+            return;
         }
 
         return '动作：' + action + '\n数据：' + value;

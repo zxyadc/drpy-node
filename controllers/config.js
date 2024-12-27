@@ -16,8 +16,14 @@ async function generateSiteJSON(jsDir, requestHost, sub, subFilePath) {
             valid_files = valid_files.filter(it => !(new RegExp(sub.reg || '.*')).test(it));
         }
         let sort_file = path.join(path.dirname(subFilePath), `./order_common.html`);
+        if (!existsSync(sort_file)) {
+            sort_file = path.join(path.dirname(subFilePath), `./order_common.example.html`);
+        }
         if (sub.sort) {
             sort_file = path.join(path.dirname(subFilePath), `./${sub.sort}.html`);
+            if (!existsSync(sort_file)) {
+                sort_file = path.join(path.dirname(subFilePath), `./${sub.sort}.example.html`);
+            }
         }
         if (existsSync(sort_file)) {
             console.log('sort_file:', sort_file);

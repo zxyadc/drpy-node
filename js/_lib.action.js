@@ -8,6 +8,7 @@ const action_data = [
             tip: '请输入消息',
             value: '',
             msg: '开始新的对话',
+            button: 3,
             imageUrl: 'https://pic.imgdb.cn/item/667ce9f4d9c307b7e9f9d052.webp',
             imageHeight: 200,
             keep: true,
@@ -57,7 +58,7 @@ const action_data = [
             type: 'input',
             title: '阿里云盘Token',
             msg: '弹出窗口就执行initAction里的动作，回调时就关闭窗口，应用于扫码场景，为了演示，动作注释了',
-            button: false,
+            button: 0,
             timeout: 20,
             qrcode: 'https://www.alipan.com/',
             //initAction: 'initAction'

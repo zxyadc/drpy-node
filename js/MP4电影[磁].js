@@ -1,12 +1,12 @@
-// http://localhost:5757/api/MP4电影?ac=list&t=分类&pg=1&ext=eyJ0eXBlIjoiMSJ9
-// http://localhost:5757/api/MP4电影?ac=list&t=1&pg=1&ext=eyJ0eXBlIjoiMSJ9
-// http://localhost:5757/api/MP4电影?ac=detail&ids=/detail/9278.html
-// http://localhost:5757/api/MP4电影?wd=我的&pg=1
-// http://localhost:5757/api/MP4电影?play=bXZfNTcyMzUtbm1fMQ%3D%3D&flag=由qq倾情打造
-const {getHtml} = $.require('./_lib.request.js')
+// http://localhost:5757/api/MP4电影[磁]?ac=list&t=分类&pg=1&ext=eyJ0eXBlIjoiMSJ9
+// http://localhost:5757/api/MP4电影[磁]?ac=list&t=1&pg=1&ext=eyJ0eXBlIjoiMSJ9
+// http://localhost:5757/api/MP4电影[磁]?ac=detail&ids=/detail/9278.html
+// http://localhost:5757/api/MP4电影[磁]?wd=我的&pg=1
+// http://localhost:5757/api/MP4电影[磁]?play=bXZfNTcyMzUtbm1fMQ%3D%3D&flag=由qq倾情打造
+const { getHtml } = $.require('./_lib.request.js')
 var rule = {
     类型: '影视',
-    title: 'MP4电影[磁]',
+    title: 'MP4电影',
     desc: 'MP4电影纯js版本',
     host: 'https://m.haomp4.cc',
     homeUrl: '',
@@ -19,27 +19,23 @@ var rule = {
     filterable: 1,
     headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-        'Accept-Language': 'zh-CN,zh;q=0.9',
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache',
         'Referer': 'https://m.haomp4.cc',
         'Upgrade-Insecure-Requests': '1',
     },
     class_parse: async () => {
         return {
             class: [
-                {type_name: '动作片', type_id: '1'},
-                {type_name: '科幻片', type_id: '2'},
-                {type_name: '爱情片', type_id: '3'},
-                {type_name: '喜剧片', type_id: '4'},
-                {type_name: '恐怖片', type_id: '5'},
-                {type_name: '战争片', type_id: '6'},
-                {type_name: '剧情片', type_id: '7'},
-                {type_name: '纪录片', type_id: '8'},
-                {type_name: '动画片', type_id: '9'},
-                {type_name: '电视剧', type_id: '10'},
-                {type_id: "分类", type_name: "分类"}],
+                { type_name: '动作片', type_id: '1' },
+                { type_name: '科幻片', type_id: '2' },
+                { type_name: '爱情片', type_id: '3' },
+                { type_name: '喜剧片', type_id: '4' },
+                { type_name: '恐怖片', type_id: '5' },
+                { type_name: '战争片', type_id: '6' },
+                { type_name: '剧情片', type_id: '7' },
+                { type_name: '纪录片', type_id: '8' },
+                { type_name: '动画片', type_id: '9' },
+                { type_name: '电视剧', type_id: '10' },
+                { type_id: "分类", type_name: "分类" }],
             filters: {
                 分类: [
                     {
@@ -369,16 +365,16 @@ var rule = {
     预处理: async () => {
         // const html = (await getHtml({
         //     url: "https://domp4.icu/"
-        // })).data;
+        // })).data;        
         // rule.host = "https://"+pq(html)("h4:first p").text().trim()
-        // console.log(rule.host);
+        // console.log(rule.host);        
         return []
     },
     推荐: async () => {
         return []
     },
     一级: async function (tid, pg, filter, extend) {
-        let {MY_CATE, input} = this;
+        let { MY_CATE, input } = this;
         const type = extend.type ? "-id-" + extend.type : "";
         const year = extend.year ? "-year-" + extend.year : "";
         const area = extend.area ? "-area-" + extend.area : "";
@@ -389,7 +385,10 @@ var rule = {
             console.log(`${rule.host}/list-index${[type, year, tag, area, p].join("")}.html`,);
             html = ((await getHtml({
                 url: `${rule.host}/list-index${[type, year, tag, area, p].join("")}.html`,
-                headers: rule.headers
+                headers: Object.assign(rule.headers, {
+                    "Referer": "https://m.haomp4.cc/sort.html",
+                    "x-requested-with": "XMLHttpRequest"
+                })
             })).data).ajaxtxt;
             html = `<div id="list_all">${html}</div>`
         } else {
@@ -415,7 +414,7 @@ var rule = {
         return videos
     },
     二级: async function (ids) {
-        let {input} = this;
+        let { input } = this;
         const html = (await getHtml({
             url: rule.host + ids[0],
             headers: rule.headers
@@ -448,7 +447,7 @@ var rule = {
         return vod
     },
     搜索: async function (wd, quick, pg) {
-        let {input} = this
+        let { input } = this
         const html = (await req(`${rule.host}/search/`, {
             method: "POST",
             headers: rule.headers,
@@ -471,6 +470,6 @@ var rule = {
         return videos
     },
     lazy: async function (flag, id, flags) {
-        return {parse: 0, url: id}
+        return { parse: 0, url: id }
     },
 };

@@ -136,15 +136,24 @@ var rule = {
         return videos
     },
     lazy: async function (flag, id, flags) {
-        let {input} = this;
+        let {input, mediaProxyUrl} = this;
         const ids = input.split('*');
         const urls = [];
         let UCDownloadingCache = {};
         let UCTranscodingCache = {};
         if (flag.startsWith('Quark-')) {
-            console.log("夸克网盘解析开始")
+            console.log("夸克网盘解析开始");
             const down = await Quark.getDownload(ids[0], ids[1], ids[2], ids[3], true);
+            const headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+                'origin': 'https://pan.quark.cn',
+                'referer': 'https://pan.quark.cn/',
+                'Cookie': Quark.cookie
+            };
             urls.push("原画", down.download_url + '#fastPlayMode##threads=10#')
+            // http://ip:port/?thread=线程数&form=url与header编码格式&url=链接&header=所需header
+            urls.push("原代服", mediaProxyUrl + '?thread=6&form=urlcode&randUa=1&url=' + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)))
+            urls.push("原代本", 'http://127.0.0.1:7777/?thread=6&form=urlcode&randUa=1&url=' + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)))
             const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
             transcoding.forEach((t) => {
                 urls.push(t.resolution === 'low' ? "流畅" : t.resolution === 'high' ? "高清" : t.resolution === 'super' ? "超清" : t.resolution, t.video_info.url)
@@ -152,12 +161,7 @@ var rule = {
             return {
                 parse: 0,
                 url: urls,
-                header: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-                    'origin': 'https://pan.quark.cn',
-                    'referer': 'https://pan.quark.cn/',
-                    'Cookie': Quark.cookie
-                }
+                header: headers
             }
         } else if (flag.startsWith('UC-')) {
             console.log("UC网盘解析开始")

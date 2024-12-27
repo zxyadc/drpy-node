@@ -2,10 +2,20 @@
   "sites_count": 36,
   "sites": [
     {
-      "key": "drpyS_哔哩直播[官]",
-      "name": "哔哩直播[官](DS)",
+      "key": "drpyS_设置中心",
+      "name": "设置中心(DS)",
       "type": 4,
-      "api": "http://localhost:5757/api/哔哩直播[官]",
+      "api": "http://localhost:5757/api/设置中心",
+      "searchable": 0,
+      "filterable": 0,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_番茄小说[书]",
+      "name": "番茄小说[书](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/番茄小说[书]",
       "searchable": 2,
       "filterable": 1,
       "quickSearch": 0,
@@ -18,6 +28,36 @@
       "api": "http://localhost:5757/api/大象影视",
       "searchable": 2,
       "filterable": 0,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_腾云驾雾[官]",
+      "name": "腾云驾雾[官](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/腾云驾雾[官]",
+      "searchable": 2,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_央视大全[官]",
+      "name": "央视大全[官](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/央视大全[官]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_哔哩直播[官]",
+      "name": "哔哩直播[官](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/哔哩直播[官]",
+      "searchable": 2,
+      "filterable": 1,
       "quickSearch": 0,
       "ext": ""
     },
@@ -38,16 +78,6 @@
       "api": "http://localhost:5757/api/动作交互",
       "searchable": 0,
       "filterable": 0,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_番茄小说[书]",
-      "name": "番茄小说[书](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/番茄小说[书]",
-      "searchable": 2,
-      "filterable": 1,
       "quickSearch": 0,
       "ext": ""
     },
@@ -182,30 +212,10 @@
       "ext": ""
     },
     {
-      "key": "drpyS_设置中心",
-      "name": "设置中心(DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/设置中心",
-      "searchable": 0,
-      "filterable": 0,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
       "key": "drpyS_素白白",
       "name": "素白白(DS)",
       "type": 4,
       "api": "http://localhost:5757/api/素白白",
-      "searchable": 2,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_腾云驾雾[官]",
-      "name": "腾云驾雾[官](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/腾云驾雾[官]",
       "searchable": 2,
       "filterable": 1,
       "quickSearch": 0,
@@ -258,16 +268,6 @@
       "api": "http://localhost:5757/api/雪糕TV",
       "searchable": 2,
       "filterable": 0,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_央视大全[官]",
-      "name": "央视大全[官](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/央视大全[官]",
-      "searchable": 1,
-      "filterable": 1,
       "quickSearch": 0,
       "ext": ""
     },

@@ -1,16 +1,23 @@
 const {action_data, generateUUID} = $.require('./_lib.action.js');
-
 // 访问测试 http://127.0.0.1:5757/api/设置中心?ac=action&action=set-cookie
 // 访问测试 http://127.0.0.1:5757/api/设置中心?ac=action&action=quarkCookieConfig&value={"cookie":"我是cookie"}
 var rule = {
     类型: '设置',
     title: '设置中心',
-    推荐: async () => {
+    推荐: async function () {
+        let {publicUrl} = this;
+        // log('publicUrl:', publicUrl);
+        let setIcon = urljoin(publicUrl, './images/icon_cookie/设置.png');
+        action_data.forEach(it => {
+            if (!it.vod_pic) {
+                it.vod_pic = setIcon;
+            }
+        })
         return action_data;
     },
     host: 'http://empty',
-    class_name: '推送&夸克&UC&阿里&哔哩&青少年模式&测试',
-    class_url: 'push&quark&uc&ali&bili&adult&test',
+    class_name: '推送&夸克&UC&阿里&哔哩&系统配置&测试',
+    class_url: 'push&quark&uc&ali&bili&system&test',
     url: '/fyclass',
     action: async function (action, value) {
         let {httpUrl} = this;
@@ -66,6 +73,10 @@ var rule = {
         }
 
         if (action === '夸克扫码') {
+            if (rule.quarkScanCheck) {
+                console.log('请等待上个扫码任务完成：' + rule.quarkScanCheck);
+                return '请等待上个扫码任务完成';
+            }
             let requestId = generateUUID();
             let headers = {
                 'User-Agent': 'Mozilla/5.0 (Linux; Android 11; M2012K10C Build/RP1A.200720.011; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/87.0.4280.141 Mobile Safari/537.36',
@@ -98,20 +109,28 @@ var rule = {
                     type: 'input',
                     title: '夸克扫码Cookie',
                     msg: '请使用夸克APP扫码登录获取',
-                    value: requestId,
                     width: 500,
-                    button: true,
+                    button: 1,
                     timeout: 20,
                     qrcode: qrcodeUrl,
                     qrcodeSize: '400',
-                    initAction: 'quarkScanCheck'
+                    initAction: 'quarkScanCheck',
+                    initValue: requestId,
+                    cancelAction: 'quarkScanCancel',
+                    cancelValue: requestId,
                 }
             });
         }
         if (action === 'quarkScanCheck') {
             log('quarkScanCheck value:', value);
+            rule.quarkScanCheck = value;
             if (this.scanInfo) { // 生成二维码的时候设置了扫码id
                 for (let i = 1; i <= 15; i++) {
+                    if (!rule.quarkScanCheck) {
+                        console.log('退出扫码检测：' + value);
+                        rule.quarkScanCheck = null;
+                        return '扫码取消';
+                    }
                     console.log('模拟扫码检测，第' + i + '次');
                     const scanResult = await _checkQuarkStatus(this.scanInfo, httpUrl);
                     log('scanResult:', scanResult);
@@ -128,6 +147,7 @@ var rule = {
                     }
                 }
             }
+            rule.quarkScanCheck = null;
 
             return JSON.stringify({
                 action: {
@@ -142,6 +162,11 @@ var rule = {
                     msg: '扫码超时,请重进'
                 }
             });
+        }
+        if (action === 'quarkScanCancel') {
+            console.log('用户取消扫码：' + value);
+            rule.quarkScanCheck = null;
+            return;
         }
         if (action === '推送视频播放') {
             try {
@@ -158,12 +183,28 @@ var rule = {
                 return '推送视频播放发生错误：' + e.message;
             }
         }
+        if (action === '推送番茄小说') {
+            try {
+                const obj = JSON.parse(value);
+                return JSON.stringify({
+                    action: {
+                        actionId: '__detail__',
+                        skey: 'drpyS_番茄小说[书]',
+                        ids: obj.push,
+                    },
+                    toast: `开始解析小说:${obj.push}`
+                });
+            } catch (e) {
+                return '推送番茄小说发生错误：' + e.message;
+            }
+        }
         let cookie_sets = [
             'quark_cookie',
             'uc_cookie',
             'ali_token',
             'bili_cookie',
             'hide_adult',
+            'thread',
         ];
         let get_cookie_sets = [
             'get_quark_cookie',
@@ -171,6 +212,7 @@ var rule = {
             'get_ali_token',
             'get_bili_cookie',
             'get_hide_adult',
+            'get_thread',
         ];
         if (cookie_sets.includes(action) && value) {
             try {
@@ -236,6 +278,8 @@ var rule = {
             'adult': urljoin(publicUrl, './images/icon_cookie/chat.webp'),
             'test': urljoin(publicUrl, './icon.svg'),
             'lives': urljoin(publicUrl, './images/lives.jpg'),
+            'settings': urljoin(publicUrl, './images/icon_cookie/设置.png'),
+            'read': urljoin(publicUrl, './images/icon_cookie/阅读.png'),
         };
         let d = [];
         switch (MY_CATE) {
@@ -250,12 +294,24 @@ var rule = {
                     嗅探1: 'https://www.6080kk.cc/haokanplay/178120-1-1.html',
                     嗅探2: 'https://www.hahads.com/play/537106-3-1.html',
                     多集: 'https://v.qq.com/x/cover/m441e3rjq9kwpsc/m00253deqqo.html#https://pan.quark.cn/s/6c8158e258f3',
+                    番茄小说: 'https://fanqienovel.com/page/7421167583522458648',
+                };
+                let quick_data1 = {
+                    '大一实习': 'https://fanqienovel.com/page/7421167583522458648',
+                    '十日终焉': 'https://fanqienovel.com/page/7143038691944959011',
+                    '斩神': 'https://fanqienovel.com/page/6982529841564224526',
                 };
                 let selectDataList = [];
+                let selectDataList1 = [];
                 for (let key of Object.keys(quick_data)) {
                     selectDataList.push(`${key}:=${quick_data[key]}`);
                 }
                 let selectData = selectDataList.join(',');
+
+                for (let key of Object.keys(quick_data1)) {
+                    selectDataList1.push(`${key}:=${quick_data1[key]}`);
+                }
+                let selectData1 = selectDataList1.join(',');
                 // log(selectData);
                 d.push({
                     vod_id: JSON.stringify({
@@ -274,6 +330,25 @@ var rule = {
                     }),
                     vod_name: '推送视频播放',
                     vod_pic: images.lives,
+                    vod_tag: 'action'
+                },);
+
+                d.push({
+                    vod_id: JSON.stringify({
+                        actionId: '推送番茄小说',
+                        id: 'push',
+                        type: 'input',
+                        title: '推送番茄小说网页目录链接进行解析',
+                        tip: '支持番茄小说网页版链接',
+                        value: 'https://fanqienovel.com/page/7421167583522458648',
+                        msg: '请输入待推送的番茄小说网页版链接',
+                        imageUrl: images.read,
+                        imageHeight: 200,
+                        keep: false,
+                        selectData: selectData1
+                    }),
+                    vod_name: '推送番茄小说',
+                    vod_pic: images.read,
                     vod_tag: 'action'
                 },);
                 break;
@@ -301,9 +376,11 @@ var rule = {
                 d.push(genMultiInput('bili_cookie', '设置哔哩 cookie', null, images.bili));
                 d.push(getInput('get_bili_cookie', '查看哔哩 cookie', images.bili));
                 break;
-            case 'adult':
-                d.push(genMultiInput('hide_adult', '设置青少年模式', '把值设置为1将会在全部接口隐藏18+源，其他值不过滤，跟随订阅', images.adult));
-                d.push(getInput('get_hide_adult', '查看青少年模式', images.adult));
+            case 'system':
+                d.push(genMultiInput('hide_adult', '设置青少年模式', '把值设置为1将会在全部接口隐藏18+源，其他值不过滤，跟随订阅', images.settings));
+                d.push(getInput('get_hide_adult', '查看青少年模式', images.settings));
+                d.push(genMultiInput('thread', '设置播放代理线程数', '默认为1，可自行配置成其他值如:10', images.settings));
+                d.push(getInput('get_thread', '查看播放代理线程数', images.settings));
                 break;
             case 'test':
                 d.push({
