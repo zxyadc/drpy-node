@@ -3,7 +3,6 @@ import {existsSync, readFileSync} from 'fs';
 import {fileURLToPath} from "url";
 import {createRequire} from 'module';
 import {XMLHttpRequest} from 'xmlhttprequest';
-import {simplecc} from "simplecc-wasm";
 import path from "path";
 import vm from 'vm';
 import '../libs_drpy/es6-extend.js'
@@ -49,7 +48,6 @@ globalThis.Ali = Ali;
 globalThis.require = createRequire(import.meta.url);
 globalThis._fetch = fetch;
 globalThis.XMLHttpRequest = XMLHttpRequest;
-globalThis.simplecc = simplecc;
 globalThis.SparkAI = SparkAI;
 globalThis.pathLib = {
     basename: path.basename,
@@ -93,6 +91,7 @@ if (typeof fetchByHiker === 'undefined') { // 判断是海阔直接放弃导入p
     }
 }
 globalThis.pupWebview = pupWebview;
+
 try {
     if (typeof fetchByHiker !== 'undefined' && typeof globalThis.import === 'function') {
         await globalThis.import('../libs_drpy/crypto-js-wasm.js'); // 海阔放在globalThis里去动态引入
@@ -112,6 +111,19 @@ try {
         ...CryptoJS
     };
 }
+
+let simplecc = null;
+try {
+    // 尝试动态导入模块puppeteerHelper
+    const simWasm = await import('simplecc-wasm');  // 使用动态 import
+    simplecc = simWasm.simplecc;
+    console.log('simplecc imported successfully');
+} catch (error) {
+    // console.log('Failed to import puppeteerHelper:', error);
+    console.log(`Failed to import simplecc:${error.message}`);
+}
+globalThis.simplecc = simplecc;
+
 
 export async function getSandbox(env = {}) {
     const {getProxyUrl} = env;
