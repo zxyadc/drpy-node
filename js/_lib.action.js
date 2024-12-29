@@ -9,7 +9,7 @@ const action_data = [
             value: '',
             msg: '开始新的对话',
             button: 3,
-            imageUrl: 'https://pic.imgdb.cn/item/667ce9f4d9c307b7e9f9d052.webp',
+            imageUrl: 'https://img2.baidu.com/it/u=1206278833,3265480730&fm=253&fmt=auto&app=120&f=JPEG?w=800&h=800',
             imageHeight: 200,
             imageType: 'card_pic_3',
             keep: true,

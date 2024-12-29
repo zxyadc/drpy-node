@@ -19,6 +19,7 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 更新至V1.0.26
 
 1. 设置中心优化，样式适配装逼壳。并支持全局站源动作
+2. 新增AI动作交互，用设置中心的连续对话即可测试
 
 [点此查看完整更新记录](docs/updateRecord.md)
 
@@ -45,6 +46,8 @@ todo:
 * [crypto-js-wasm使用教程](docs/crypto-js-wasm/readme-CN.md)
 * [puppeteer使用教程](docs/pupInstall.md)
 * [drpyS源属性说明](docs/ruleAttr.md)
+* [讯飞星火开放平台](https://console.xfyun.cn/services/bm4)
+* [讯飞星火智能体数据集](https://xinghuo.xfyun.cn/botcenter/private-dataset)
 
 ## 问题说明
 

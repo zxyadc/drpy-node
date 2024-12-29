@@ -13,6 +13,10 @@
         "sourceTag": "设置,动作",
         "actions": [
           {
+            "name": "连续对话",
+            "action": "{\"actionId\":\"连续对话\",\"id\":\"talk\",\"type\":\"input\",\"title\":\"连续对话\",\"tip\":\"请输入消息\",\"value\":\"\",\"msg\":\"开始新的对话\",\"button\":3,\"imageUrl\":\"https://img2.baidu.com/it/u=1206278833,3265480730&fm=253&fmt=auto&app=120&f=JPEG?w=800&h=800\",\"imageHeight\":200,\"imageType\":\"card_pic_3\",\"keep\":true}"
+          },
+          {
             "name": "查看夸克cookie",
             "action": "查看夸克cookie"
           },

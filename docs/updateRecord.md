@@ -9,20 +9,36 @@
    简体转繁体: `simplecc("发财了去植发", "s2t")`  
    繁体转简体: `simplecc("發財了去植髮", "t2s")`
 3. 增加源相互调用功能,仅支持在源的特定函数里使用，示例:
+
 ```javascript
 let {proxyUrl, getRule} = this;
 const tx_rule = await getRule('腾云驾雾[官]');
 if (tx_rule) {
-   log(tx_rule.url);
-   log(tx_rule.title);
-   // log(JSON.stringify(tx_rule));
-   let data1 = await tx_rule.callRuleFn('搜索', ['斗罗大陆'])
-   log(data1);
-   let data2 = await tx_rule.callRuleFn('一级', ['tv'])
-   log(data2);
-}else{
-   log('没有这个原')
+    log(tx_rule.url);
+    log(tx_rule.title);
+    // log(JSON.stringify(tx_rule));
+    let data1 = await tx_rule.callRuleFn('搜索', ['斗罗大陆'])
+    log(data1);
+    let data2 = await tx_rule.callRuleFn('一级', ['tv'])
+    log(data2);
+} else {
+    log('没有这个原')
 }
+```
+
+4. 增加讯飞星火AI对话交互动作,设置中心推荐栏可用。 源里可使用这个对象 `SparkAI`,调用示例:
+```javascript
+const sparkAI = new SparkAI({
+                    authKey: ENV.get('spark_ai_authKey'), 
+                    baseURL: 'https://spark-api-open.xf-yun.com',
+                });
+ rule.askLock = 1;
+ try {
+     replyContent = await sparkAI.ask(prompt, {temperature: 1.0});
+ } catch (error) {
+     replyContent = error.message;
+ }
+ rule.askLock = 0;
 ```
 
 ### 20241229

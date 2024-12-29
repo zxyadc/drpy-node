@@ -91,6 +91,21 @@ const rule = {
         log('proxyUrl:', proxyUrl);
         log('type of getRule:', typeof getRule);
         // test_rc4()
+
+        const sparkAI = new SparkAI({
+            authKey: '12', // 替换为你的鉴权信息
+            baseURL: 'https://spark-api-open.xf-yun.com',
+        });
+
+        try {
+            const prompt = '你好，今天的天气怎么样？';
+            const answer = await sparkAI.ask(prompt, {temperature: 0.7});
+            console.log('AI 回复：', answer);
+        } catch (error) {
+            console.error('调用失败：', error.message);
+        }
+
+        /*
         const tx_rule = await getRule('腾云驾雾[官]');
         if (tx_rule) {
             log(tx_rule.url);
@@ -103,6 +118,9 @@ const rule = {
         } else {
             log('没有这个原')
         }
+
+         */
+
         /*
         (async ()=>{
             for (let i = 1; i <= 100; i++) {

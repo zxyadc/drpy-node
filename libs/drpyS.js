@@ -3,7 +3,7 @@ import {existsSync, readFileSync} from 'fs';
 import {fileURLToPath} from "url";
 import {createRequire} from 'module';
 import {XMLHttpRequest} from 'xmlhttprequest';
-import { simplecc } from "simplecc-wasm";
+import {simplecc} from "simplecc-wasm";
 import path from "path";
 import vm from 'vm';
 import '../libs_drpy/es6-extend.js'
@@ -14,6 +14,7 @@ import {ENV} from '../utils/env.js';
 import {Quark} from "../utils/quark.js";
 import {UC} from "../utils/uc.js";
 import {Ali} from "../utils/ali.js";
+import SparkAI from '../utils/SparkAI.js';
 // const { req } = await import('../utils/req.js');
 import {gbkTool} from '../libs_drpy/gbk.js'
 // import {atob, btoa, base64Encode, base64Decode, md5} from "../libs_drpy/crypto-util.js";
@@ -49,6 +50,7 @@ globalThis.require = createRequire(import.meta.url);
 globalThis._fetch = fetch;
 globalThis.XMLHttpRequest = XMLHttpRequest;
 globalThis.simplecc = simplecc;
+globalThis.SparkAI = SparkAI;
 globalThis.pathLib = {
     basename: path.basename,
     extname: path.extname,
@@ -151,6 +153,7 @@ export async function getSandbox(env = {}) {
         _fetch,
         XMLHttpRequest,
         simplecc,
+        SparkAI,
         batchFetch,
         JSProxyStream,
         JSFile,
