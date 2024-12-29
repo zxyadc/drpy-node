@@ -1,6 +1,15 @@
 const {action_data, generateUUID} = $.require('./_lib.action.js');
+const {
+    _checkQuarkStatus,
+    _checkUCStatus,
+    _checkAliStatus,
+    _checkBiliStatus,
+    QRCodeHandler,
+    qrcode
+} = $.require('./_lib.scan.js');
 // 访问测试 http://127.0.0.1:5757/api/设置中心?ac=action&action=set-cookie
 // 访问测试 http://127.0.0.1:5757/api/设置中心?ac=action&action=quarkCookieConfig&value={"cookie":"我是cookie"}
+
 var rule = {
     类型: '设置',
     title: '设置中心',
@@ -15,10 +24,215 @@ var rule = {
         })
         return action_data;
     },
+    类型: '设置',
+    // 推荐样式
+    hikerListCol: 'icon_round_4',
+    // 分类列表样式
+    hikerClassListCol: 'avatar',
+    UCScanCheck: null,
+    quarkScanCheck: null,
+    aliScanCheck: null,
+    biliScanCheck: null,
     host: 'http://empty',
     class_name: '推送&夸克&UC&阿里&哔哩&系统配置&测试',
     class_url: 'push&quark&uc&ali&bili&system&test',
     url: '/fyclass',
+
+
+    一级: async function (tid, pg, filter, extend) {
+        let {input, MY_CATE, MY_PAGE, publicUrl} = this;
+        // log('publicUrl:', publicUrl);
+        if (MY_PAGE > 1) {
+            return []
+        }
+        let images = {
+            'quark': urljoin(publicUrl, './images/icon_cookie/夸克.webp'),
+            'uc': urljoin(publicUrl, './images/icon_cookie/UC.png'),
+            'ali': urljoin(publicUrl, './images/icon_cookie/阿里.png'),
+            'bili': urljoin(publicUrl, './images/icon_cookie/哔哩.png'),
+            'adult': urljoin(publicUrl, './images/icon_cookie/chat.webp'),
+            'test': urljoin(publicUrl, './icon.svg'),
+            'lives': urljoin(publicUrl, './images/lives.jpg'),
+            'settings': urljoin(publicUrl, './images/icon_cookie/设置.png'),
+            'read': urljoin(publicUrl, './images/icon_cookie/阅读.png'),
+        };
+        let d = [];
+        switch (MY_CATE) {
+            case 'push':
+                let quick_data = {
+                    腾讯: 'https://v.qq.com/x/cover/mzc00200vkqr54u/u4100l66fas.html',
+                    爱奇艺: 'http://www.iqiyi.com/v_1b0tk1b8tl8.html',
+                    夸克: 'https://pan.quark.cn/s/6c8158e258f3',
+                    UC: 'https://drive.uc.cn/s/59023f57d3ce4?public=1',
+                    阿里: 'https://www.alipan.com/s/vgXMcowK8pQ',
+                    直链1: 'https://vdse.bdstatic.com//628ca08719cef5987ea2ae3c6f0d2386.mp4',
+                    嗅探1: 'https://www.6080kk.cc/haokanplay/178120-1-1.html',
+                    嗅探2: 'https://www.hahads.com/play/537106-3-1.html',
+                    多集: 'https://v.qq.com/x/cover/m441e3rjq9kwpsc/m00253deqqo.html#https://pan.quark.cn/s/6c8158e258f3',
+                    海阔二级单线路: gzip(JSON.stringify({
+                        "actor": "剧集",
+                        "content": "【道长DR】　　围绕上世纪30年代的上海滩，讲述了两位坚韧勇敢的女性在波澜诡谲的民国时代相互救赎、完成蜕变的动人故事。 收起",
+                        "director": "qingbenjiaren2024",
+                        "from": "线路223",
+                        "name": "卿本佳人2024",
+                        "pic": "https://pic3.yzzyimages.com/upload/vod/2024-11-21/17321619851.jpg",
+                        "url": "第01集$https://b.6080z.com/vodplay/101329-4-1.html#第02集$https://b.6080z.com/vodplay/101329-4-2.html#第03集$https://b.6080z.com/vodplay/101329-4-3.html#第04集$https://b.6080z.com/vodplay/101329-4-4.html#第05集$https://b.6080z.com/vodplay/101329-4-5.html#第06集$https://b.6080z.com/vodplay/101329-4-6.html#第07集$https://b.6080z.com/vodplay/101329-4-7.html#第08集$https://b.6080z.com/vodplay/101329-4-8.html#第09集$https://b.6080z.com/vodplay/101329-4-9.html#第10集$https://b.6080z.com/vodplay/101329-4-10.html#第11集$https://b.6080z.com/vodplay/101329-4-11.html#第12集$https://b.6080z.com/vodplay/101329-4-12.html#第12集$https://b.6080z.com/vodplay/101329-4-13.html#第13集$https://b.6080z.com/vodplay/101329-4-14.html#第14集$https://b.6080z.com/vodplay/101329-4-15.html#第15集$https://b.6080z.com/vodplay/101329-4-16.html#第16集$https://b.6080z.com/vodplay/101329-4-17.html#第17集$https://b.6080z.com/vodplay/101329-4-18.html#第18集$https://b.6080z.com/vodplay/101329-4-19.html#第19集$https://b.6080z.com/vodplay/101329-4-20.html#第20集$https://b.6080z.com/vodplay/101329-4-21.html#第21集$https://b.6080z.com/vodplay/101329-4-22.html#第22集$https://b.6080z.com/vodplay/101329-4-23.html"
+                    })),
+                };
+                let quick_data1 = {
+                    '大一实习': 'https://fanqienovel.com/page/7421167583522458648',
+                    '十日终焉': 'https://fanqienovel.com/page/7143038691944959011',
+                    '斩神': 'https://fanqienovel.com/page/6982529841564224526',
+                };
+                let selectDataList = [];
+                let selectDataList1 = [];
+                for (let key of Object.keys(quick_data)) {
+                    selectDataList.push(`${key}:=${quick_data[key]}`);
+                }
+                let selectData = selectDataList.join(',');
+                // log(selectData);
+                for (let key of Object.keys(quick_data1)) {
+                    selectDataList1.push(`${key}:=${quick_data1[key]}`);
+                }
+                let selectData1 = selectDataList1.join(',');
+                // log(selectData);
+                d.push({
+                    vod_id: JSON.stringify({
+                        actionId: '推送视频播放',
+                        id: 'push',
+                        type: 'input',
+                        title: '推送视频地址进行播放',
+                        tip: '支持网盘、官链、直链、待嗅探链接',
+                        value: '',
+                        msg: '请输入待推送的视频地址',
+                        imageUrl: images.lives,
+                        imageHeight: 200,
+                        imageType: 'card_pic_3',
+                        keep: true,
+                        button: 4,
+                        width: 640,
+                        // selectData: '腾讯:=https://v.qq.com/x/cover/m441e3rjq9kwpsc/l0045w5hv1k.html,2:=bb输入默认值bbbbb,3:=c输入默认值ddd,4:=输入默认值,5:=111,6:=22222,7:=HOHO,HELLO,world'
+                        selectData: selectData
+                    }),
+                    vod_name: '推送视频播放',
+                    vod_pic: images.lives,
+                    vod_tag: 'action'
+                },);
+
+                d.push({
+                    vod_id: JSON.stringify({
+                        actionId: '推送番茄小说',
+                        id: 'push',
+                        type: 'input',
+                        title: '推送番茄小说网页目录链接进行解析',
+                        tip: '支持番茄小说网页版链接',
+                        value: 'https://fanqienovel.com/page/7421167583522458648',
+                        msg: '请输入待推送的番茄小说网页版链接',
+                        imageUrl: images.read,
+                        imageHeight: 200,
+                        imageType: 'card_pic_3',
+                        keep: false,
+                        selectData: selectData1
+                    }),
+                    vod_name: '推送番茄小说',
+                    vod_pic: images.read,
+                    vod_tag: 'action'
+                },);
+                break;
+
+            case 'quark':
+                d.push(genMultiInput('quark_cookie', '设置夸克 cookie', null, images.quark));
+                d.push(getInput('get_quark_cookie', '查看夸克 cookie', images.quark));
+                d.push({
+                    vod_id: '夸克扫码',
+                    vod_name: '夸克扫码',
+                    vod_pic: images.quark,
+                    vod_remarks: '夸克',
+                    vod_tag: 'action'
+                });
+                break;
+            case 'uc':
+                d.push(genMultiInput('uc_cookie', '设置UC cookie', null, images.uc));
+                d.push(getInput('get_uc_cookie', '查看UC cookie', images.uc));
+                d.push({
+                    vod_id: 'UC扫码',
+                    vod_name: 'UC扫码',
+                    vod_pic: images.uc,
+                    vod_remarks: 'UC',
+                    vod_tag: 'action'
+                });
+                break;
+            case 'ali':
+                d.push(genMultiInput('ali_token', '设置阿里 token', null, images.ali));
+                d.push(getInput('get_ali_token', '查看阿里 token', images.ali));
+                d.push({
+                    vod_id: '阿里扫码',
+                    vod_name: '阿里扫码',
+                    vod_pic: images.ali,
+                    vod_remarks: '阿里',
+                    vod_tag: 'action'
+                });
+                break;
+            case 'bili':
+                d.push(genMultiInput('bili_cookie', '设置哔哩 cookie', null, images.bili));
+                d.push(getInput('get_bili_cookie', '查看哔哩 cookie', images.bili));
+                d.push({
+                    vod_id: '哔哩扫码',
+                    vod_name: '哔哩扫码',
+                    vod_pic: images.bili,
+                    vod_remarks: '哔哩',
+                    vod_tag: 'action'
+                });
+                break;
+            case 'system':
+                d.push(genMultiInput('hide_adult', '设置青少年模式', '把值设置为1将会在全部接口隐藏18+源，其他值不过滤，跟随订阅', images.settings));
+                d.push(getInput('get_hide_adult', '查看青少年模式', images.settings));
+                d.push(genMultiInput('thread', '设置播放代理线程数', '默认为1，可自行配置成其他值如:10', images.settings));
+                d.push(getInput('get_thread', '查看播放代理线程数', images.settings));
+                break;
+            case 'test':
+                d.push({
+                    vod_id: "proxyStream",
+                    vod_name: "测试本地代理流",
+                    vod_pic: images.lives,
+                    vod_desc: "流式代理mp4等视频"
+                });
+                break;
+        }
+        return d
+    },
+    二级: async function (ids) {
+        let {input, orId, getProxyUrl} = this;
+        // log(input, orId);
+        if (orId === 'proxyStream') {
+            let media_url = 'https://vdse.bdstatic.com//628ca08719cef5987ea2ae3c6f0d2386.mp4';
+            return {
+                vod_id: 'proxyStream',
+                vod_name: '测试代理流',
+                vod_play_from: 'drpyS本地流代理',
+                vod_play_url: '测试播放流$' + getProxyUrl().replace('?do=js', media_url) + '#不代理直接播$' + media_url
+            }
+        }
+    },
+    play_parse: true,
+    lazy: async function () {
+        let {input} = this;
+        return {parse: 0, url: input}
+    },
+    proxy_rule: async function () {
+        let {input, proxyPath} = this;
+        const url = proxyPath;
+        log('start proxy:', url);
+        try {
+            const headers = {
+                'user-agent': PC_UA,
+            }
+            return [200, null, url, headers, 2]
+        } catch (e) {
+            log('proxy error:', e.message);
+            return [500, 'text/plain', e.message]
+        }
+    },
     action: async function (action, value) {
         let {httpUrl} = this;
         if (action === 'set-cookie') {
@@ -49,9 +263,9 @@ var rule = {
             try {
                 a = b;
             } catch (e) {
-                console.error('测试出错捕获：', e);
+                error('测试出错捕获：', e);
             }
-            console.error('对象日志测试:', 0, '==== ', content, ' ====', true);
+            error('对象日志测试:', 0, '==== ', content, ' ====', true);
             if (content.talk.indexOf('http') > -1) {
                 return JSON.stringify({
                     action: {
@@ -78,15 +292,10 @@ var rule = {
                 return '请等待上个扫码任务完成';
             }
             let requestId = generateUUID();
-            let headers = {
-                'User-Agent': 'Mozilla/5.0 (Linux; Android 11; M2012K10C Build/RP1A.200720.011; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/87.0.4280.141 Mobile Safari/537.36',
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Accept': 'application/json, text/plain, */*'
-            };
             log('httpUrl:', httpUrl);
             log('request_id:', requestId);
             let data = await post('https://uop.quark.cn/cas/ajax/getTokenForQrcodeLogin', {
-                headers: headers,
+                headers: {Referer: '', ...QRCodeHandler.HEADERS},
                 data: {
                     request_id: requestId,
                     client_id: "532",
@@ -96,10 +305,10 @@ var rule = {
             console.log('data:', data);
             let qcToken = JSON.parse(data).data.members.token;
             let qrcodeUrl = `https://su.quark.cn/4_eMHBJ?token=${qcToken}&client_id=532&ssb=weblogin&uc_param_str=&uc_biz_str=S%3Acustom%7COPT%3ASAREA%400%7COPT%3AIMMERSIVE%401%7COPT%3ABACK_BTN_STYLE%400`;
-            this.scanInfo = {
-                request_id: requestId,
-                headers,
-                token: qcToken
+            // log('qrcodeUrl:', qrcodeUrl);
+            qrcode.platformStates[QRCodeHandler.PLATFORM_QUARK] = {
+                token: qcToken,
+                request_id: requestId
             };
             return JSON.stringify({
                 action: {
@@ -124,20 +333,22 @@ var rule = {
         if (action === 'quarkScanCheck') {
             log('quarkScanCheck value:', value);
             rule.quarkScanCheck = value;
-            if (this.scanInfo) { // 生成二维码的时候设置了扫码id
+            const state = qrcode.platformStates[QRCodeHandler.PLATFORM_QUARK];
+            if (state) { // 生成二维码的时候设置了扫码id
                 for (let i = 1; i <= 15; i++) {
                     if (!rule.quarkScanCheck) {
                         console.log('退出扫码检测：' + value);
-                        rule.quarkScanCheck = null;
                         return '扫码取消';
                     }
-                    console.log('模拟扫码检测，第' + i + '次');
-                    const scanResult = await _checkQuarkStatus(this.scanInfo, httpUrl);
+                    console.log('[quarkScanCheck]等待用户扫码，第' + i + '次');
+                    const scanResult = await _checkQuarkStatus(state, httpUrl);
                     log('scanResult:', scanResult);
                     if (scanResult.status === 'CONFIRMED') {
                         let cookie = scanResult.cookie;
                         log('扫码成功获取到cookie:', cookie);
                         parseSaveCookie('quark_cookie', cookie);
+                        rule.quarkScanCheck = null;
+                        qrcode.platformStates[QRCodeHandler.PLATFORM_QUARK] = null;
                         return '扫描完成，已成功获取cookie并入库';
                     } else if (scanResult.status === 'EXPIRED') {
                         log('已过期')
@@ -148,7 +359,7 @@ var rule = {
                 }
             }
             rule.quarkScanCheck = null;
-
+            qrcode.platformStates[QRCodeHandler.PLATFORM_QUARK] = null;
             return JSON.stringify({
                 action: {
                     actionId: 'quarkCookieError',
@@ -166,8 +377,307 @@ var rule = {
         if (action === 'quarkScanCancel') {
             console.log('用户取消扫码：' + value);
             rule.quarkScanCheck = null;
+            qrcode.platformStates[QRCodeHandler.PLATFORM_QUARK] = null;
             return;
         }
+
+        if (action === 'UC扫码') {
+            if (rule.UCScanCheck) {
+                log('请等待上个扫码任务完成：' + rule.UCScanCheck);
+                return '请等待上个扫码任务完成';
+            }
+            let requestId = generateUUID();
+            log('httpUrl:', httpUrl);
+            log('request_id:', requestId);
+            let data = await post('https://api.open.uc.cn/cas/ajax/getTokenForQrcodeLogin', {
+                headers: {Referer: '', ...QRCodeHandler.HEADERS},
+                data: {
+                    request_id: requestId,
+                    client_id: "381",
+                    v: "1.2",
+                }
+            });
+            log('data:', data);
+            let qcToken = JSON.parse(data).data.members.token;
+            let qrcodeUrl = `https://su.uc.cn/1_n0ZCv?token=${qcToken}&client_id=381&uc_param_str=&uc_biz_str=S%3Acustom%7CC%3Atitlebar_fix`;
+            // log('qrcodeUrl:', qrcodeUrl);
+            qrcode.platformStates[QRCodeHandler.PLATFORM_UC] = {
+                token: qcToken,
+                request_id: requestId
+            };
+            return JSON.stringify({
+                action: {
+                    actionId: 'UCScanCookie',
+                    id: 'UCScanCookie',
+                    canceledOnTouchOutside: false,
+                    type: 'input',
+                    title: 'UC扫码Cookie',
+                    msg: '请使用UC APP扫码登录获取',
+                    width: 500,
+                    button: 1,
+                    timeout: 20,
+                    qrcode: qrcodeUrl,
+                    qrcodeSize: '400',
+                    initAction: 'UCScanCheck',
+                    initValue: requestId,
+                    cancelAction: 'UCScanCancel',
+                    cancelValue: requestId,
+                }
+            });
+        }
+        if (action === 'UCScanCheck') {
+            log('UCScanCheck value:', value);
+            rule.UCScanCheck = value;
+            const state = qrcode.platformStates[QRCodeHandler.PLATFORM_UC];
+            if (state) { // 生成二维码的时候设置了扫码id
+                for (let i = 1; i <= 15; i++) {
+                    if (!rule.UCScanCheck) {
+                        console.log('退出扫码检测：' + value);
+                        return '扫码取消';
+                    }
+                    console.log('[UCScanCheck]等待用户扫码，第' + i + '次');
+                    const scanResult = await _checkUCStatus(state, httpUrl);
+                    log('scanResult:', scanResult);
+                    if (scanResult.status === 'CONFIRMED') {
+                        let cookie = scanResult.cookie;
+                        log('扫码成功获取到cookie:', cookie);
+                        parseSaveCookie('uc_cookie', cookie);
+                        rule.UCScanCheck = null;
+                        qrcode.platformStates[QRCodeHandler.PLATFORM_UC] = null;
+                        return '扫描完成，已成功获取cookie并入库';
+                    } else if (scanResult.status === 'EXPIRED') {
+                        log('已过期')
+                        break;
+                    } else {
+                        await sleep(1000);
+                    }
+                }
+            }
+            rule.UCScanCheck = null;
+            qrcode.platformStates[QRCodeHandler.PLATFORM_UC] = null;
+            return JSON.stringify({
+                action: {
+                    actionId: 'UCCookieError',
+                    id: 'cookie',
+                    type: 'input',
+                    title: 'UC Cookie',
+                    width: 300,
+                    button: false,
+                    imageUrl: 'https://preview.qiantucdn.com/agency/dp/dp_thumbs/1014014/15854479/staff_1024.jpg!w1024_new_small_1',
+                    imageHeight: 200,
+                    msg: '扫码超时,请重进'
+                }
+            });
+        }
+        if (action === 'UCScanCancel') {
+            console.log('用户取消扫码：' + value);
+            rule.UCScanCheck = null;
+            qrcode.platformStates[QRCodeHandler.PLATFORM_UC] = null;
+            return;
+        }
+
+        if (action === '阿里扫码') {
+            if (rule.aliScanCheck) {
+                log('请等待上个扫码任务完成：' + rule.aliScanCheck);
+                return '请等待上个扫码任务完成';
+            }
+            log('httpUrl:', httpUrl);
+            let data = await post('https://passport.aliyundrive.com/newlogin/qrcode/generate.do', {
+                headers: {
+                    Referer: '',
+                    ...QRCodeHandler.HEADERS
+                },
+                data: {
+                    appName: "aliyun_drive",
+                    fromSite: "52",
+                    appEntrance: "web",
+                    isMobile: "false",
+                    lang: "zh_CN",
+                    returnUrl: "",
+                    bizParams: "",
+                    _bx_v: "2.2.3"
+                }
+            });
+            log('data:', data);
+            const contentData = JSON.parse(data).content.data;
+            let qrcodeUrl = contentData.codeContent;
+            log('qrcodeUrl:', qrcodeUrl);
+            qrcode.platformStates[QRCodeHandler.PLATFORM_ALI] = {
+                ck: contentData.ck,
+                t: contentData.t
+            };
+            return JSON.stringify({
+                action: {
+                    actionId: 'aliScanCookie',
+                    id: 'aliScanCookie',
+                    canceledOnTouchOutside: false,
+                    type: 'input',
+                    title: '阿里扫码Cookie',
+                    msg: '请使用阿里云盘 APP扫码登录获取',
+                    width: 500,
+                    button: 1,
+                    timeout: 20,
+                    qrcode: qrcodeUrl,
+                    qrcodeSize: '400',
+                    initAction: 'aliScanCheck',
+                    initValue: qrcodeUrl,
+                    cancelAction: 'aliScanCancel',
+                    cancelValue: qrcodeUrl,
+                }
+            });
+        }
+        if (action === 'aliScanCheck') {
+            log('aliScanCheck value:', value);
+            rule.aliScanCheck = value;
+            const state = qrcode.platformStates[QRCodeHandler.PLATFORM_ALI];
+            if (state) { // 生成二维码的时候设置了扫码id
+                for (let i = 1; i <= 15; i++) {
+                    if (!rule.aliScanCheck) {
+                        console.log('退出扫码检测：' + value);
+                        return '扫码取消';
+                    }
+                    console.log('[aliScanCheck]等待用户扫码，第' + i + '次');
+                    const scanResult = await _checkAliStatus(state, httpUrl);
+                    log('scanResult:', scanResult);
+                    if (scanResult.status === 'CONFIRMED') {
+                        let cookie = scanResult.token;
+                        log('扫码成功获取到cookie:', cookie);
+                        parseSaveCookie('ali_token', cookie);
+                        rule.aliScanCheck = null;
+                        qrcode.platformStates[QRCodeHandler.PLATFORM_ALI] = null;
+                        return '扫描完成，已成功获取cookie并入库';
+                    } else if (scanResult.status === 'EXPIRED') {
+                        log('已过期')
+                        break;
+                    } else {
+                        await sleep(1000);
+                    }
+                }
+            }
+            rule.aliScanCheck = null;
+            qrcode.platformStates[QRCodeHandler.PLATFORM_ALI] = null;
+            return JSON.stringify({
+                action: {
+                    actionId: 'aliCookieError',
+                    id: 'cookie',
+                    type: 'input',
+                    title: '阿里 Cookie',
+                    width: 300,
+                    button: false,
+                    imageUrl: 'https://preview.qiantucdn.com/agency/dp/dp_thumbs/1014014/15854479/staff_1024.jpg!w1024_new_small_1',
+                    imageHeight: 200,
+                    msg: '扫码超时,请重进'
+                }
+            });
+        }
+        if (action === 'aliScanCancel') {
+            console.log('用户取消扫码：' + value);
+            rule.aliScanCheck = null;
+            qrcode.platformStates[QRCodeHandler.PLATFORM_ALI] = null;
+            return;
+        }
+
+        if (action === '哔哩扫码') {
+            if (rule.biliScanCheck) {
+                log('请等待上个扫码任务完成：' + rule.biliScanCheck);
+                return '请等待上个扫码任务完成';
+            }
+            log('httpUrl:', httpUrl);
+            const res = await axios({
+                url: httpUrl,
+                method: "POST",
+                data: {
+                    url: "https://passport.bilibili.com/x/passport-login/web/qrcode/generate",
+                    headers: {
+                        ...QRCodeHandler.HEADERS
+                    },
+                    params: {
+                        source: "main-mini"
+                    }
+                }
+            });
+            const resData = res.data.data;
+            // log('resData:', resData);
+            if (resData.code !== 0) {
+                throw new Error(resData.message);
+            }
+            const qrcodeData = resData.data;
+            const qrcodeUrl = qrcodeData.url;
+            qrcode.platformStates[QRCodeHandler.PLATFORM_BILI] = {
+                qrcode_key: qrcodeData.qrcode_key
+            };
+            return JSON.stringify({
+                action: {
+                    actionId: 'billiScanCookie',
+                    id: 'biliScanCookie',
+                    canceledOnTouchOutside: false,
+                    type: 'input',
+                    title: '哔哩扫码Cookie',
+                    msg: '请使用哔哩哔哩 APP扫码登录获取',
+                    width: 500,
+                    button: 1,
+                    timeout: 20,
+                    qrcode: qrcodeUrl,
+                    qrcodeSize: '400',
+                    initAction: 'biliScanCheck',
+                    initValue: qrcodeUrl,
+                    cancelAction: 'biliScanCancel',
+                    cancelValue: qrcodeUrl,
+                }
+            });
+        }
+        if (action === 'biliScanCheck') {
+            log('biliScanCheck value:', value);
+            rule.biliScanCheck = value;
+            const state = qrcode.platformStates[QRCodeHandler.PLATFORM_BILI];
+            if (state) { // 生成二维码的时候设置了扫码id
+                for (let i = 1; i <= 15; i++) {
+                    if (!rule.biliScanCheck) {
+                        console.log('退出扫码检测：' + value);
+                        return '扫码取消';
+                    }
+                    console.log('[biliScanCheck]等待用户扫码，第' + i + '次');
+                    const scanResult = await _checkBiliStatus(state, httpUrl);
+                    log('scanResult:', scanResult);
+                    if (scanResult.status === 'CONFIRMED') {
+                        let cookie = scanResult.cookie;
+                        log('扫码成功获取到cookie:', cookie);
+                        parseSaveCookie('bili_cookie', cookie);
+                        rule.biliScanCheck = null;
+                        qrcode.platformStates[QRCodeHandler.PLATFORM_BILI] = null;
+                        return '扫描完成，已成功获取cookie并入库';
+                    } else if (scanResult.status === 'EXPIRED') {
+                        log('已过期')
+                        break;
+                    } else {
+                        await sleep(1000);
+                    }
+                }
+            }
+            rule.biliScanCheck = null;
+            qrcode.platformStates[QRCodeHandler.PLATFORM_BILI] = null;
+            return JSON.stringify({
+                action: {
+                    actionId: 'biliCookieError',
+                    id: 'cookie',
+                    type: 'input',
+                    title: '哔哩 Cookie',
+                    width: 300,
+                    button: false,
+                    imageUrl: 'https://preview.qiantucdn.com/agency/dp/dp_thumbs/1014014/15854479/staff_1024.jpg!w1024_new_small_1',
+                    imageHeight: 200,
+                    msg: '扫码超时,请重进'
+                }
+            });
+        }
+        if (action === 'biliScanCancel') {
+            console.log('用户取消扫码：' + value);
+            rule.biliScanCheck = null;
+            qrcode.platformStates[QRCodeHandler.PLATFORM_BILI] = null;
+            return;
+        }
+
+
         if (action === '推送视频播放') {
             try {
                 const obj = JSON.parse(value);
@@ -175,7 +685,7 @@ var rule = {
                     action: {
                         actionId: '__detail__',
                         skey: 'push_agent',
-                        ids: obj.push,
+                        ids: encodeURIComponent(obj.push),
                     },
                     toast: `开始解析视频:${obj.push}`
                 });
@@ -264,168 +774,6 @@ var rule = {
         return '动作：' + action + '\n数据：' + value;
     },
 
-    一级: async function (tid, pg, filter, extend) {
-        let {input, MY_CATE, MY_PAGE, publicUrl} = this;
-        // log('publicUrl:', publicUrl);
-        if (MY_PAGE > 1) {
-            return []
-        }
-        let images = {
-            'quark': urljoin(publicUrl, './images/icon_cookie/夸克.webp'),
-            'uc': urljoin(publicUrl, './images/icon_cookie/UC.png'),
-            'ali': urljoin(publicUrl, './images/icon_cookie/阿里.png'),
-            'bili': urljoin(publicUrl, './images/icon_cookie/哔哩.png'),
-            'adult': urljoin(publicUrl, './images/icon_cookie/chat.webp'),
-            'test': urljoin(publicUrl, './icon.svg'),
-            'lives': urljoin(publicUrl, './images/lives.jpg'),
-            'settings': urljoin(publicUrl, './images/icon_cookie/设置.png'),
-            'read': urljoin(publicUrl, './images/icon_cookie/阅读.png'),
-        };
-        let d = [];
-        switch (MY_CATE) {
-            case 'push':
-                let quick_data = {
-                    腾讯: 'https://v.qq.com/x/cover/mzc00200vkqr54u/u4100l66fas.html',
-                    爱奇艺: 'http://www.iqiyi.com/v_1b0tk1b8tl8.html',
-                    夸克: 'https://pan.quark.cn/s/6c8158e258f3',
-                    UC: 'https://drive.uc.cn/s/59023f57d3ce4?public=1',
-                    阿里: 'https://www.alipan.com/s/vgXMcowK8pQ',
-                    直链1: 'https://vdse.bdstatic.com//628ca08719cef5987ea2ae3c6f0d2386.mp4',
-                    嗅探1: 'https://www.6080kk.cc/haokanplay/178120-1-1.html',
-                    嗅探2: 'https://www.hahads.com/play/537106-3-1.html',
-                    多集: 'https://v.qq.com/x/cover/m441e3rjq9kwpsc/m00253deqqo.html#https://pan.quark.cn/s/6c8158e258f3',
-                    番茄小说: 'https://fanqienovel.com/page/7421167583522458648',
-                };
-                let quick_data1 = {
-                    '大一实习': 'https://fanqienovel.com/page/7421167583522458648',
-                    '十日终焉': 'https://fanqienovel.com/page/7143038691944959011',
-                    '斩神': 'https://fanqienovel.com/page/6982529841564224526',
-                };
-                let selectDataList = [];
-                let selectDataList1 = [];
-                for (let key of Object.keys(quick_data)) {
-                    selectDataList.push(`${key}:=${quick_data[key]}`);
-                }
-                let selectData = selectDataList.join(',');
-
-                for (let key of Object.keys(quick_data1)) {
-                    selectDataList1.push(`${key}:=${quick_data1[key]}`);
-                }
-                let selectData1 = selectDataList1.join(',');
-                // log(selectData);
-                d.push({
-                    vod_id: JSON.stringify({
-                        actionId: '推送视频播放',
-                        id: 'push',
-                        type: 'input',
-                        title: '推送视频地址进行播放',
-                        tip: '支持网盘、官链、直链、待嗅探链接',
-                        value: '',
-                        msg: '请输入待推送的视频地址',
-                        imageUrl: images.lives,
-                        imageHeight: 200,
-                        keep: false,
-                        // selectData: '腾讯:=https://v.qq.com/x/cover/m441e3rjq9kwpsc/l0045w5hv1k.html,2:=bb输入默认值bbbbb,3:=c输入默认值ddd,4:=输入默认值,5:=111,6:=22222,7:=HOHO,HELLO,world'
-                        selectData: selectData
-                    }),
-                    vod_name: '推送视频播放',
-                    vod_pic: images.lives,
-                    vod_tag: 'action'
-                },);
-
-                d.push({
-                    vod_id: JSON.stringify({
-                        actionId: '推送番茄小说',
-                        id: 'push',
-                        type: 'input',
-                        title: '推送番茄小说网页目录链接进行解析',
-                        tip: '支持番茄小说网页版链接',
-                        value: 'https://fanqienovel.com/page/7421167583522458648',
-                        msg: '请输入待推送的番茄小说网页版链接',
-                        imageUrl: images.read,
-                        imageHeight: 200,
-                        keep: false,
-                        selectData: selectData1
-                    }),
-                    vod_name: '推送番茄小说',
-                    vod_pic: images.read,
-                    vod_tag: 'action'
-                },);
-                break;
-
-            case 'quark':
-                d.push(genMultiInput('quark_cookie', '设置夸克 cookie', null, images.quark));
-                d.push(getInput('get_quark_cookie', '查看夸克 cookie', images.quark));
-                d.push({
-                    vod_id: '夸克扫码',
-                    vod_name: '夸克扫码',
-                    vod_pic: 'https://pic.qisuidc.cn/s/2024/10/23/6718c212f1fdd.webp',
-                    vod_remarks: '夸克',
-                    vod_tag: 'action'
-                });
-                break;
-            case 'uc':
-                d.push(genMultiInput('uc_cookie', '设置UC cookie', null, images.uc));
-                d.push(getInput('get_uc_cookie', '查看UC cookie', images.uc));
-                break;
-            case 'ali':
-                d.push(genMultiInput('ali_token', '设置阿里 token', null, images.ali));
-                d.push(getInput('get_ali_token', '查看阿里 token', images.ali));
-                break;
-            case 'bili':
-                d.push(genMultiInput('bili_cookie', '设置哔哩 cookie', null, images.bili));
-                d.push(getInput('get_bili_cookie', '查看哔哩 cookie', images.bili));
-                break;
-            case 'system':
-                d.push(genMultiInput('hide_adult', '设置青少年模式', '把值设置为1将会在全部接口隐藏18+源，其他值不过滤，跟随订阅', images.settings));
-                d.push(getInput('get_hide_adult', '查看青少年模式', images.settings));
-                d.push(genMultiInput('thread', '设置播放代理线程数', '默认为1，可自行配置成其他值如:10', images.settings));
-                d.push(getInput('get_thread', '查看播放代理线程数', images.settings));
-                break;
-            case 'test':
-                d.push({
-                    vod_id: "proxyStream",
-                    vod_name: "测试本地代理流",
-                    vod_pic: images.lives,
-                    vod_desc: "流式代理mp4等视频"
-                });
-                break;
-        }
-        return d
-    },
-    二级: async function (ids) {
-        let {input, orId, getProxyUrl} = this;
-        log(input, orId);
-        if (orId === 'proxyStream') {
-            let media_url = 'https://vdse.bdstatic.com//628ca08719cef5987ea2ae3c6f0d2386.mp4';
-            return {
-                vod_id: 'proxyStream',
-                vod_name: '测试代理流',
-                vod_play_from: 'drpyS本地流代理',
-                vod_play_url: '测试播放流$' + getProxyUrl().replace('?do=js', media_url) + '#不代理直接播$' + media_url
-            }
-        }
-    },
-    play_parse: true,
-    lazy: async function () {
-        let {input} = this;
-        return {parse: 0, url: input}
-    },
-    proxy_rule: async function () {
-        let {input, proxyPath} = this;
-        const url = proxyPath;
-        log('start proxy:', url);
-        try {
-            const headers = {
-                'user-agent': PC_UA,
-            }
-            return [200, null, url, headers, 2]
-        } catch (e) {
-            log('proxy error:', e.message);
-            return [500, 'text/plain', e.message]
-        }
-    },
-
 };
 
 
@@ -470,6 +818,7 @@ function getInput(actionId, title, img) {
             msg: '查看已设置的cookie需要授权码',
             imageUrl: 'https://pic.imgdb.cn/item/667ce9f4d9c307b7e9f9d052.webp',
             imageHeight: 200,
+            imageType: 'card_pic_3',
         }),
         vod_name: title,
         vod_tag: 'action',
@@ -477,130 +826,12 @@ function getInput(actionId, title, img) {
     }
 }
 
-async function _checkQuarkStatus(state, httpUrl) {
-    try {
-        const res = await axios({
-            url: httpUrl,
-            method: "POST",
-            data: {
-                url: "https://uop.quark.cn/cas/ajax/getServiceTicketByQrcodeToken",
-                headers: state.headers,
-                params: {
-                    request_id: state.request_id,
-                    client_id: "532",
-                    v: "1.2",
-                    token: state.token
-                }
-            }
-        });
-        const resData = res.data;
-
-        if (resData.data.status === 2000000) { // 扫码成功
-            const serviceTicket = resData.data.data.members.service_ticket;
-            const cookieRes = await axios({
-                url: httpUrl,
-                method: "POST",
-                data: {
-                    url: "https://pan.quark.cn/account/info",
-                    headers: state.headers,
-                    params: {
-                        st: serviceTicket,
-                        lw: "scan"
-                    }
-                }
-            });
-            log('扫码成功,开始获取cookie');
-            const cookieResData = cookieRes.data;
-            // console.log(cookieResData.headers['set-cookie']);
-            const cookies = Array.isArray(cookieResData.headers['set-cookie']) ? cookieResData.headers['set-cookie'].join('; ') : cookieResData.headers['set-cookie'];
-            const cookies2array = formatCookiesToList(cookies);
-            let mainCookies = formatCookie(cookies2array);
-            const cookieSelfRes = await axios({
-                url: httpUrl,
-                method: "POST",
-                data: {
-                    url: "https://drive-pc.quark.cn/1/clouddrive/file/sort?pr=ucpro&fr=pc&uc_param_str=&pdir_fid=0&_page=1&_size=50&_fetch_total=1&_fetch_sub_dirs=0&_sort=file_type:asc,updated_at:desc",
-                    headers: {
-                        ...state.headers,
-                        Origin: 'https://pan.quark.cn',
-                        Referer: 'https://pan.quark.cn/',
-                        Cookie: mainCookies
-                    }
-                }
-            });
-            const cookieResDataSelf = cookieSelfRes.data;
-            const cookiesSelf = Array.isArray(cookieResDataSelf.headers['set-cookie']) ? cookieResDataSelf.headers['set-cookie'].join('; ') : cookieResDataSelf.headers['set-cookie'];
-            const cookies2arraySelf = formatCookiesToList(cookiesSelf);
-            const mainCookiesSelf = formatCookie(cookies2arraySelf);
-            if (mainCookiesSelf) mainCookies += ';' + mainCookiesSelf;
-            return {
-                status: 'CONFIRMED',
-                cookie: mainCookies
-            };
-        } else if (resData.data.status === 50004002) { // token过期
-            return {status: 'EXPIRED'};
-        } else {
-            return {status: 'NEW'};
-        }
-    } catch (e) {
-        console.error(e);
-        log(`[_checkQuarkStatus] error:${e.message}`);
-        throw new Error(e.response.data.message || e.message);
-    }
-}
-
-function formatCookiesToList(cookieString) {
-    const result = [];
-    let currentCookie = '';
-    let inExpires = false;
-
-    for (let i = 0; i < cookieString.length; i++) {
-        const char = cookieString[i];
-
-        // 判断是否进入或退出 `expires` 属性
-        if (cookieString.slice(i, i + 8).toLowerCase() === 'expires=') {
-            inExpires = true;
-        }
-        if (inExpires && char === ';') {
-            inExpires = false;
-        }
-
-        // 检测到逗号分隔符并且不在 `expires` 属性中，表示一个 Cookie 条目结束
-        if (char === ',' && !inExpires) {
-            result.push(currentCookie.trim());
-            currentCookie = '';
-        } else {
-            currentCookie += char;
-        }
-    }
-
-    // 添加最后一个 Cookie 条目
-    if (currentCookie.trim()) {
-        result.push(currentCookie.trim());
-    }
-
-    return result;
-}
-
-function formatCookie(cookies) {
-    if (!Array.isArray(cookies)) cookies = [cookies];
-    if (cookies.length === 0) return '';
-
-    let mainCookies = [];
-    for (const cookie of cookies) {
-        if (cookie && typeof cookie === 'string' && cookie.trim()) {
-            mainCookies.push(cookie.split('; ')[0]);
-        }
-    }
-    return mainCookies.join(';');
-}
-
 function parseSaveCookie(key, value) {
     let cookie_obj = COOKIE.parse(value);
     let cookie_str = value;
 
     if (['quark_cookie', 'uc_cookie'].includes(key)) {
-        // console.log(cookie_obj);
+        // log(cookie_obj);
         cookie_str = COOKIE.stringify({
             __pus: cookie_obj.__pus || '',
             __puus: cookie_obj.__puus || '',

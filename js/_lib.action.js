@@ -11,6 +11,7 @@ const action_data = [
             button: 3,
             imageUrl: 'https://pic.imgdb.cn/item/667ce9f4d9c307b7e9f9d052.webp',
             imageHeight: 200,
+            imageType: 'card_pic_3',
             keep: true,
         }),
         vod_name: '连续对话',
@@ -47,6 +48,7 @@ const action_data = [
             msg: '单项输入带图, 例如显示验证码图片',
             imageUrl: 'https://pic.imgdb.cn/item/667ce9f4d9c307b7e9f9d052.webp',
             imageHeight: 200,
+            imageType: 'card_pic_3',
         }),
         vod_name: '单项输入带图',
         vod_tag: 'action'

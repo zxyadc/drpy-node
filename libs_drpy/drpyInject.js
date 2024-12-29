@@ -95,14 +95,17 @@ async function request(url, opt = {}) {
         }
         let _url = typeof url === "object" ? url.url : url;
         console.log(`req:${_url} headers:${JSON.stringify(headers)} data:${JSON.stringify(_data)}`);
-        var resp = await axios(url, {
+        const _axios = axios.create({
+            httpsAgent: agent
+        });
+        var resp = await _axios(url, {
             responseType: respType,
             method: opt ? opt.method || 'get' : 'get',
             headers: headers,
             data: _data,
             timeout: timeout,
             maxRedirects: !redirect ? 0 : null,
-            httpsAgent: agent
+            // httpsAgent: agent
         });
         let data = resp.data;
         var resHeader = {};

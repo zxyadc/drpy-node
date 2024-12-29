@@ -127,6 +127,7 @@ var rule = {
                     button: 0,
                     imageUrl: 'https://preview.qiantucdn.com/agency/dp/dp_thumbs/1014014/15854479/staff_1024.jpg!w1024_new_small_1',
                     imageHeight: 200,
+                    imageType: 'card_pic_3',
                     msg: '扫码超时,请重进'
                 }
             });

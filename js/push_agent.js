@@ -16,12 +16,31 @@ var rule = {
         return []
     },
     二级: async function (ids) {
-        let {input} = this;
-        let vod = {}
+        let {input, orId, publicUrl} = this;
         let playform = []
         let playurls = []
-        log(input);
-        input = decodeURIComponent(input)
+        input = decodeURIComponent(orId);
+        let icon = urljoin(publicUrl, './images/icon_cookie/推送.jpg');
+        // log(input);
+        let vod = {
+            vod_pic: icon,
+            vod_id: orId,
+            vod_content: orId || '温馨提醒:宝子们，推送的时候记得确保ids存在哟~',
+            vod_name: 'DS推送:道长&秋秋倾情打造',
+        }
+        try {
+            let push_vod = JSON.parse(input);
+            push_vod = Array.isArray(push_vod) ? push_vod[0] : push_vod;
+            vod.vod_actor = push_vod.actor || push_vod.vod_actor || '';
+            vod.vod_content = push_vod.content || push_vod.vod_content || '';
+            vod.vod_director = push_vod.director || push_vod.vod_director || '';
+            vod.vod_play_from = push_vod.from || push_vod.vod_play_from || '';
+            vod.vod_name = push_vod.name || push_vod.vod_name || '';
+            vod.vod_pic = push_vod.pic || push_vod.vod_pic || '';
+            vod.vod_play_url = push_vod.url || push_vod.vod_play_url || '';
+            return vod
+        } catch (e) {
+        }
         if (input.indexOf('#')) {
             let list = input.split('#');
             log(list);
@@ -204,8 +223,6 @@ var rule = {
         }
         vod.vod_play_from = playform.join("$$$")
         vod.vod_play_url = playurls.join("$$$")
-        vod.vod_id = input
-        vod.vod_content = input
         return vod
     },
     lazy: async function (flag, id, flags) {
@@ -218,7 +235,7 @@ var rule = {
             } else {
                 return {parse: 1, url: input}
             }
-        } else {
+        } else if (/Quark-|UC-|Ali-/.test(flag)) {
             const ids = input.split('*');
             const urls = [];
             let UCDownloadingCache = {};
@@ -289,6 +306,8 @@ var rule = {
                     },
                 }
             }
+        } else {
+            return input
         }
     },
 }

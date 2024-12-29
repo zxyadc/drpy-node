@@ -292,10 +292,10 @@
       "ext": ""
     },
     {
-      "key": "drpyS_ACG漫画网",
-      "name": "ACG漫画网(DS)",
+      "key": "drpyS_ACG漫画网[画]",
+      "name": "ACG漫画网[画](DS)",
       "type": 4,
-      "api": "http://localhost:5757/api/ACG漫画网",
+      "api": "http://localhost:5757/api/ACG漫画网[画]",
       "searchable": 2,
       "filterable": 0,
       "quickSearch": 0,
