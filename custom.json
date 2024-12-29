@@ -1,5 +1,5 @@
 {
-  "sites_count": 36,
+  "sites_count": 37,
   "sites": [
     {
       "key": "drpyS_设置中心",
@@ -9,6 +9,27 @@
       "searchable": 0,
       "filterable": 0,
       "quickSearch": 0,
+      "more": {
+        "sourceTag": "设置,动作",
+        "actions": [
+          {
+            "name": "查看夸克cookie",
+            "action": "查看夸克cookie"
+          },
+          {
+            "name": "设置夸克cookie",
+            "action": "设置夸克cookie"
+          },
+          {
+            "name": "夸克扫码",
+            "action": "夸克扫码"
+          },
+          {
+            "name": "设置玩偶域名",
+            "action": "{\"actionId\":\"玩偶域名\",\"id\":\"domain\",\"type\":\"input\",\"width\":450,\"title\":\"玩偶域名\",\"tip\":\"请输入玩偶域名\",\"value\":\"\",\"msg\":\"选择或输入使用的域名\",\"selectData\":\"1:=https://www.wogg.net/,2:=https://wogg.xxooo.cf/,3:=https://wogg.888484.xyz/,4:=https://www.wogg.bf/,5:=https://woggapi.333232.xyz/\"}"
+          }
+        ]
+      },
       "ext": ""
     },
     {
@@ -78,6 +99,16 @@
       "api": "http://localhost:5757/api/动作交互",
       "searchable": 0,
       "filterable": 0,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_多多[盘]",
+      "name": "多多[盘](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/多多[盘]",
+      "searchable": 1,
+      "filterable": 1,
       "quickSearch": 0,
       "ext": ""
     },

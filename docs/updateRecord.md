@@ -1,5 +1,30 @@
 # drpyS更新记录
 
+### 20241230
+
+更新至V1.0.26
+
+1. 设置中心优化，样式适配装逼壳。并支持全局站源动作
+2. 增加简繁体转换函数 `simplecc`,用法如下:  
+   简体转繁体: `simplecc("发财了去植发", "s2t")`  
+   繁体转简体: `simplecc("發財了去植髮", "t2s")`
+3. 增加源相互调用功能,仅支持在源的特定函数里使用，示例:
+```javascript
+let {proxyUrl, getRule} = this;
+const tx_rule = await getRule('腾云驾雾[官]');
+if (tx_rule) {
+   log(tx_rule.url);
+   log(tx_rule.title);
+   // log(JSON.stringify(tx_rule));
+   let data1 = await tx_rule.callRuleFn('搜索', ['斗罗大陆'])
+   log(data1);
+   let data2 = await tx_rule.callRuleFn('一级', ['tv'])
+   log(data2);
+}else{
+   log('没有这个原')
+}
+```
+
 ### 20241229
 
 更新至V1.0.25

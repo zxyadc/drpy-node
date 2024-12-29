@@ -3,6 +3,7 @@ import {existsSync, readFileSync} from 'fs';
 import {fileURLToPath} from "url";
 import {createRequire} from 'module';
 import {XMLHttpRequest} from 'xmlhttprequest';
+import { simplecc } from "simplecc-wasm";
 import path from "path";
 import vm from 'vm';
 import '../libs_drpy/es6-extend.js'
@@ -47,6 +48,7 @@ globalThis.Ali = Ali;
 globalThis.require = createRequire(import.meta.url);
 globalThis._fetch = fetch;
 globalThis.XMLHttpRequest = XMLHttpRequest;
+globalThis.simplecc = simplecc;
 globalThis.pathLib = {
     basename: path.basename,
     extname: path.extname,
@@ -148,6 +150,7 @@ export async function getSandbox(env = {}) {
         req,
         _fetch,
         XMLHttpRequest,
+        simplecc,
         batchFetch,
         JSProxyStream,
         JSFile,
@@ -531,6 +534,8 @@ async function invokeWithInjectVars(rule, method, injectVars, args) {
 async function invokeMethod(filePath, env, method, args = [], injectVars = {}) {
     const moduleObject = await init(filePath, env); // 确保模块已初始化
     switch (method) {
+        case 'get_rule':
+            return moduleObject;
         case 'class_parse':
             injectVars = await homeParse(moduleObject, ...args);
             if (!injectVars) {
@@ -752,7 +757,8 @@ async function homeParse(rule) {
         for (let i = 0; i < cnt; i++) {
             classes.push({
                 'type_id': urls[i],
-                'type_name': names[i]
+                'type_name': names[i],
+                'type_flag': rule['class_flag'],
             });
         }
     }
@@ -764,6 +770,7 @@ async function homeParse(rule) {
         classes: classes,
         filters: rule.filter,
         cate_exclude: rule.cate_exclude,
+        home_flag: rule.home_flag,
         fetch_params: deepCopy(rule.rule_fetch_params),
         jsp: jsp,
         pdfh: jsp.pdfh.bind(jsp),
@@ -787,7 +794,8 @@ async function homeParseAfter(d, _type, hikerListCol, hikerClassListCol, injectV
     const {
         classes,
         filters,
-        cate_exclude
+        cate_exclude,
+        home_flag,
     } = injectVars;
     if (!Array.isArray(d.class)) {
         d.class = classes;
@@ -797,6 +805,9 @@ async function homeParseAfter(d, _type, hikerListCol, hikerClassListCol, injectV
     }
     if (!d.list) {
         d.list = [];
+    }
+    if (!d.type_flag && home_flag) {
+        d.type_flag = home_flag;
     }
     d.class = d.class.filter(it => !cate_exclude || !(new RegExp(cate_exclude).test(it.type_name)));
     return d
@@ -1143,6 +1154,10 @@ export async function action(filePath, env, action, value) {
     } catch (e) {
         return '动作规则错误:' + e.message
     }
+}
+
+export async function getRule(filePath, env) {
+    return await invokeMethod(filePath, env, 'get_rule', [], {});
 }
 
 export async function jx(filePath, env, params) {

@@ -24,15 +24,71 @@ export default (fastify, options, done) => {
             const query = method === 'GET' ? request.query : request.body;
             const protocol = request.protocol;
             const hostname = request.hostname;
-            const proxyUrl = `${protocol}://${hostname}${request.url}`.split('?')[0].replace('/api/', '/proxy/') + '/?do=js';
+            // const proxyUrl = `${protocol}://${hostname}${request.url}`.split('?')[0].replace('/api/', '/proxy/') + '/?do=js';
+            // const proxyUrl = `${protocol}://${hostname}/proxy/${moduleName}/?do=js`;
+            // console.log('proxyUrl:', proxyUrl);
+
             const publicUrl = `${protocol}://${hostname}/public/`;
             const httpUrl = `${protocol}://${hostname}/http`;
             const mediaProxyUrl = `${protocol}://${hostname}/mediaProxy`;
+
             // console.log(`proxyUrl:${proxyUrl}`);
-            const env = {
-                proxyUrl, publicUrl, httpUrl, mediaProxyUrl, getProxyUrl: function () {
+            function getEnv(moduleName) {
+                const proxyUrl = `${protocol}://${hostname}/proxy/${moduleName}/?do=js`;
+                const getProxyUrl = function () {
                     return proxyUrl
+                };
+                return {
+                    proxyUrl, publicUrl, httpUrl, mediaProxyUrl, getProxyUrl
                 }
+            }
+
+            const env = getEnv(moduleName);
+            env.getRule = async function (_moduleName) {
+                const _modulePath = path.join(options.jsDir, `${_moduleName}.js`);
+                if (!existsSync(_modulePath)) {
+                    return null;
+                }
+                const _env = getEnv(_moduleName);
+                const RULE = await drpy.getRule(_modulePath, _env);
+                RULE.callRuleFn = async function (_method, _args) {
+                    let invokeMethod = null;
+                    switch (_method) {
+                        case 'class_parse':
+                            invokeMethod = 'home';
+                            break;
+                        case '推荐':
+                            invokeMethod = 'homeVod';
+                            break;
+                        case '一级':
+                            invokeMethod = 'cate';
+                            break;
+                        case '二级':
+                            invokeMethod = 'detail';
+                            break;
+                        case '搜索':
+                            invokeMethod = 'search';
+                            break;
+                        case 'lazy':
+                            invokeMethod = 'play';
+                            break;
+                        case 'proxy_rule':
+                            invokeMethod = 'proxy';
+                            break;
+                        case 'action':
+                            invokeMethod = 'action';
+                            break;
+                    }
+                    if (!invokeMethod) {
+                        if (typeof RULE[_method] !== 'function') {
+                            return null
+                        } else {
+                            return await RULE[_method]
+                        }
+                    }
+                    return await drpy[invokeMethod](_modulePath, _env, ..._args)
+                };
+                return RULE
             };
             const pg = Number(query.pg) || 1;
             try {

@@ -29,6 +29,28 @@ var rule = {
     hikerListCol: 'icon_round_4',
     // 分类列表样式
     hikerClassListCol: 'avatar',
+    home_flag: '3-0-S',
+    class_flag: '3-11-S',
+    more: {
+        sourceTag: '设置,动作',
+        actions: [
+            {name: '查看夸克cookie', action: '查看夸克cookie'},
+            {name: '设置夸克cookie', action: '设置夸克cookie'},
+            {name: '夸克扫码', action: '夸克扫码'},
+            {
+                name: '设置玩偶域名', action: JSON.stringify({
+                    actionId: '玩偶域名',
+                    id: 'domain',
+                    type: 'input',
+                    width: 450,
+                    title: '玩偶域名',
+                    tip: '请输入玩偶域名',
+                    value: '',
+                    msg: '选择或输入使用的域名',
+                    selectData: '1:=https://www.wogg.net/,2:=https://wogg.xxooo.cf/,3:=https://wogg.888484.xyz/,4:=https://www.wogg.bf/,5:=https://woggapi.333232.xyz/'
+                }),
+            }],
+    },
     UCScanCheck: null,
     quarkScanCheck: null,
     aliScanCheck: null,
@@ -37,7 +59,6 @@ var rule = {
     class_name: '推送&夸克&UC&阿里&哔哩&系统配置&测试',
     class_url: 'push&quark&uc&ali&bili&system&test',
     url: '/fyclass',
-
 
     一级: async function (tid, pg, filter, extend) {
         let {input, MY_CATE, MY_PAGE, publicUrl} = this;
@@ -234,7 +255,7 @@ var rule = {
         }
     },
     action: async function (action, value) {
-        let {httpUrl} = this;
+        let {httpUrl, publicUrl} = this;
         if (action === 'set-cookie') {
             return JSON.stringify({
                 action: {
@@ -263,9 +284,9 @@ var rule = {
             try {
                 a = b;
             } catch (e) {
-                error('测试出错捕获：', e);
+                console.error('测试出错捕获：', e);
             }
-            error('对象日志测试:', 0, '==== ', content, ' ====', true);
+            console.error('对象日志测试:', 0, '==== ', content, ' ====', true);
             if (content.talk.indexOf('http') > -1) {
                 return JSON.stringify({
                     action: {
@@ -770,6 +791,12 @@ var rule = {
                 return '发生错误：' + e.message;
             }
         }
+        if (action === '查看夸克cookie') {
+            return {action: getInput('get_quark_cookie', '查看夸克 cookie', urljoin(publicUrl, './images/icon_cookie/夸克.webp')).vod_id};
+        }
+        if (action === '设置夸克cookie') {
+            return {action: genMultiInput('quark_cookie', '设置夸克 cookie', null).vod_id};
+        }
 
         return '动作：' + action + '\n数据：' + value;
     },
@@ -816,7 +843,8 @@ function getInput(actionId, title, img) {
             tip: '请输入.env中配置的入库授权码',
             value: '',
             msg: '查看已设置的cookie需要授权码',
-            imageUrl: 'https://pic.imgdb.cn/item/667ce9f4d9c307b7e9f9d052.webp',
+            // imageUrl: img || 'https://pic.imgdb.cn/item/667ce9f4d9c307b7e9f9d052.webp',
+            imageUrl: img || 'https://pic.qisuidc.cn/s/2024/10/23/6718c212f1fdd.webp',
             imageHeight: 200,
             imageType: 'card_pic_3',
         }),

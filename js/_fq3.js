@@ -52,7 +52,10 @@ function test_ua() {
     log('XMLHttpRequest:', typeof XMLHttpRequest)
     const xhr = new XMLHttpRequest();
     log(xhr);
-
+    let aa = simplecc("发财了去植发", "s2t"); // '發財了去植髮'
+    let bb = simplecc("發財了去植髮", "t2s"); // '发财了去植发'
+    log('aa:', aa)
+    log('bb:', bb)
 }
 
 // 下面这个代码放哪儿都是可以后端持续执行任务，比如放class_parse里
@@ -79,13 +82,27 @@ const rule = {
     host: 'https://fanqienovel.com/',
     homeUrl: 'https://fanqienovel.com/api/author/book/category_list/v0/',
     url: '/api/author/library/book_list/v0/?page_count=18&page_index=(fypage-1)&gender=-1&category_id=fyclass&creation_status=-1&word_count=-1&sort=0#fyfilter',
-    class_parse: async () => {
+    class_parse: async function () {
+        let {proxyUrl, getRule} = this;
         // let ip = await getPublicIp1();
         let ip = await getPublicIp2();
         log('ip:', ip);
-        test_ua();
+        // test_ua();
+        log('proxyUrl:', proxyUrl);
+        log('type of getRule:', typeof getRule);
         // test_rc4()
-
+        const tx_rule = await getRule('腾云驾雾[官]');
+        if (tx_rule) {
+            log(tx_rule.url);
+            log(tx_rule.title);
+            // log(JSON.stringify(tx_rule));
+            let data1 = await tx_rule.callRuleFn('搜索', ['斗罗大陆'])
+            log(data1);
+            let data2 = await tx_rule.callRuleFn('一级', ['tv'])
+            log(data2);
+        } else {
+            log('没有这个原')
+        }
         /*
         (async ()=>{
             for (let i = 1; i <= 100; i++) {

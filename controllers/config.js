@@ -66,6 +66,7 @@ async function generateSiteJSON(jsDir, requestHost, sub, subFilePath) {
             searchable: ruleObject.searchable,
             filterable: ruleObject.filterable,
             quickSearch: ruleObject.quickSearch,
+            more: ruleObject.more,
             ext: "", // 固定为空字符串
         };
         sites.push(site);
