@@ -3,9 +3,10 @@ import path from 'path';
 import * as drpy from '../libs/drpyS.js';
 import {naturalSort, urljoin} from '../utils/utils.js'
 import {ENV} from "../utils/env.js";
+import {validatePwd} from "../utils/api_validate.js";
 
 // 工具函数：生成 JSON 数据
-async function generateSiteJSON(jsDir, requestHost, sub, subFilePath) {
+async function generateSiteJSON(jsDir, requestHost, sub, subFilePath, pwd) {
     const files = readdirSync(jsDir);
     let valid_files = files.filter((file) => file.endsWith('.js') && !file.startsWith('_')); // 筛选出不是 "_" 开头的 .js 文件
     let sort_list = [];
@@ -42,7 +43,10 @@ async function generateSiteJSON(jsDir, requestHost, sub, subFilePath) {
         const baseName = path.basename(file, '.js'); // 去掉文件扩展名
         let key = `drpyS_${baseName}`;
         let name = `${baseName}(DS)`;
-        const api = `${requestHost}/api/${baseName}`;  // 使用请求的 host 地址，避免硬编码端口
+        let api = `${requestHost}/api/${baseName}`;  // 使用请求的 host 地址，避免硬编码端口
+        if (pwd) {
+            api += `?pwd=${pwd}`;
+        }
         let ruleObject = {
             searchable: 0, // 固定值
             filterable: 0, // 固定值
@@ -168,7 +172,7 @@ function getSubs(subFilePath) {
 
 export default (fastify, options, done) => {
 
-    fastify.get('/index', async (request, reply) => {
+    fastify.get('/index', {preHandler: validatePwd}, async (request, reply) => {
         if (!existsSync(options.indexFilePath)) {
             reply.code(404).send({error: 'index.json not found'});
             return;
@@ -179,9 +183,10 @@ export default (fastify, options, done) => {
     });
 
     // 接口：返回配置 JSON，同时写入 index.json
-    fastify.get('/config*', async (request, reply) => {
+    fastify.get('/config*', {preHandler: validatePwd}, async (request, reply) => {
         let t1 = (new Date()).getTime();
         const query = request.query; // 获取 query 参数
+        const pwd = query.pwd || '';
         const sub_code = query.sub || '';
         const cfg_path = request.params['*']; // 捕获整个路径
         try {
@@ -201,7 +206,7 @@ export default (fastify, options, done) => {
                 }
             }
 
-            const siteJSON = await generateSiteJSON(options.jsDir, requestHost, sub, options.subFilePath);
+            const siteJSON = await generateSiteJSON(options.jsDir, requestHost, sub, options.subFilePath, pwd);
             const parseJSON = generateParseJSON(options.jxDir, requestHost);
             const livesJSON = generateLivesJSON(requestHost);
             const playerJSON = generatePlayerJSON(options.configDir, requestHost);

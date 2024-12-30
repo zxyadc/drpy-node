@@ -67,7 +67,8 @@ const start = async () => {
         console.log(`Server listening at:`);
         console.log(`- Local: ${localAddress}`);
         console.log(`- LAN:   ${lanAddress}`);
-        console.log(`- PLATFORM:   ${process.platform}`);
+        console.log(`- PLATFORM:   ${process.platform} ${process.arch}`);
+        console.log(`- VERSION:   ${process.version}`);
         if (process.env.VERCEL) {
             console.log('Running on Vercel!');
             console.log('Vercel Environment:', process.env.VERCEL_ENV); // development, preview, production

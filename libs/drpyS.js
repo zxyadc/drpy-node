@@ -13,7 +13,7 @@ import {ENV} from '../utils/env.js';
 import {Quark} from "../utils/quark.js";
 import {UC} from "../utils/uc.js";
 import {Ali} from "../utils/ali.js";
-import SparkAI from '../utils/SparkAI.js';
+import AIS from '../utils/ais.js';
 // const { req } = await import('../utils/req.js');
 import {gbkTool} from '../libs_drpy/gbk.js'
 // import {atob, btoa, base64Encode, base64Decode, md5} from "../libs_drpy/crypto-util.js";
@@ -48,7 +48,7 @@ globalThis.Ali = Ali;
 globalThis.require = createRequire(import.meta.url);
 globalThis._fetch = fetch;
 globalThis.XMLHttpRequest = XMLHttpRequest;
-globalThis.SparkAI = SparkAI;
+globalThis.AIS = AIS;
 globalThis.pathLib = {
     basename: path.basename,
     extname: path.extname,
@@ -165,7 +165,7 @@ export async function getSandbox(env = {}) {
         _fetch,
         XMLHttpRequest,
         simplecc,
-        SparkAI,
+        AIS,
         batchFetch,
         JSProxyStream,
         JSFile,

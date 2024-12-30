@@ -28,12 +28,12 @@ var rule = {
         });
         return action_data;
     },
-    类型: '设置',
     // 推荐样式
     hikerListCol: 'icon_round_4',
     // 分类列表样式
     hikerClassListCol: 'avatar',
-    home_flag: '3-0-S',
+    // home_flag: '3-0-S',
+    home_flag: '5',
     class_flag: '3-11-S',
     more: {
         sourceTag: '设置,动作',
@@ -52,6 +52,11 @@ var rule = {
                     imageHeight: 200,
                     imageType: 'card_pic_3',
                     keep: true,
+                    width: 680,
+                    height: 800,
+                    msgType: 'long_text',
+                    httpTimeout: 60,
+                    canceledOnTouchOutside: false,
                 })
             },
             {name: '查看夸克cookie', action: '查看夸克cookie'},
@@ -230,8 +235,14 @@ var rule = {
                 d.push(getInput('get_hide_adult', '查看青少年模式', images.settings));
                 d.push(genMultiInput('thread', '设置播放代理线程数', '默认为1，可自行配置成其他值如:10', images.settings));
                 d.push(getInput('get_thread', '查看播放代理线程数', images.settings));
-                d.push(genMultiInput('spark_ai_authKey', '设置讯飞AI鉴权', '在这个页面的http鉴权信息:https://console.xfyun.cn/services/bm4', images.settings));
+                d.push(genMultiInput('now_ai', '设置当前AI', '1: 讯飞星火 2:deepseek 3.讯飞智能体\n如果不填，连续对话默认使用讯飞星火', images.settings));
+                d.push(getInput('get_now_ai', '查看当前AI', images.settings));
+                d.push(genMultiInput('spark_ai_authKey', '设置讯飞AI鉴权', '在这个页面的http鉴权信息:\nhttps://console.xfyun.cn/services/bm4', images.settings));
                 d.push(getInput('get_spark_ai_authKey', '查看讯飞AI鉴权', images.settings));
+                d.push(genMultiInput('deepseek_apiKey', '设置deepseek AI鉴权', '在这个页面的http鉴权信息:\nhttps://platform.deepseek.com/api_keys', images.settings));
+                d.push(getInput('get_deepseek_apiKey', '查看deepseek AI鉴权', images.settings));
+                d.push(genMultiInput('sparkBotObject', '设置讯飞星火智能体 AI鉴权', '设置对象形式，如:{"appId":"6fafca", "uid":"道长", "assistantId":"tke24zrzq3f1"}\n 在这个页面的http鉴权信息:\nhttps://xinghuo.xfyun.cn/botcenter/createbot', images.settings));
+                d.push(getInput('get_sparkBotObject', '查看讯飞星火智能体 AI鉴权', images.settings));
                 break;
             case 'test':
                 d.push({
@@ -342,13 +353,31 @@ var rule = {
                         toast: 'AI思考中，请稍候继续提问'
                     });
                 }
-                const sparkAI = new SparkAI({
-                    authKey: ENV.get('spark_ai_authKey'),
-                    baseURL: 'https://spark-api-open.xf-yun.com',
-                });
+                let AI = null;
+                switch (ENV.get('now_ai', '1')) {
+                    case '1':
+                        AI = new AIS.SparkAI({
+                            authKey: ENV.get('spark_ai_authKey'),
+                            baseURL: 'https://spark-api-open.xf-yun.com',
+                        });
+                        break;
+                    case '2':
+                        AI = new AIS.DeepSeek({
+                            apiKey: ENV.get('deepseek_apiKey'),
+                        });
+                        break;
+                    case '3':
+                        const sparkBotObject = ENV.get('sparkBotObject', {}, 1);
+                        // log('sparkBotObject:', sparkBotObject);
+                        AI = new AIS.SparkAIBot(sparkBotObject.appId, sparkBotObject.uid, sparkBotObject.assistantId);
+                        break;
+                }
+                if (!AI) {
+                    return '当前AI配置不正确，请进入设置中心-系统配置-设置当前AI'
+                }
                 rule.askLock = 1;
                 try {
-                    replyContent = await sparkAI.ask(prompt, {temperature: 1.0});
+                    replyContent = await AI.ask(prompt, {temperature: 1.0});
                 } catch (error) {
                     replyContent = error.message;
                 }
@@ -358,7 +387,8 @@ var rule = {
                 action: {
                     actionId: '__keep__',
                     msg: '你:' + prompt + '\n' + 'AI:' + replyContent,
-                    reset: true
+                    reset: true,
+                    msgType: 'long_text',
                 },
                 toast: '你有新的消息'
             });
@@ -405,6 +435,7 @@ var rule = {
                     initValue: requestId,
                     cancelAction: 'quarkScanCancel',
                     cancelValue: requestId,
+                    httpTimeout: 60,
                 }
             });
         }
@@ -500,6 +531,7 @@ var rule = {
                     initValue: requestId,
                     cancelAction: 'UCScanCancel',
                     cancelValue: requestId,
+                    httpTimeout: 60,
                 }
             });
         }
@@ -601,6 +633,7 @@ var rule = {
                     initValue: qrcodeUrl,
                     cancelAction: 'aliScanCancel',
                     cancelValue: qrcodeUrl,
+                    httpTimeout: 60,
                 }
             });
         }
@@ -701,6 +734,7 @@ var rule = {
                     initValue: qrcodeUrl,
                     cancelAction: 'biliScanCancel',
                     cancelValue: qrcodeUrl,
+                    httpTimeout: 60,
                 }
             });
         }
@@ -794,6 +828,9 @@ var rule = {
             'hide_adult',
             'thread',
             'spark_ai_authKey',
+            'deepseek_apiKey',
+            'sparkBotObject',
+            'now_ai',
         ];
         let get_cookie_sets = [
             'get_quark_cookie',
@@ -803,6 +840,9 @@ var rule = {
             'get_hide_adult',
             'get_thread',
             'get_spark_ai_authKey',
+            'get_deepseek_apiKey',
+            'get_sparkBotObject',
+            'get_now_ai',
         ];
         if (cookie_sets.includes(action) && value) {
             try {
@@ -816,8 +856,17 @@ var rule = {
                 if (auth_code !== COOKIE_AUTH_CODE) {
                     return `您输入的入库授权码【${auth_code}】不正确`
                 }
-                ENV.set(action, cookie);
-                return `设置成功!已成功设置环境变量【${action}】的值为:${cookie}`;
+                if (action === 'sparkBotObject') {
+                    try {
+                        ENV.set(action, cookie, 1);
+                        return `设置成功!已成功设置环境变量【${action}】的值为:${cookie}`;
+                    } catch (e) {
+                        return `设置失败!发送了错误:${e.message}`;
+                    }
+                } else {
+                    ENV.set(action, cookie);
+                    return `设置成功!已成功设置环境变量【${action}】的值为:${cookie}`;
+                }
             } catch (e) {
                 return '发生错误：' + e.message;
             }
@@ -842,7 +891,7 @@ var rule = {
                         type: 'input',
                         title: key,
                         tip: `你想查看的:${key}`,
-                        value: cookie,
+                        value: typeof cookie === 'string' ? cookie : JSON.stringify(cookie),
                         msg: '此弹窗是动态设置的参数，可用于动态返回原设置值等场景'
                     }
                 });

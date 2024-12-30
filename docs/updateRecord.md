@@ -1,5 +1,21 @@
 # drpyS更新记录
 
+### 20241231
+
+更新至V1.0.27
+
+1. 设置中心优化，样式微调
+2. 新增 `_lib.waf.js` 通用过长城雷池防火墙工具，与对应示例源 `团长资源[盘].js`
+3. 优化 `多多[盘].js` 默认筛选不正确导致没数据问题
+4. 新增源 `专享影视.js` `火车太堵.js`
+5. 增加 `robots.txt` 防止被引擎收录
+6. 服务启动增加打印nodejs版本号
+7. 主页接口增加basic验证，请自己手动配置.env文件中的 `API_AUTH_NAME` 和 `API_AUTH_CODE`
+8. 配置接口和源接口增加api授权，在.env文件中配置 `API_PWD = dzyyds`
+9. AI工具集成到 `AIS` 对象里了
+10. ENV环境变量get和set方法增加参数3:`isObject=1`,支持读写变量如果是字符串自动转为object对象
+11. AI库完成讯飞星火智能体对接，可配置当前AI为3，新增依赖库 `ws`
+
 ### 20241230
 
 更新至V1.0.26
@@ -27,18 +43,19 @@ if (tx_rule) {
 ```
 
 4. 增加讯飞星火AI对话交互动作,设置中心推荐栏可用。 源里可使用这个对象 `SparkAI`,调用示例:
+
 ```javascript
 const sparkAI = new SparkAI({
-                    authKey: ENV.get('spark_ai_authKey'), 
-                    baseURL: 'https://spark-api-open.xf-yun.com',
-                });
- rule.askLock = 1;
- try {
-     replyContent = await sparkAI.ask(prompt, {temperature: 1.0});
- } catch (error) {
-     replyContent = error.message;
- }
- rule.askLock = 0;
+    authKey: ENV.get('spark_ai_authKey'),
+    baseURL: 'https://spark-api-open.xf-yun.com',
+});
+rule.askLock = 1;
+try {
+    replyContent = await sparkAI.ask(prompt, {temperature: 1.0});
+} catch (error) {
+    replyContent = error.message;
+}
+rule.askLock = 0;
 ```
 
 ### 20241229

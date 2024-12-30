@@ -1,5 +1,5 @@
 {
-  "sites_count": 37,
+  "sites_count": 40,
   "sites": [
     {
       "key": "drpyS_设置中心",
@@ -14,7 +14,7 @@
         "actions": [
           {
             "name": "连续对话",
-            "action": "{\"actionId\":\"连续对话\",\"id\":\"talk\",\"type\":\"input\",\"title\":\"连续对话\",\"tip\":\"请输入消息\",\"value\":\"\",\"msg\":\"开始新的对话\",\"button\":3,\"imageUrl\":\"https://img2.baidu.com/it/u=1206278833,3265480730&fm=253&fmt=auto&app=120&f=JPEG?w=800&h=800\",\"imageHeight\":200,\"imageType\":\"card_pic_3\",\"keep\":true}"
+            "action": "{\"actionId\":\"连续对话\",\"id\":\"talk\",\"type\":\"input\",\"title\":\"连续对话\",\"tip\":\"请输入消息\",\"value\":\"\",\"msg\":\"开始新的对话\",\"button\":3,\"imageUrl\":\"https://img2.baidu.com/it/u=1206278833,3265480730&fm=253&fmt=auto&app=120&f=JPEG?w=800&h=800\",\"imageHeight\":200,\"imageType\":\"card_pic_3\",\"keep\":true,\"width\":680,\"height\":800,\"msgType\":\"long_text\",\"httpTimeout\":60,\"canceledOnTouchOutside\":false}"
           },
           {
             "name": "查看夸克cookie",
@@ -157,6 +157,16 @@
       "ext": ""
     },
     {
+      "key": "drpyS_火车太堵",
+      "name": "火车太堵(DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/火车太堵",
+      "searchable": 1,
+      "filterable": 0,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
       "key": "drpyS_荐片",
       "name": "荐片(DS)",
       "type": 4,
@@ -257,6 +267,16 @@
       "ext": ""
     },
     {
+      "key": "drpyS_团长资源[盘]",
+      "name": "团长资源[盘](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/团长资源[盘]",
+      "searchable": 1,
+      "filterable": 0,
+      "quickSearch": 1,
+      "ext": ""
+    },
+    {
       "key": "push_agent",
       "name": "推送(DS)",
       "type": 4,
@@ -323,6 +343,16 @@
       "api": "http://localhost:5757/api/至臻[盘]",
       "searchable": 1,
       "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_专享影视",
+      "name": "专享影视(DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/专享影视",
+      "searchable": 1,
+      "filterable": 0,
       "quickSearch": 0,
       "ext": ""
     },

@@ -3,12 +3,14 @@ import {existsSync} from 'fs';
 import {base64Decode} from '../libs_drpy/crypto-util.js';
 import * as drpy from '../libs/drpyS.js';
 import {ENV} from "../utils/env.js";
+import {validatePwd} from "../utils/api_validate.js";
 
 export default (fastify, options, done) => {
     // 动态加载模块并根据 query 执行不同逻辑
     fastify.route({
         method: ['GET', 'POST'], // 同时支持 GET 和 POST
         url: '/api/:module',
+        preHandler: validatePwd,
         schema: {
             consumes: ['application/json', 'application/x-www-form-urlencoded'], // 声明支持的内容类型
         },

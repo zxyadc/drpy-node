@@ -2,10 +2,11 @@ import path from 'path';
 import {readdirSync, readFileSync, writeFileSync, existsSync} from 'fs';
 import '../utils/marked.min.js';
 import {computeHash} from '../utils/utils.js';
+import {validateBasicAuth} from "../utils/api_validate.js";
 
 export default (fastify, options, done) => {
     // 添加 / 接口
-    fastify.get('/', async (request, reply) => {
+    fastify.get('/', {preHandler: validateBasicAuth}, async (request, reply) => {
         let readmePath = null;
         const indexHtmlPath = path.join(options.rootDir, 'public/index.html');
         // console.log(`indexHtmlPath:${indexHtmlPath}`);
@@ -60,6 +61,11 @@ export default (fastify, options, done) => {
 
         // 返回 HTML 内容
         reply.type('text/html;charset=utf-8').send(indexHtml);
+    });
+
+    // 新增 /robots.txt 路由
+    fastify.get('/robots.txt', (request, reply) => {
+        reply.type('text/plain;charset=utf-8').sendFile('robots.txt', path.join(options.rootDir, 'public'));
     });
 
     // 新增 /favicon.ico 路由

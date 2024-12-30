@@ -71,9 +71,11 @@ export const ENV = {
     /**
      * 获取环境变量（支持缓存）
      * @param {string} [key] 可选，获取特定键的值或完整对象
+     * @param _value 默认值
+     * @param isObject 是否为对象格式，默认为0
      * @returns {string|Object} 环境变量值或完整对象
      */
-    get(key) {
+    get(key, _value = '', isObject = 0) {
         if (!key) {
             // 不传参时获取整个对象
             if (cache.has(FULL_ENV_CACHE_KEY)) {
@@ -92,10 +94,21 @@ export const ENV = {
         }
         console.log(`从文件中读取: ${key}`);
         const envObj = this._readEnvFile();
-        const value = envObj[key] || "";
+        let value = envObj[key] || _value;
+
+        // 如果是对象格式，但value不是对象。则转换
+        if (isObject && typeof value !== 'object') {
+            try {
+                value = JSON.parse(value);
+            } catch (e) {
+                value = {};
+                console.error(`Failed to parse value for key "${key}" as object: ${e.message}`);
+            }
+        }
 
         // 写入缓存
         cache.set(key, value);
+
 
         return value;
     },
@@ -103,11 +116,22 @@ export const ENV = {
     /**
      * 设置环境变量
      * @param {string} key 键名
-     * @param {string} [value=''] 键值
+     * @param {string|Object} [value=''] 键值
+     * @param {number} [isObject=0] 是否为对象格式，默认为0
      */
-    set(key, value = "") {
+    set(key, value = "", isObject = 0) {
         if (!key || typeof key !== "string") {
             throw new Error("Key must be a non-empty string.");
+        }
+
+        // 如果是对象格式，但value不是对象。则转换
+        if (isObject && typeof value !== 'object') {
+            try {
+                value = JSON.parse(value);
+            } catch (e) {
+                value = {};
+                console.error(`Failed to parse value for key "${key}" as object: ${e.message}`);
+            }
         }
 
         const envObj = this._readEnvFile();

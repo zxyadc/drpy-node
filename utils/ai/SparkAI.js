@@ -1,12 +1,14 @@
 import axios from 'axios';
 
+// https://console.xfyun.cn/services/bm4
+// https://xinghuo.xfyun.cn/botcenter/private-dataset
 class SparkAI {
     constructor({authKey, baseURL}) {
-        if (!authKey || !baseURL) {
+        if (!authKey) {
             throw new Error('Missing required configuration parameters.');
         }
         this.authKey = authKey;
-        this.baseURL = baseURL;
+        this.baseURL = baseURL || 'https://spark-api-open.xf-yun.com';
     }
 
     async ask(prompt, options = {}) {
