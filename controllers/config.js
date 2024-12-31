@@ -125,6 +125,8 @@ function generateParseJSON(jxDir, requestHost) {
 function generateLivesJSON(requestHost) {
     let lives = [];
     let live_url = process.env.LIVE_URL || '';
+    let epg_url = process.env.EPG_URL || ''; // 从.env文件读取
+    let logo_url = process.env.LOGO_URL || ''; // 从.env文件读取
     if (live_url && !live_url.startsWith('http')) {
         let public_url = urljoin(requestHost, 'public/');
         live_url = urljoin(public_url, live_url);
@@ -138,8 +140,8 @@ function generateLivesJSON(requestHost) {
                 "url": live_url,
                 "playerType": 1,
                 "ua": "okhttp/3.12.13",
-                "epg": "https://epg.mxdyeah.top/api/diyp/?ch={name}&date={date}",
-                "logo": "https://live.mxdyeah.top/logo/{name}.png"
+                "epg": epg_url,
+                "logo": logo_url
             }
         )
     }
