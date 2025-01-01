@@ -1,5 +1,5 @@
 {
-  "sites_count": 40,
+  "sites_count": 43,
   "sites": [
     {
       "key": "drpyS_设置中心",
@@ -75,6 +75,26 @@
       "filterable": 1,
       "quickSearch": 0,
       "ext": ""
+    },
+    {
+      "key": "drpyS_哔哩大全[官]",
+      "name": "哔哩大全[官](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/我的哔哩[官]",
+      "searchable": 2,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": "../json/哔哩大全.json"
+    },
+    {
+      "key": "drpyS_哔哩教育[官]",
+      "name": "哔哩教育[官](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/我的哔哩[官]",
+      "searchable": 2,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": "../json/哔哩教育.json"
     },
     {
       "key": "drpyS_哔哩直播[官]",
@@ -211,6 +231,16 @@
       "name": "老白故事[听](DS)",
       "type": 4,
       "api": "http://localhost:5757/api/老白故事[听]",
+      "searchable": 2,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_七猫小说[书]",
+      "name": "七猫小说[书](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/七猫小说[书]",
       "searchable": 2,
       "filterable": 1,
       "quickSearch": 0,

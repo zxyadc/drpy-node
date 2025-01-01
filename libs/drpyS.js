@@ -6,6 +6,7 @@ import {XMLHttpRequest} from 'xmlhttprequest';
 import path from "path";
 import vm from 'vm';
 import '../libs_drpy/es6-extend.js'
+import {getSitesMap} from "../utils/sites-map.js";
 import * as utils from '../utils/utils.js';
 import * as misc from '../utils/misc.js';
 import COOKIE from '../utils/cookieManager.js';
@@ -36,6 +37,7 @@ import '../libs_drpy/moduleLoader.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const _data_path = path.join(__dirname, '../data');
+const _config_path = path.join(__dirname, '../config');
 
 globalThis.misc = misc;
 globalThis.utils = utils;
@@ -314,10 +316,22 @@ export async function init(filePath, env, refresh) {
         const fileContent = await readFile(filePath, 'utf-8');
         // 计算文件的 hash 值
         const fileHash = computeHash(fileContent);
+        const moduleName = path.basename(filePath, '.js');
+        const moduleExt = env.ext;
+        // log('moduleName:', moduleName);
+        // log('moduleExt:', moduleExt);
+        let SitesMap = getSitesMap(_config_path);
+        // log('SitesMap:', SitesMap);
+        if (moduleExt && SitesMap[moduleName]) {
+            if (!SitesMap[moduleName].find(i => i.queryStr === moduleExt) && !SitesMap[moduleName].find(i => i.queryObject.params === moduleExt)) {
+                throw new Error("moduleExt is wrong!")
+            }
+        }
+        let hashMd5 = md5(filePath + moduleExt);
 
         // 检查缓存：是否有文件且未刷新且文件 hash 未变化
-        if (moduleCache.has(filePath) && !refresh) {
-            const cached = moduleCache.get(filePath);
+        if (moduleCache.has(hashMd5) && !refresh) {
+            const cached = moduleCache.get(hashMd5);
             if (cached.hash === fileHash) {
                 // log(`Module ${filePath} already initialized and unchanged, returning cached instance.`);
                 return cached.moduleObject;
@@ -370,6 +384,13 @@ export async function init(filePath, env, refresh) {
         // 访问沙箱中的 rule 对象。不进行deepCopy了,避免初始化或者预处理对rule.xxx进行修改后，在其他函数里使用却没生效问题
         // const moduleObject = utils.deepCopy(sandbox.rule);
         const rule = sandbox.rule;
+        if (moduleExt) { // 传了参数才覆盖rule参数，否则取rule内置
+            if (moduleExt.startsWith('../json')) {
+                rule.params = urljoin(env.jsonUrl, moduleExt.slice(8));
+            } else {
+                rule.params = moduleExt
+            }
+        }
         await initParse(rule, vm, context);
         // otherScript放入到initParse去执行
 //         const otherScript = new vm.Script(`
@@ -385,7 +406,7 @@ export async function init(filePath, env, refresh) {
         moduleObject.cost = t2 - t1;
         // console.log(`${filePath} headers:`, moduleObject.headers);
         // 缓存模块和文件的 hash 值
-        moduleCache.set(filePath, {moduleObject, hash: fileHash});
+        moduleCache.set(hashMd5, {moduleObject, hash: fileHash});
         return moduleObject;
     } catch (error) {
         console.log('Error in drpy.init:', error);

@@ -24,6 +24,12 @@ fastify.register(fastifyStatic, {
     decorateReply: false, // 禁用 sendFile
 });
 
+fastify.register(fastifyStatic, {
+    root: path.join(__dirname, 'json'),
+    prefix: '/json/', // 新的访问路径前缀
+    decorateReply: false, // 禁用 sendFile
+});
+
 // 注册插件以支持 application/x-www-form-urlencoded
 fastify.register(formBody);
 
@@ -48,7 +54,8 @@ registerRoutes(fastify, {
 const start = async () => {
     try {
         // 启动 Fastify 服务
-        await fastify.listen({port: PORT, host: '0.0.0.0'});
+        // await fastify.listen({port: PORT, host: '0.0.0.0'});
+        await fastify.listen({port: PORT, host: '::'});
 
         // 获取本地和局域网地址
         const localAddress = `http://localhost:${PORT}`;
