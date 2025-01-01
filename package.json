@@ -7,7 +7,7 @@
     "build": "node index.js",
     "dev": "node index.js",
     "dev-win": "chcp 65001 && node index.js",
-    "pm2": "pm2 start index.js",
+    "pm2": "pm2 start index.js --name drpys",
     "package": "python package.py"
   },
   "engines": {
