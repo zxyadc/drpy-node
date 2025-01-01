@@ -12,6 +12,7 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 * [央视点播解析工具](/proxy/央视大全[官]/index.html)
 * [cookie管理插件](/apps/cookie-butler/index.html)
 * [本站防止爬虫协议](/robots.txt)
+* [本项目主页-免翻](https://git-proxy.playdreamer.cn/hjdhnx/drpy-node)
 
 ## 更新记录
 
