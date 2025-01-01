@@ -1,5 +1,9 @@
 // 接口basic验证
 export const validateBasicAuth = (request, reply, done) => {
+    if (!process.env.hasOwnProperty('API_AUTH_NAME') && !process.env.hasOwnProperty('API_AUTH_CODE')) {
+        done();
+        return
+    }
     // console.log('进入了basic验证');
     const authHeader = request.headers.authorization;
 

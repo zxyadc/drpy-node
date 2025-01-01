@@ -341,6 +341,8 @@ var rule = {
                     toast: '你要去看视频了'
                 });
             }
+            let user1 = '你';
+            let user2 = 'AI';
             let replyContent = prompt;
             if (ENV.get('spark_ai_authKey')) {
                 if (rule.askLock) {
@@ -360,16 +362,19 @@ var rule = {
                             authKey: ENV.get('spark_ai_authKey'),
                             baseURL: 'https://spark-api-open.xf-yun.com',
                         });
+                        user2 = '讯飞星火';
                         break;
                     case '2':
                         AI = new AIS.DeepSeek({
                             apiKey: ENV.get('deepseek_apiKey'),
                         });
+                        user2 = 'deepSeek';
                         break;
                     case '3':
                         const sparkBotObject = ENV.get('sparkBotObject', {}, 1);
                         // log('sparkBotObject:', sparkBotObject);
                         AI = new AIS.SparkAIBot(sparkBotObject.appId, sparkBotObject.uid, sparkBotObject.assistantId);
+                        user2 = '讯飞智能体';
                         break;
                 }
                 if (!AI) {
@@ -386,7 +391,7 @@ var rule = {
             return JSON.stringify({
                 action: {
                     actionId: '__keep__',
-                    msg: '你:' + prompt + '\n' + 'AI:' + replyContent,
+                    msg: `${user1}:` + prompt + '\n' + `${user2}:` + replyContent,
                     reset: true,
                     msgType: 'long_text',
                 },

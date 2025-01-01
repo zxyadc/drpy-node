@@ -5,7 +5,7 @@ import datetime
 EXCLUDE_DIRS = ['.git', '.idea', 'soft', 'drop_code', 'jstest', 'local', 'logs', '对话1.txt']
 
 # 要排除的文件列表
-EXCLUDE_FILES = ['config/env.json', '.env', 'js/玩偶哥哥[盘].js']
+EXCLUDE_FILES = ['config/env.json', '.env']
 
 def compress_directory():
     # 获取当前目录名
