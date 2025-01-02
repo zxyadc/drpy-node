@@ -129,8 +129,8 @@ get_device_ip() {
     # 这里使用的是ipinfo.io服务，你也可以使用其他服务
     IP=$(curl -s https://ipinfo.io/ip)
     if [ $? -eq 0 ]; then
-        echo "设备IP地址：$IP"
-        echo "公网IP自行打码"
+        echo "=     设备IP地址：$IP"
+        echo "=        公网IP自行打码"
         return 0
     else
         echo "无法获取设备IP地址。"
@@ -203,15 +203,72 @@ create_default_env() {
     fi
 }
 
+# 定义初始化.env文件的函数
+initialize_default_env() {
+    local env_path="$1/.env"
+    local env_development_path="$1/.env.development"
+    
+    # 检查.env文件是否存在
+    if [ ! -f "$env_path" ]; then
+        echo ".env文件不存在，正在使用.env.development作为模板创建..."
+        # 提示用户输入自定义值，并设置30秒超时
+        echo "请输入网盘入库密码（30秒内无输入则使用默认值'drpys'）："
+        read -t 30 cookie_auth_code
+        if [ -z "$cookie_auth_code" ]; then
+            cookie_auth_code="drpys"
+        fi
+
+        echo "请输入登录用户名（30秒内无输入则使用默认值'admin'）："
+        read -t 30 api_auth_name
+        if [ -z "$api_auth_name" ]; then
+            api_auth_name="admin"
+        fi
+
+        echo "请输入登录密码（30秒内无输入则使用默认值'drpys'）："
+        read -t 30 api_auth_code
+        if [ -z "$api_auth_code" ]; then
+            api_auth_code="drpys"
+        fi
+
+        echo "请输入订阅PWD值（30秒内无输入则使用默认值'dzyyds'）："
+        read -t 30 api_pwd
+        if [ -z "$api_pwd" ]; then
+            api_pwd="dzyyds"
+        fi
+
+        # 使用.env.development作为模板创建.env文件，并替换自定义值
+        cp "$env_development_path" "$env_path"
+        if [ $? -eq 0 ]; then
+            sed -i "s|COOKIE_AUTH_CODE = .*|COOKIE_AUTH_CODE = $cookie_auth_code|g" "$env_path"
+            sed -i "s|API_AUTH_NAME = .*|API_AUTH_NAME = $api_auth_name|g" "$env_path"
+            sed -i "s|API_AUTH_CODE = .*|API_AUTH_CODE = $api_auth_code|g" "$env_path"
+            sed -i "s|API_PWD = .*|API_PWD = $api_pwd|g" "$env_path"
+            echo ".env文件创建成功。"
+        else
+            echo ".env文件创建失败。"
+            exit 1
+        fi
+    else
+        echo ".env文件已存在，无需创建。"
+    fi
+}
+
 # IP显示标识
 has_displayed_ip=""
 # 显示内网和公网访问地址
 display_ip_addresses() {
-    echo "项目主页访问地址："
-    echo "内网访问地址：http://$LOCAL_IP:5757"
+    echo "=================================================="
+    echo "=         项目主页及相关默认值提示            "
+    echo "= 内网访问地址：http://$LOCAL_IP:5757     "
+    echo "=         默认登录账户admin                 "
+    echo "=         默认登录密码drpys                  "
+    echo "=         默认入库密码drpys                 "
+    echo "=       默认订阅pwd值dzyyds                 "
+    echo "= 如需修改以上密码值则自行修改源码根目录.env文件                 "
     get_device_ip
     if [ $? -eq 0 ]; then
-        echo "公网主页地址：http://$IP:5757"
+        echo "= 公网主页地址：http://$IP:5757"
+        echo "=================================================="
     else
         echo "无法获取公网IP地址。"
     fi
@@ -229,7 +286,7 @@ else
         cd "$REPO_DIR/$PROJECT_NAME"
         # 克隆后创建env.json和.env文件
         create_env_json "$REPO_DIR/$PROJECT_NAME"
-        create_default_env "$REPO_DIR/$PROJECT_NAME"
+        initialize_default_env "$REPO_DIR/$PROJECT_NAME" # 调用初始化.env文件的函数
         echo "正在执行yarn..."
         yarn config set registry https://registry.npmmirror.com/
         yarn
@@ -447,7 +504,7 @@ while true; do
         if [ -z "$has_displayed_ip" ]; then # 检查是否已经显示过IP地址
         echo "当前仓库已经是最新的，无需更新。"
         display_ip_addresses
-            has_displayed_ip=1 # 设置一个标志，表示已经显示过IP地址
+        has_displayed_ip=1 # 设置一个标志，表示已经显示过IP地址
         fi
         break # 退出循环
     fi
