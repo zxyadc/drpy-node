@@ -73,6 +73,6 @@ echo "30 7 * * * bash -c \"\$(curl -fsSLk https://git-proxy.playdreamer.cn/hjdhn
 
 chmod a+x /path/autorun.sh
 
-echo "30 7 * * * bash /path/autorun.sh " >> /path/logfile.log 2>&1" | crontab -
+echo "30 7 * * * bash /path/autorun.sh  >> /path/logfile.log 2>&1" | crontab -
 
 命令说明 /patch 为脚本存放路径（脚本放在与源码同级的自定义目录中）
