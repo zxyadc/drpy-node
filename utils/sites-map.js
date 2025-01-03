@@ -25,7 +25,7 @@ export function getSitesMap(configDir) {
                     SitesMap[SitesMapKey] = [];
                 }
                 let SitesMapQuery = line.split('@')[1].trim();
-                let SitesMapAlias = line.split('@')[2].trim();
+                let SitesMapAlias = line.split('@').length > 2 ? line.split('@')[2].trim() : SitesMapKey;
                 SitesMap[SitesMapKey].push({
                     alias: SitesMapAlias,
                     queryStr: SitesMapQuery,

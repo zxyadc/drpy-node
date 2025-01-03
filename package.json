@@ -1,6 +1,6 @@
 {
   "name": "drpy-node",
-  "version": "1.0.28",
+  "version": "1.0.30",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -25,6 +25,7 @@
     "dotenv": "^16.4.7",
     "fastify": "^4.15.0",
     "fastq": "^1.17.1",
+    "google-protobuf": "^3.21.4",
     "lodash": "^4.17.21",
     "lru-cache": "^9.1.2",
     "mime-types": "^2.1.35",
@@ -36,6 +37,7 @@
     "sync-fetch": "^0.6.0-2",
     "tunnel": "^0.0.6",
     "ws": "^8.18.0",
-    "xmlhttprequest": "^1.8.0"
+    "xmlhttprequest": "^1.8.0",
+    "zlib": "^1.0.5"
   }
 }

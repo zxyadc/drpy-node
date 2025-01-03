@@ -6,6 +6,8 @@ import {ENV} from "../utils/env.js";
 import {validatePwd} from "../utils/api_validate.js";
 import {getSitesMap} from "../utils/sites-map.js";
 
+const {jsEncoder} = drpy;
+
 // 工具函数：生成 JSON 数据
 async function generateSiteJSON(jsDir, configDir, requestHost, sub, subFilePath, pwd) {
     const files = readdirSync(jsDir);
@@ -42,7 +44,8 @@ async function generateSiteJSON(jsDir, configDir, requestHost, sub, subFilePath,
     }
     let SitesMap = getSitesMap(configDir);
     // console.log(SitesMap);
-    for (const file of valid_files) {
+    // 使用 Promise.all 并发执行文件的处理
+    const filePromises = valid_files.map(async (file) => {
         const baseName = path.basename(file, '.js'); // 去掉文件扩展名
         let api = `${requestHost}/api/${baseName}`;  // 使用请求的 host 地址，避免硬编码端口
         if (pwd) {
@@ -74,6 +77,9 @@ async function generateSiteJSON(jsDir, configDir, requestHost, sub, subFilePath,
                 } else {
                     ext = it.queryStr;
                 }
+                if (ext) {
+                    ext = jsEncoder.gzip(ext);
+                }
                 fileSites.push({key: key, name: name, ext: ext})
             });
         } else {
@@ -95,7 +101,9 @@ async function generateSiteJSON(jsDir, configDir, requestHost, sub, subFilePath,
             };
             sites.push(site);
         });
-    }
+    });
+    // 等待所有的文件处理完成
+    await Promise.all(filePromises);
     sites = naturalSort(sites, 'name', sort_list);
     return {sites};
 }
@@ -243,8 +251,10 @@ export default (fastify, options, done) => {
                 }
             }
             let t2 = (new Date()).getTime();
-            configObj.cost = t2 - t1;
-            reply.send(configObj);
+            let cost = t2 - t1;
+            // configObj.cost = cost;
+            // reply.send(configObj);
+            reply.send(Object.assign({cost}, configObj));
         } catch (error) {
             reply.status(500).send({error: 'Failed to generate site JSON', details: error.message});
         }

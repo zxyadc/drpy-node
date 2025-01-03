@@ -10,6 +10,14 @@ const {getPublicIp1, getPublicIp2} = require('../js/_lib.request.cjs');
 const {XMLHttpRequest} = require("xmlhttprequest");
 console.log('typeof getPublicIp1:', typeof getPublicIp1);
 console.log('typeof getPublicIp2:', typeof getPublicIp2);
+console.log('typeof runMain:', typeof runMain);
+// runMain有弊端，参数类似错误调用会卡死，比如gzip传参了个数字
+const a = await runMain(`
+async function main(a){
+return jsEncoder.gzip(a+'')
+}
+`, 123);
+console.log('a:', a);
 
 function test_rc4() {
     /*
@@ -92,7 +100,7 @@ const rule = {
         log('type of getRule:', typeof getRule);
         // test_rc4()
 
-        const sparkAI = new SparkAI({
+        const sparkAI = new AIS.SparkAI({
             authKey: '12', // 替换为你的鉴权信息
             baseURL: 'https://spark-api-open.xf-yun.com',
         });

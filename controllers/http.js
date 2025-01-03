@@ -51,5 +51,36 @@ export default (fastify, options, done) => {
         }
     });
 
+    fastify.get('/ai', async (request, reply) => {
+        const userInput = request.query.text;
+
+        if (!userInput || userInput.trim() === '') {
+            return reply.status(400).send({error: '请提供文本内容'});
+        }
+
+        const postFields = {
+            messages: [
+                {role: 'user', content: userInput}
+            ],
+            model: 'gpt-4o-mini-2024-07-18'
+        };
+        // console.log(JSON.stringify(postFields));
+        try {
+            const response = await _axios.post(
+                'https://api.s01s.cn/API/ai_zdy/?type=2',
+                postFields,
+                {
+                    headers: {'Content-Type': 'application/json'},
+                    timeout: 30000,
+                }
+            );
+
+            return reply.send(response.data);
+        } catch (error) {
+            fastify.log.error('Error:', error.message);
+            return reply.status(500).send({error: '请求失败，请稍后重试'});
+        }
+    });
+
     done();
 };

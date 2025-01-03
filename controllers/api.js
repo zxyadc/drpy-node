@@ -35,6 +35,8 @@ export default (fastify, options, done) => {
             const jsonUrl = `${protocol}://${hostname}/json/`;
             const httpUrl = `${protocol}://${hostname}/http`;
             const mediaProxyUrl = `${protocol}://${hostname}/mediaProxy`;
+            const hostUrl = `${hostname.split(':')[0]}`;
+            const fServer = fastify.server;
 
             // console.log(`proxyUrl:${proxyUrl}`);
             function getEnv(moduleName) {
@@ -43,7 +45,7 @@ export default (fastify, options, done) => {
                     return proxyUrl
                 };
                 return {
-                    proxyUrl, publicUrl, jsonUrl, httpUrl, mediaProxyUrl, getProxyUrl, ext: moduleExt
+                    proxyUrl, publicUrl, jsonUrl, httpUrl, mediaProxyUrl, hostUrl, fServer, getProxyUrl, ext: moduleExt
                 }
             }
 
@@ -185,15 +187,29 @@ export default (fastify, options, done) => {
         const proxyPath = request.params['*']; // 捕获整个路径
         fastify.log.info(`try proxy for ${moduleName} -> ${proxyPath}: ${JSON.stringify(query)}`);
         const rangeHeader = request.headers.range; // 获取客户端的 Range 请求头
+
+        const moduleExt = query.extend || '';
         const protocol = request.protocol;
         const hostname = request.hostname;
-        const proxyUrl = `${protocol}://${hostname}${request.url}`.split('?')[0].replace(proxyPath, '') + '?do=js';
-        // console.log(`proxyUrl:${proxyUrl}`);
-        const env = {
-            proxyUrl, proxyPath, getProxyUrl: function () {
+
+        const publicUrl = `${protocol}://${hostname}/public/`;
+        const jsonUrl = `${protocol}://${hostname}/json/`;
+        const httpUrl = `${protocol}://${hostname}/http`;
+        const mediaProxyUrl = `${protocol}://${hostname}/mediaProxy`;
+        const hostUrl = `${hostname.split(':')[0]}`;
+        const fServer = fastify.server;
+
+        function getEnv(moduleName) {
+            const proxyUrl = `${protocol}://${hostname}/proxy/${moduleName}/?do=js`;
+            const getProxyUrl = function () {
                 return proxyUrl
-            },
-        };
+            };
+            return {
+                proxyUrl, publicUrl, jsonUrl, httpUrl, mediaProxyUrl, hostUrl, fServer, getProxyUrl, ext: moduleExt
+            }
+        }
+
+        const env = getEnv(moduleName);
         try {
             const backRespList = await drpy.proxy(modulePath, env, query);
             const statusCode = backRespList[0];
@@ -267,14 +283,29 @@ export default (fastify, options, done) => {
         if (!existsSync(jxPath)) {
             return reply.status(404).send({error: `解析 ${jxName} not found`});
         }
+        const moduleExt = query.extend || '';
         const protocol = request.protocol;
         const hostname = request.hostname;
-        const proxyUrl = `${protocol}://${hostname}${request.url}`.split('?')[0].replace('/parse/', '/proxy/') + '/?do=js';
-        const env = {
-            proxyUrl, getProxyUrl: function () {
+
+        const publicUrl = `${protocol}://${hostname}/public/`;
+        const jsonUrl = `${protocol}://${hostname}/json/`;
+        const httpUrl = `${protocol}://${hostname}/http`;
+        const mediaProxyUrl = `${protocol}://${hostname}/mediaProxy`;
+        const hostUrl = `${hostname.split(':')[0]}`;
+        const fServer = fastify.server;
+
+        function getEnv(moduleName) {
+            // const proxyUrl = `${protocol}://${hostname}/proxy/${moduleName}/?do=js`;
+            const proxyUrl = `${protocol}://${hostname}${request.url}`.split('?')[0].replace('/parse/', '/proxy/') + '/?do=js';
+            const getProxyUrl = function () {
                 return proxyUrl
+            };
+            return {
+                proxyUrl, publicUrl, jsonUrl, httpUrl, mediaProxyUrl, hostUrl, getProxyUrl, fServer, ext: moduleExt
             }
-        };
+        }
+
+        const env = getEnv('');
         try {
             const backResp = await drpy.jx(jxPath, env, query);
             const statusCode = 200;
