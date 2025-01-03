@@ -6,7 +6,7 @@ var rule = {
    title: '木偶[盘]',
     host: 'https://wogg.xxooo.cf',
     //url: '/index.php/vod/show/id/fyclass/page/fypage.html',
-    url: '/vodshow/fyclass-fyfilter.html',
+    url: '/index.php/vodshow/fyclass-fyfilter.html',
     filter_url: '{{fl.area}}-{{fl.by or "time"}}-{{fl.class}}-----fypage---{{fl.year}}',
    cate_exclude: '网址|专题|全部影片',
    tab_order:['阿里#1','KUAKE11','YOUSEE1','YOUSEE11'],
