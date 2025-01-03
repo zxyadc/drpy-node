@@ -1,5 +1,5 @@
 {
-  "sites_count": 45,
+  "sites_count": 47,
   "sites": [
     {
       "key": "drpyS_设置中心",
@@ -197,6 +197,16 @@
       "ext": ""
     },
     {
+      "key": "drpyS_集百动漫",
+      "name": "集百动漫(DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/集百动漫",
+      "searchable": 1,
+      "filterable": 0,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
       "key": "drpyS_荐片",
       "name": "荐片(DS)",
       "type": 4,
@@ -242,6 +252,16 @@
       "type": 4,
       "api": "http://localhost:5757/api/老白故事[听]",
       "searchable": 2,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_七度空间[密]",
+      "name": "七度空间[密](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/七度空间[密]",
+      "searchable": 1,
       "filterable": 1,
       "quickSearch": 0,
       "ext": ""

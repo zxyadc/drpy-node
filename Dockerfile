@@ -17,8 +17,8 @@ RUN git clone https://github.com/hjdhnx/drpy-node.git .
 # 设置npm镜像为npmmirror
 RUN npm config set registry https://registry.npmmirror.com
 
-# 全局安装yarn和pm2工具
-RUN npm install -g yarn pm2
+# 全局安装pm2工具(yarn已经自带了不需要再自己装)
+RUN npm install -g pm2
 
 # 安装项目依赖项和puppeteer
 RUN yarn && yarn add puppeteer

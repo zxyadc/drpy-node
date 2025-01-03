@@ -7,6 +7,7 @@ import path from "path";
 import vm from 'vm';
 import WebSocket, {WebSocketServer} from 'ws';
 import zlib from 'zlib';
+import * as minizlib from 'minizlib';
 import '../libs_drpy/es6-extend.js'
 import {getSitesMap} from "../utils/sites-map.js";
 import * as utils from '../utils/utils.js';
@@ -55,6 +56,7 @@ globalThis.XMLHttpRequest = XMLHttpRequest;
 globalThis.WebSocket = WebSocket;
 globalThis.WebSocketServer = WebSocketServer;
 globalThis.zlib = zlib;
+globalThis.minizlib = minizlib;
 globalThis.AIS = AIS;
 globalThis.pathLib = {
     basename: path.basename,
@@ -268,6 +270,7 @@ export async function getSandbox(env = {}) {
         WebSocket,
         WebSocketServer,
         zlib,
+        minizlib,
     };
 
     // 创建一个沙箱上下文，注入需要的全局变量和函数
@@ -585,6 +588,8 @@ async function invokeWithInjectVars(rule, method, injectVars, args) {
         case 'lazy':
             result = await playParseAfter(rule, result, args[1], args[0]);
             console.log(`免嗅 ${injectVars.input} 执行完毕,结果为:`, JSON.stringify(result));
+            break;
+        case 'proxy_rule':
             break;
         default:
             console.log(`invokeWithInjectVars: ${injectVars['method']}`);

@@ -205,7 +205,16 @@ export default (fastify, options, done) => {
                 return proxyUrl
             };
             return {
-                proxyUrl, publicUrl, jsonUrl, httpUrl, mediaProxyUrl, hostUrl, fServer, getProxyUrl, ext: moduleExt
+                proxyUrl,
+                proxyPath,
+                publicUrl,
+                jsonUrl,
+                httpUrl,
+                mediaProxyUrl,
+                hostUrl,
+                fServer,
+                getProxyUrl,
+                ext: moduleExt
             }
         }
 

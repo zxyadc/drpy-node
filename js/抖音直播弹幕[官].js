@@ -210,7 +210,7 @@ function connectWebSocket(hostUrl, room_id, ttwid) {
         let payload = pushframe.getPayload_asU8();
         try {
             const buffer = zlib.gunzipSync(payload);
-            //console.log('解压成功');
+            // console.log('zlib解压成功');
             let response = new proto.douyin.Response.deserializeBinary(buffer);
             let res = response.toObject();
             let frame = pushframe.toObject();
