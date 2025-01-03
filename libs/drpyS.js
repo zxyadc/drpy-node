@@ -346,7 +346,7 @@ export async function init(filePath, env, refresh) {
                 throw new Error("moduleExt is wrong!")
             }
         }
-        let hashMd5 = md5(filePath + moduleExt);
+        let hashMd5 = md5(filePath + '#pAq#' + moduleExt);
 
         // 检查缓存：是否有文件且未刷新且文件 hash 未变化
         if (moduleCache.has(hashMd5) && !refresh) {
@@ -1006,6 +1006,7 @@ async function detailParse(rule, ids) {
         input: url,
         vid: vid,
         orId: orId,
+        fyclass: fyclass,
         MY_URL: url,
         fetch_params: deepCopy(rule.rule_fetch_params),
         jsp: jsp,

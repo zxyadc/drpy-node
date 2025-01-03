@@ -1,5 +1,5 @@
 {
-  "sites_count": 47,
+  "sites_count": 50,
   "sites": [
     {
       "key": "drpyS_设置中心",
@@ -105,6 +105,36 @@
       "filterable": 1,
       "quickSearch": 0,
       "ext": ""
+    },
+    {
+      "key": "drpyS_采王成人[密]",
+      "name": "采王成人[密](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/采集之王[合]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": "H4sIAAAAAAAAA9PT088qzs/Tf9ne/nJ2W/TT9W2xL+fOfNbQqAcSVjFUAQAd5YgpIQAAAA=="
+    },
+    {
+      "key": "drpyS_采王道长[合]",
+      "name": "采王道长[合](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/采集之王[合]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": "H4sIAAAAAAAAA9PT088qzs/Tf9ne/nJ228u5M581NOqBRFQMAcGPDNobAAAA"
+    },
+    {
+      "key": "drpyS_采王zy[密]",
+      "name": "采王zy[密](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/采集之王[合]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": "H4sIAAAAAAAAA9PT088qzs/Tf9ne/nJ2W3RVZezLuTOfNTTqgURVDAGu/MCKHwAAAA=="
     },
     {
       "key": "drpyS_动漫巴士[漫]",
