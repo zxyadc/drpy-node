@@ -57,6 +57,25 @@
 <ol>
 <li>windows上直接运行index.js可能会发现运行过程中的日志打印出中文乱码。建议通过yarn dev运行或者在package.json里点击dev脚本运行</li>
 </ol>
+<h2 id="安装说明">安装说明</h2>
+<p>1.zy安装方案</p>
+<ul>
+<li><a href="https://zy.catni.cn/otherShare/drpyS-build.html">多平台安装教程</a></li>
+</ul>
+<p>2.自动化安装方案（直接薅道长羊毛）</p>
+<ul>
+<li>终端执行</li>
+</ul>
+<p><code>bash -c &quot;$(curl -fsSLk https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/refs/heads/main/autorun.sh)&quot;</code></p>
+<ul>
+<li>添加定时方案</li>
+</ul>
+<p><code>echo &quot;30 7 * * * bash -c \&quot;\$(curl -fsSLk https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/refs/heads/main/autorun.sh)\&quot;&quot; &gt;&gt; /path/logfile.log 2&gt;&amp;1&quot; | crontab -</code></p>
+<p>或者下载脚本到本地后</p>
+<p><code>chmod a+x /path/autorun.sh</code></p>
+<p><code>echo &quot;30 7 * * * bash /path/autorun.sh  &gt;&gt; /path/logfile.log 2&gt;&amp;1&quot; | crontab -</code></p>
+<p>命令说明 /patch 为脚本存放路径（脚本放在与源码同级的自定义目录中）</p>
 
                 </body>
                 </html>
+            
