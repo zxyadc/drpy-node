@@ -62,12 +62,16 @@ todo:
 
 2.自动化安装方案（直接薅道长羊毛）
 * 终端执行
+
 bash -c "$(curl -fsSLk https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/refs/heads/main/autorun.sh)"
 
 * 添加定时方案
+
 echo "30 7 * * * bash -c \"\$(curl -fsSLk https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/refs/heads/main/autorun.sh)\"" >> /path/logfile.log 2>&1" | crontab -
 或者下载脚本到本地后
+
 chmod a+x /path/autorun.sh
+
 echo "30 7 * * * bash /path/autorun.sh " >> /path/logfile.log 2>&1" | crontab -
 
 命令说明 /patch 为脚本存放路径（脚本放在与源码同级的自定义目录中）
