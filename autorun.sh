@@ -32,6 +32,7 @@ check_node_version() {
     if [[ "$node_version" < "v20.0.0" ]]; then
         echo "Node.js版本低于20.0.0，正在安装Node.js v20以上版本..."
         install_node_v20
+        npm config set registry https://registry.npmmirror.com
     else
         echo "Node.js版本符合要求（v20以上），跳过安装。"
     fi
@@ -39,12 +40,21 @@ check_node_version() {
 
 # 安装Node.js v20以上版本
 install_node_v20() {
-    echo "正在安装Node.js v20以上版本..."
-    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-    sudo apt-get update
-    sudo apt-get install -y nodejs
-    npm install -g cnpm --registry=https://registry.npmmirror.com
-    echo "Node.js v20以上版本安装完成。"
+    echo "正在安装NVM..."
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh  | bash
+
+    # 启用NVM
+    export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+    # 安装Node.js 20.18.1
+    echo "正在安装Node.js 20.18.1..."
+    nvm install 20.18.1
+
+    # 设置默认Node.js版本
+    nvm alias default 20.18.1
+
+    echo "Node.js 20.18.1安装完成。"
 }
 
 # 检查NVM是否存在，如果不存在则安装
@@ -63,11 +73,13 @@ fi
 install_yarn_and_pm2() {
     if command -v yarn >/dev/null 2>&1; then
         echo "Yarn已安装，跳过Yarn安装。"
+        yarn config set registry https://registry.yarnpkg.com
     else
         echo "Yarn未安装，正在安装Yarn..."
         nvm install-node # 安装最新版本的Node.js，自动选择大于v20的版本
         nvm use default
         npm install -g yarn
+        yarn config set registry https://registry.yarnpkg.com
         if [ $? -ne 0 ]; then
             echo "Yarn安装失败，请手动安装Yarn后重试。"
             exit 1
@@ -129,8 +141,8 @@ get_device_ip() {
     # 这里使用的是ipinfo.io服务，你也可以使用其他服务
     IP=$(curl -s https://ipinfo.io/ip)
     if [ $? -eq 0 ]; then
-        echo "=     设备IP地址：$IP"
-        echo "=        公网IP自行打码"
+        echo "=        设备IP地址：$IP"
+        echo "=           公网IP自行打码"
         return 0
     else
         echo "无法获取设备IP地址。"
@@ -212,25 +224,25 @@ initialize_default_env() {
     if [ ! -f "$env_path" ]; then
         echo ".env文件不存在，正在使用.env.development作为模板创建..."
         # 提示用户输入自定义值，并设置30秒超时
-        echo "请输入网盘入库密码（30秒内无输入则使用默认值'drpys'）："
+        echo "请输入网盘入库密码（30秒内无输入则使用默认值'drpys'直接回车可跳过）："
         read -t 30 cookie_auth_code
         if [ -z "$cookie_auth_code" ]; then
             cookie_auth_code="drpys"
         fi
 
-        echo "请输入登录用户名（30秒内无输入则使用默认值'admin'）："
+        echo "请输入登录用户名（30秒内无输入则使用默认值'admin'直接回车可跳过）："
         read -t 30 api_auth_name
         if [ -z "$api_auth_name" ]; then
             api_auth_name="admin"
         fi
 
-        echo "请输入登录密码（30秒内无输入则使用默认值'drpys'）："
+        echo "请输入登录密码（30秒内无输入则使用默认值'drpys'直接回车可跳过）："
         read -t 30 api_auth_code
         if [ -z "$api_auth_code" ]; then
             api_auth_code="drpys"
         fi
 
-        echo "请输入订阅PWD值（30秒内无输入则使用默认值'dzyyds'）："
+        echo "请输入订阅PWD值（30秒内无输入则使用默认值'dzyyds'直接回车可跳过）："
         read -t 30 api_pwd
         if [ -z "$api_pwd" ]; then
             api_pwd="dzyyds"
@@ -253,6 +265,22 @@ initialize_default_env() {
     fi
 }
 
+# 定义读取.env文件参数的函数
+read_env_params() {
+    # 读取.env文件中的参数值，考虑等号前后的空格
+    COOKIE_AUTH_CODE=$(grep '^COOKIE_AUTH_CODE' .env | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | cut -d'=' -f2)
+    API_AUTH_NAME=$(grep '^API_AUTH_NAME' .env | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | cut -d'=' -f2)
+    API_AUTH_CODE=$(grep '^API_AUTH_CODE' .env | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | cut -d'=' -f2)
+    API_PWD=$(grep '^API_PWD' .env | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | cut -d'=' -f2)
+
+    # 输出参数值
+    echo "=         当前登录账户$API_AUTH_NAME                 "
+    echo "=         当前登录密码$API_AUTH_CODE                  "
+    echo "=         当前入库密码$COOKIE_AUTH_CODE                 "
+    echo "=         当前订阅pwd值$API_PWD                 "
+}
+
+
 # IP显示标识
 has_displayed_ip=""
 # 显示内网和公网访问地址
@@ -260,10 +288,8 @@ display_ip_addresses() {
     echo "=================================================="
     echo "=         项目主页及相关默认值提示            "
     echo "= 内网访问地址：http://$LOCAL_IP:5757     "
-    echo "=         默认登录账户admin                 "
-    echo "=         默认登录密码drpys                  "
-    echo "=         默认入库密码drpys                 "
-    echo "=       默认订阅pwd值dzyyds                 "
+    # 调用read_env_params函数来显示.env中的值
+    read_env_params
     echo "= 如需修改以上密码值则自行修改源码根目录.env文件                 "
     get_device_ip
     if [ $? -eq 0 ]; then
@@ -504,7 +530,7 @@ while true; do
         if [ -z "$has_displayed_ip" ]; then # 检查是否已经显示过IP地址
         echo "当前仓库已经是最新的，无需更新。"
         display_ip_addresses
-        has_displayed_ip=1 # 设置一个标志，表示已经显示过IP地址
+            has_displayed_ip=1 # 设置一个标志，表示已经显示过IP地址
         fi
         break # 退出循环
     fi
