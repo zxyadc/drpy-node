@@ -32,6 +32,7 @@ check_node_version() {
     if [[ "$node_version" < "v20.0.0" ]]; then
         echo "Node.js版本低于20.0.0，正在安装Node.js v20以上版本..."
         install_node_v20
+        npm config set registry https://registry.npmmirror.com
     else
         echo "Node.js版本符合要求（v20以上），跳过安装。"
     fi
@@ -72,11 +73,13 @@ fi
 install_yarn_and_pm2() {
     if command -v yarn >/dev/null 2>&1; then
         echo "Yarn已安装，跳过Yarn安装。"
+        yarn config set registry https://registry.yarnpkg.com
     else
         echo "Yarn未安装，正在安装Yarn..."
         nvm install-node # 安装最新版本的Node.js，自动选择大于v20的版本
         nvm use default
         npm install -g yarn
+        yarn config set registry https://registry.yarnpkg.com
         if [ $? -ne 0 ]; then
             echo "Yarn安装失败，请手动安装Yarn后重试。"
             exit 1
