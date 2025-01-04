@@ -1,7 +1,7 @@
 # drpyS(drpy-node)
 
 nodejs作为服务端的drpy实现。全面升级异步写法  
-积极开发中，每日一更，当前进度 `25%`
+积极开发中，每日一更，当前进度 `26%`
 
 * [本地配置接口-动态本地](/config?pwd=)
 * [本地配置接口-动态外网/局域网](/config/1?pwd=)
@@ -16,11 +16,11 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 
 ## 更新记录
 
-### 20250103
+### 20250104
 
-更新至V1.0.30
+更新至V1.1.0
 
-1. 增加 `抖音` `直转点`
+1. 支持采王
 
 [点此查看完整更新记录](docs/updateRecord.md)
 
@@ -54,3 +54,27 @@ todo:
 ## 问题说明
 
 1. windows上直接运行index.js可能会发现运行过程中的日志打印出中文乱码。建议通过yarn dev运行或者在package.json里点击dev脚本运行
+
+## 安装说明
+
+1.zy安装方案
+
+* [多平台安装教程](https://zy.catni.cn/otherShare/drpyS-build.html)
+
+2.自动化安装方案（直接薅道长羊毛）
+
+* 终端执行
+
+`bash -c "$(curl -fsSLk https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/refs/heads/main/autorun.sh)"`
+
+* 添加定时方案
+
+`echo "30 7 * * * bash -c \"\$(curl -fsSLk https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/refs/heads/main/autorun.sh)\"" >> /path/logfile.log 2>&1" | crontab -`
+
+或者下载脚本到本地后
+
+`chmod a+x /path/autorun.sh`
+
+`echo "30 7 * * * bash /path/autorun.sh  >> /path/logfile.log 2>&1" | crontab -`
+
+命令说明 /patch 为脚本存放路径（脚本放在与源码同级的自定义目录中）

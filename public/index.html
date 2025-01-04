@@ -8,7 +8,7 @@
                 </head>
                 <body>
                     <h1 id="drpysdrpy-node">drpyS(drpy-node)</h1>
-<p>nodejs作为服务端的drpy实现。全面升级异步写法<br>积极开发中，每日一更，当前进度 <code>25%</code></p>
+<p>nodejs作为服务端的drpy实现。全面升级异步写法<br>积极开发中，每日一更，当前进度 <code>26%</code></p>
 <ul>
 <li><a href="/config?pwd=">本地配置接口-动态本地</a></li>
 <li><a href="/config/1?pwd=">本地配置接口-动态外网/局域网</a></li>
@@ -22,10 +22,10 @@
 <li><a href="https://git-proxy.playdreamer.cn/hjdhnx/drpy-node">本项目主页-免翻</a></li>
 </ul>
 <h2 id="更新记录">更新记录</h2>
-<h3 id="20250103">20250103</h3>
-<p>更新至V1.0.30</p>
+<h3 id="20250104">20250104</h3>
+<p>更新至V1.1.0</p>
 <ol>
-<li>增加 <code>抖音</code> <code>直转点</code></li>
+<li>支持采王</li>
 </ol>
 <p><a href="docs/updateRecord.md">点此查看完整更新记录</a></p>
 <h2 id="基础框架">基础框架</h2>
@@ -57,6 +57,24 @@
 <ol>
 <li>windows上直接运行index.js可能会发现运行过程中的日志打印出中文乱码。建议通过yarn dev运行或者在package.json里点击dev脚本运行</li>
 </ol>
+<h2 id="安装说明">安装说明</h2>
+<p>1.zy安装方案</p>
+<ul>
+<li><a href="https://zy.catni.cn/otherShare/drpyS-build.html">多平台安装教程</a></li>
+</ul>
+<p>2.自动化安装方案（直接薅道长羊毛）</p>
+<ul>
+<li>终端执行</li>
+</ul>
+<p><code>bash -c &quot;$(curl -fsSLk https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/refs/heads/main/autorun.sh)&quot;</code></p>
+<ul>
+<li>添加定时方案</li>
+</ul>
+<p><code>echo &quot;30 7 * * * bash -c \&quot;\$(curl -fsSLk https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/refs/heads/main/autorun.sh)\&quot;&quot; &gt;&gt; /path/logfile.log 2&gt;&amp;1&quot; | crontab -</code></p>
+<p>或者下载脚本到本地后</p>
+<p><code>chmod a+x /path/autorun.sh</code></p>
+<p><code>echo &quot;30 7 * * * bash /path/autorun.sh  &gt;&gt; /path/logfile.log 2&gt;&amp;1&quot; | crontab -</code></p>
+<p>命令说明 /patch 为脚本存放路径（脚本放在与源码同级的自定义目录中）</p>
 
                 </body>
                 </html>
