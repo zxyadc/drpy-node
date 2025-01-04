@@ -90,7 +90,7 @@ async function generateSiteJSON(jsDir, configDir, requestHost, sub, subFilePath,
         fileSites.forEach((fileSite) => {
             const site = {
                 key: fileSite.key,
-                name: fileSite.name,
+                name: fileSite.name.replace(/优汐/g, ''),
                 type: 4, // 固定值
                 api,
                 searchable: ruleObject.searchable,
@@ -105,6 +105,64 @@ async function generateSiteJSON(jsDir, configDir, requestHost, sub, subFilePath,
     // 等待所有的文件处理完成
     await Promise.all(filePromises);
     sites = naturalSort(sites, 'name', sort_list);
+    
+
+    // 合并过滤条件的函数
+function shouldExclude(site) {
+    const excludeKeywords = ['玩偶', '555', '团长', '密', 'ACG', 'Omo', '人人', '好乐', '央视'];
+  //  const excludeKeywords = ['密'];
+    //除了筛选
+    return excludeKeywords.some(keyword => site.name.includes(keyword));
+   //留下筛选
+  //  return!excludeKeywords.some(keyword => site.name.includes(keyword));
+}
+sites = sites.filter(site =>!shouldExclude(site));
+// 自定义排序函数
+function customSort(a, b) {
+// 定义排序顺序     
+    let order = ['盘', '中心', '交互',  '[合]', '直播', '官','书', '听'];
+    let js_order = ['木偶[盘]', '小米[盘]', '闪电[盘]', '蜡笔[盘]', '至臻[盘]'];
+// 先按照 js_order 排序
+let i = js_order.indexOf(a.name.split('(')[0]);
+  let j = js_order.indexOf(b.name.split('(')[0]);
+
+  // 先按照 js_order 排序
+  if (i!== -1 && j!== -1) {
+    return i - j;
+  } else if (i!== -1) {
+    return -1;
+  } else if (j!== -1) {
+    return 1;
+  }
+    let indexA = order.length;
+    let indexB = order.length;
+    order.forEach((keyword, index) => {
+        if (a.name.includes(keyword)) {
+            indexA = index;
+        }
+        if (b.name.includes(keyword)) {
+            indexB = index;
+        }
+    });
+    if (indexA!== indexB) {
+        return indexA - indexB;
+    }
+    //放最后
+    const hasPushA = a.name.includes('推送');
+    const hasPushB = b.name.includes('推送');
+    if (hasPushA &&!hasPushB) {
+        return 1;
+    } else if (!hasPushA && hasPushB) {
+        return -1;
+    }
+
+    if (indexA!== indexB) {
+        return indexA - indexB;
+    }
+    return a.name.localeCompare(b.name);
+}
+// 使用自定义排序函数进行排序
+sites.sort(customSort);
     return {sites};
 }
 
