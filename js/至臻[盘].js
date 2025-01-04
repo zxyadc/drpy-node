@@ -10,7 +10,7 @@ var rule = {
     searchUrl: '/index.php/vod/search/page/fypage/wd/**.html',
     filter: 'H4sIAAAAAAAAA+2aW08bRxTHn5NPUfmZyqwJBPKWe8j9fqvy4ASrRaVUAloJRUiAsbG52AYRjGtzawADwdgGSsHU+Mt4du1v0V3P+MzMWSQWBTV9mEf/f8dnZs6Mz54z3o8XL7g015UfPrp+9vW7rrg+ePt87R2uBle39xef+dnIH5GFcfPz796u33w1w25TJoH1qn/dks0ProEGqhrpKXJ4ZIRHGXB3drhbOA3ldX9AppeB6qG5ciEs01ZOh2L64KxM24BWv8wZS0My1RoBk7F1YwZNS9NEXC6mEPa4Bt5ZBiwqXd7eXh4UEk6bK3EYFDKbMu3rvmue3EyTIyObME0OgGzCNHkdaCCqyRuEBqIaeIG1CV6oJm8VmgvV6iaVzBqZ2JRNmAZzGcsaRWTCNHnjbCuyNDBZHbWtiGkw3cxa+XgJTZdq4CU4XU1sIC9UAy8Lm+YakReqnWGP9OEtY3YKmVANTPxj+vAfyIRqELqjKAkcoNBRDX4S89P63KpswjQYaHa0Ei6ggagGcTneNmb+IsU8Cg3IYBhdqXzGp4ZqYBIJkugOMqEanJpSzNxedGqoxncqpc9P4Z2qaWAyUjK+oKUzDQJYnDKOUictTSJiCvD2+LxCBkjlyETBaQZYSVcTwfo4liN3+SBDkkUGYM/WEvpB9gQ7Bniwc/rh8Un+KIANjq/qqS3Jjkkw4uKG+TXJgkkQqeMItmASjLL7CVswCbZ1PI8tmMTP2d/Ygkl8lJx9lJzkYzJHCmuyDyqBj5GoGXES2pDdgArzXS0Z0YwRTshTBpWnpyV9vGR+WR4UVLAL7JePZmUjKokHrMvb/SM/YJVsprI+6PSAJYumfX0Ay5GbScIWYAsmwUbvrGALJsFhiRfJZBwbcVU4VDYjKgkHE1swSThUNgsqCUfGtmYqCWEn237Zgkpi2Pt93h4edj2+X43vOQy7p9Fzqe7ecuOuCQJtwrRJpB5MPSLVMNVE2ohpo0C1NkS1NpG2Ytoq0suYXhZpC6YtIm3GtFmkOFaaGCsNx0oTY6XhWGlirDQcK02MlYZjZVWG4u/O19fnE44AycT17KTDI3AVjlfNi/sqkGuIXANyHZHrQG4gcgPITURuArmFyC0gtxG5DeQOIneAtCPSDuQuIneB3EPkHpD7iNwH8gCRB0AeIvIQyCNEHgF5jMhjIE8QeQLkKSJPgTxD5BmQ54g8B/ICkRdAXiLyEsgrRF4BeY3IayBvEHkD5C0ib4E0ft+GmKWIP4H3/UIGjEyTQtR2/HlitPy873f3dZrm9SHKhYKemxHoT519vfzhkx0hoaBAez/82uOzZvCu4eJ3Ls9Xtp88FZgPvXIhLXRbVifH84j5jLGqGxnzJKRvpa3SRsY8g5kVmFlfIdxyfm3i6RW0g76LlvhkaJ/4oycV/4ycoTcl2/ukkEEmVDtbJ3dab+qgk3PQmzroMhx0T+XDZVuXwTTepgX0RBZtBtVgLp+CtpaRaUIjYtsApp1cPTIv9vJR9SeqP1H9yX/Vn6jeQvUWqrdQvYXqLf7PvcUF1yWxt/iK6rw6GDbSg6iipppYEI4s2gtCU4PJbpcquZBswjTwMp3Rx9DlNdP40ymgH6D6lWn8EbdbPoyh6VJNKJyqn9F0mQYmhU2yvYBMqAZzSe7Y/0OgGniZWdT38H9OVOOt1YEeipYL07bbf4lAGPf+NOt1FEaqgcf8cGVoAvmimiqaVdHMp6yKZlU0q6JZFc2qaFZFsyqaadHcdF7vg9H7+Po4nR1uISvSy3iR8QxCb+JFpp3bPbuDMt3BW1KGP1NZRv0A02CgyLoRC6KBqAYmsQVjC78NRDUI4elvJlVi85UI+luAaTDQ0jJJokt8pvG659Qbej1VsL8CRTWYy+lv8Dj4F4PkzGDvoblQTTRZ3bWbmBrs0cpx+R/0IhXTwEtkkYSSyAvV+C9ph2RQK8U0GCg5pidQE8Q0Ht08KcVxdGvayQWluudXLYtqWVTLoloW1bKolkUgqmVRLYu9ZWkWWhaVjVU2VtlYZWOVjb9VNvaodKzSsUrHKh2rdPyt0/HAv3MHuB3hPQAA',
     cate_exclude: '网址|专题|全部影片',
-    tab_rename: {'KUAKE1': '夸克1', 'KUAKE11': '夸克2', 'YOUSEE1': 'UC1', 'YOUSEE11': 'UC2',},
+    tab_order:['阿里#1','KUAKE11','YOUSEE1','YOUSEE11'],
     play_parse: true,
     searchable: 1,
     filterable: 1,
@@ -32,7 +32,7 @@ var rule = {
             type_id: '5',
             type_name: '至臻短剧',
         }, {
-            type_id: '25',
+            type_id: '26',
             type_name: '臻彩视觉',
         }
         ];
@@ -96,7 +96,8 @@ var rule = {
                         playurls.push("资源已经失效，请访问其他资源")
                     }
                 }
-            } else if (/drive.uc.cn/.test(link)) {
+            } 
+             if (/drive.uc.cn/.test(link)) {
                 const shareData = UC.getShareData(link);
                 if (shareData) {
                     const videos = await UC.getFilesByShareUrl(shareData);
@@ -112,9 +113,46 @@ var rule = {
                     }
                 }
             }
+       if (/www.alipan.com/.test(link)) {
+                const shareData = Ali.getShareData(link);
+                if (shareData) {
+                    const videos = await Ali.getFilesByShareUrl(shareData);
+                    log(videos)
+                    if (videos.length > 0) {
+                        playform.push('Ali-' + shareData.shareId);
+                        playurls.push(videos.map((v) => {
+                            const ids = [v.share_id, v.file_id, v.subtitle ? v.subtitle.file_id : ''];
+                            return formatPlayUrl('', v.name) + '$' + ids.join('*');
+                        }).join('#'))
+                    } else {
+                        playform.push('Ali-' + shareData.shareId);
+                        playurls.push("资源已经失效，请访问其他资源")
+                        
+                    }
+                }
+            }
         }
-        vod.vod_play_from = playform.join("$$$")
-        vod.vod_play_url = playurls.join("$$$")
+    // 去除后缀
+    let processedArray = playform.map(str => str.replace(/-[\w]+$/, "").replace(/UC/, "优汐").replace(/Quark/, "夸克").replace(/Ali/, "阿里"));
+
+// 处理重复元素
+    let uniqueArray = [];
+    let count = {};
+    processedArray.forEach((item) => {
+    if (!count[item]) {
+        count[item] = 1;
+      //  uniqueArray.push(item);
+        uniqueArray.push(item + '#' + count[item]);
+    } else {
+        count[item]++;
+        uniqueArray.push(item + '#' + count[item]);
+    }
+});
+
+// 连接成字符串
+        vod.vod_play_from = uniqueArray.join("$$$");
+       // vod.vod_play_from = playform.map(str => str.replace(/-[\w]+$/, "")).join("$$$");
+        vod.vod_play_url = playurls.join("$$$");
         return vod
     },
     搜索: async function (wd, quick, pg) {
@@ -135,25 +173,20 @@ var rule = {
         })
         return videos
     },
-    lazy: async function (flag, id, flags) {
-        let {input, mediaProxyUrl} = this;
+lazy: async function (flag, id, flags) {
+        let {getProxyUrl, input} = this;
         const ids = input.split('*');
         const urls = [];
+        const headers = []
+        let names = []
         let UCDownloadingCache = {};
         let UCTranscodingCache = {};
-        if (flag.startsWith('Quark-')) {
-            console.log("夸克网盘解析开始");
+        let downUrl = ''
+        if (flag.startsWith('夸克')) {
+            console.log("夸克网盘解析开始")
             const down = await Quark.getDownload(ids[0], ids[1], ids[2], ids[3], true);
-            const headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-                'origin': 'https://pan.quark.cn',
-                'referer': 'https://pan.quark.cn/',
-                'Cookie': Quark.cookie
-            };
+            // urls.push("go原画代理",'http://127.0.0.1:7777/?thread=20&url='+down.download_url)
             urls.push("原画", down.download_url + '#fastPlayMode##threads=10#')
-            // http://ip:port/?thread=线程数&form=url与header编码格式&url=链接&header=所需header
-            urls.push("原代服", mediaProxyUrl + '?thread=6&form=urlcode&randUa=1&url=' + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)))
-            urls.push("原代本", 'http://127.0.0.1:7777/?thread=6&form=urlcode&randUa=1&url=' + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)))
             const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
             transcoding.forEach((t) => {
                 urls.push(t.resolution === 'low' ? "流畅" : t.resolution === 'high' ? "高清" : t.resolution === 'super' ? "超清" : t.resolution, t.video_info.url)
@@ -161,9 +194,15 @@ var rule = {
             return {
                 parse: 0,
                 url: urls,
-                header: headers
+                header: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+                    'origin': 'https://pan.quark.cn',
+                    'referer': 'https://pan.quark.cn/',
+                    'Cookie': Quark.cookie
+                }
             }
-        } else if (flag.startsWith('UC-')) {
+        }
+        if (flag.startsWith('优汐')) {
             console.log("UC网盘解析开始")
             if (!UCDownloadingCache[ids[1]]) {
                 const down = await UC.getDownload(ids[0], ids[1], ids[2], ids[3], true);
@@ -176,10 +215,39 @@ var rule = {
                 url: urls,
                 header: {
                     "Referer": "https://drive.uc.cn/",
-                    "cookie": UC.cookie,
+                    "cookie": ENV.get("uc_cookie"),
                     "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch'
                 },
             }
+        }
+        if (flag.startsWith('阿里')) {
+            const transcoding_flag = {
+                UHD: "4K 超清",
+                QHD: "2K 超清",
+                FHD: "1080 全高清",
+                HD: "720 高清",
+                SD: "540 标清",
+                LD: "360 流畅"
+            };
+            console.log("网盘解析开始")
+            const down = await Ali.getDownload(ids[0], ids[1], flag === 'down');
+            urls.push("原画", down.url + "#isVideo=true##ignoreMusic=true#")
+            urls.push("极速原画", down.url + "#fastPlayMode##threads=10#")
+            const transcoding = (await Ali.getLiveTranscoding(ids[0], ids[1])).sort((a, b) => b.template_width - a.template_width);
+            transcoding.forEach((t) => {
+                if (t.url !== '') {
+                    urls.push(transcoding_flag[t.template_id], t.url);
+                }
+            });
+            return {
+                parse: 0,
+                url: urls,
+                header: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+                    'Referer': 'https://www.aliyundrive.com/',
+                },
+            }
+
         }
     },
 }

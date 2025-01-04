@@ -3,14 +3,14 @@ const {
    formatPlayUrl,
 } = misc;
 var rule = {
-   title: '蜡笔[盘]',
-   host: 'https://duopan.fun',
+   title: '小米[盘]',
+   host: 'http://ucmi.fun/',
    url: '/index.php/vod/show/id/fyclass/page/fypage.html',
    filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
    searchUrl: '/index.php/vod/search/page/fypage/wd/**.html',
-   filter: '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'
-	,
-	
+   filter: 
+   'H4sIAAAAAAACA+2XW08bRxiG7/kZvqbyrEkIcJdzyPl8VC6cZNWiUiqBWwlFSGnADoeAA6J2aEyaqhxTHJu0TRNbhj/j3bX/RXc942+/ed0Gt0qlpp3LfZ/P38y8M7vj934kJiJ9t+5HPrdHI32Ru4PxkZFIZ2Qo/oXtPzpT6+540n/+Oj74ld2oGwrk5EZ9fCOQ/YfIWKdSMzm/XqnRRqeo0pol3uS26heWKK1Z4n7zxH2Q0UuURgNNb1QrORhIajTQ+rzzrgwDSY260NpYF6nRXCafVktTMBepNUtq+TXn8Uu9RGk0l+mCV4ESpbEVeYvllhUFGpWsPmpZkdJouvm16s4LmK7UqEtqob60CV2kRl2ev/TXCF2k9hf2yH245WXmoURqVDI+7T78DkqkRtaV007yLVgntWZJfXnBfbqqlyiNBso8qk2VYCCpkS87r7zFX53KNlhDMhWmV2o/4qmRGpXMpZz0ayiRGp2a3Sf+9sKpkVq4Uzl3eR53qqFRycSu9xMsXWlkYGXeK+f+aGkaGbsd/EB+AuLDdpx9AXJF53Gp3S/Aynp9KdUcJ2gUVRLt1tqS+7agVSgpNLjovtvRe0iJ1rQz5zyraBVKog3/+VusUBJtwMw2ViiJemRX3dyW3kNKtJbvN7GHksJT9RtWKCmcabF1pkWtx2zRKa3pPaREPSbSvsvO5KbehlRa8+qul857U0v6skkNP0Yv3Jld/8f6oKRSXfJNtZzRi6TEj9NgfOjT8DjVCvnaxoN2j9Ozil/fHCBoFFUS20asUBIdltcrWKEk2sZsxZnNYlGosu1uKZISOzJYoSR2MFsqpMSOTMuapcRsd16N6xVS4raP2vHh0HY3+6ae/aVN22Mitq/ZPmgTbQiMdiHt4jSGNMaphdTiVCAVjFq9QH2B0R6kPZweQHqA026k3ZzuR7qfU/TK4l5Z6JXFvbLQK4t7ZaFXFvfKQq8s7pVArwT3SqBXgnsl0CvBvRLoleBeCfRKcK8EeiW4VwK9EtwrgV4J7pVArwT3SqBXvqB9o+xEwmavi5PPuoXZNl+Xg/QqNrpEDxI5BOQQkcNADhM5AuQIkaNAjhI5BuQYkeNAjhM5AeQEkX4g/UROAjlJ5BSQU0ROAzlN5AyQM0TOAjlL5ByQc0TOAzlP5AKQC0QuArlI5BKQS0QuA7lM5AqQK0SuArlK5BqQa0SuA7lO5AaQG0RuArlJRHzSCyxQ+CtwZ5TdFnMLTindcvzDSyToc2c0mhjwy5tDVEslt7jI6GcDiZHwoi5MOJMpRkfufjlsBzO43Rnx74C+Wx0mgpoIaiLo/zqCdnyIDJpK+vXvzaB75rYPkVL3zo/t5Ni90mEbOTZT9KObs/yD3oZUk+b+dpp7fxLrMFHMRDETxUwUM1HMRLGPJorFtCgWT9j998LZeNtl5/lM+/d9tURZbOBetKub363+bctZ+F1zt9b9v0Gc9ej3qQmIJiCagGgCogmI/6KA2GESokmIJiGahGgSokmIJiH+hxNi1z+YEHv/5N+Gz/YJc2eaO9PcmebONHemuTM/pjtz7HfSRKYPZDEAAA=='
+   ,
    cate_exclude: '网址|专题|全部影片',
    tab_order:['阿里#1','KUAKE11','YOUSEE1','YOUSEE11'],
    play_parse: true,
@@ -19,28 +19,19 @@ var rule = {
    quickSearch: 0,
    class_parse: async () => {
       let classes = [{
-            type_id: '1',
+            type_id: '20',
             type_name: '电影',
          }, {
-            type_id: '2',
+            type_id: '21',
             type_name: '剧集',
          }, {
-            type_id: '3',
+            type_id: '22',
             type_name: '动漫',
          }, {
-            type_id: '4',
+            type_id: '23',
             type_name: '综艺',
-         }, {
-            type_id: '5',
-            type_name: '短剧',
-         }, {
-            type_id: '24',
-            type_name: '臻彩4K',
-         },
-         {
-            type_id: '29',
-            type_name: '蜡笔臻彩',
          }
+
       ];
       return {
          class: classes,
@@ -50,24 +41,8 @@ var rule = {
       // await Quark.initQuark()
       return []
    },
-   推荐: async function(tid, pg, filter, extend) {
-      let {MY_CATE, input} = this;
-      let html = (await getHtml('https://duopan.fun/index.php/vod/show/id/24.html')).data
-      const $ = pq(html)
-      let videos = []
-      $('.module-items .module-item').each((index, item) => {
-         const a = $(item).find('a:first')[0];
-         const img = $(item).find('img:first')[0];
-         const content = $(item).find('.video-text:first').text();
-         videos.push({
-            "vod_name": a.attribs.title,
-            "vod_id": a.attribs.href,
-            "vod_remarks": content,
-            "vod_pic": img.attribs['data-src']
-         })
-      })
-      return videos
-   },
+   
+
    一级: async function(tid, pg, filter, extend) {
       let {MY_CATE, input} = this;
       let html = (await getHtml(input)).data
@@ -153,7 +128,7 @@ var rule = {
                 }
             }
         }
-      // 去除后缀
+// 去除后缀
     let processedArray = playform.map(str => str.replace(/-[\w]+$/, "").replace(/UC/, "优汐").replace(/Quark/, "夸克").replace(/Ali/, "阿里"));
 
 // 处理重复元素
@@ -176,7 +151,6 @@ var rule = {
         vod.vod_play_url = playurls.join("$$$");
         return vod
     },
-
    搜索: async function(wd, quick, pg) {
       let {input} = this
       let html = (await getHtml(input)).data
@@ -195,7 +169,7 @@ var rule = {
       })
       return videos
    },
-lazy: async function (flag, id, flags) {
+   lazy: async function (flag, id, flags) {
         let {getProxyUrl, input} = this;
         const ids = input.split('*');
         const urls = [];

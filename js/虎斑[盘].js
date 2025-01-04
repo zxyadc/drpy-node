@@ -2,27 +2,15 @@ const {getHtml} = $.require('./_lib.request.js')
 const {
     formatPlayUrl,
 } = misc;
-const aliTranscodingCache = {};
-const aliDownloadingCache = {};
 var rule = {
-    title: '多多[盘]',
-    host: 'https://tv.yydsys.top',
-    // url: '/index.php/vod/show/id/fyclassfyfilter.html',
-    url: '/index.php/vod/show/id/fyfilter.html',
+    title: '虎斑[盘]',
+    host: 'http://wp.huban.xyz',
+    url: '/index.php/vod/show/id/fyclass/page/fypage.html',
+    filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
     searchUrl: '/index.php/vod/search/page/fypage/wd/**.html',
-    filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by or "/by/time"}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
-    // filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
-    filter: 'H4sIAAAAAAAAA+2a2U4jRxSGr4fH6Gsi0zDMdjf7vu8zmgvPyEpGIUQCEgkhJMDYYxjABjF4HJstwx6MzRJiTIxfxtVtv0W6XeXT1X8jYUsoyUVd+vt/n6o6Vd19jtt9TWc0Xbv0tulMn/ZjoFe7pH3o8Hd3a81ap/+ngPWRjawawZD1+Vd/xy8WeNunddo4tFYJrtnY+qD1Nws6k7L8gvqqkXyC1SxmZFvEcyyC1SzGYMwYmHFbBKOBRtdKhRQMxBkNtDrJDg5hIM4oCq1NisIZzSXytZQfgblwVrOU0ytsbMNtEYzmMpoxC2ARTFqROX3oWZHNyLL8ybMiwWi66ZXS0QJMlzOKEp6qJNYhCmcUZW7DWiNE4ayBPTKGNs2ZSbBwRpbgqDH0G1g4o9QdRlkoB6njrGapzE4ZX5fdFsFooJlP5ZE8DMQZ5eVoy5z+kxW2ITWEyRhdKn/DU8MZWSbCLLoDFs7o1BRj1vbCqeHM2amUMTuJO1VlZBkumn/A0gWjBBYmzcPUcUtzKf3v7C/wW4C/K+CX7gCpLBvL13sHWFqtJMK1cexAvlIuzZIFIdCerSSMXOYYnxCcZGeNg6Pj4nGBNji+bKQ2XT6BaMT5detrLodAlKmjCXQIRKPsfkGHQLStn7fRIZBzzv5Ch0DOKFnvKFlXjPEsy6+4Y3BEMYajVsZZZN0dhijNd7loRtPmSMI9ZaLO7WnB+Fy0vuwelCj5Qvulwxm3iSP5gHX4O793Dlg5ky6vDdR7wJIFy18bwA7kE0jaAnQIRBu9s4QOgeiwxAtsPI4mh0qHymPiSDqY6BBIOlQeB0fSkfGsmSMp7Wwr6HZwJKe9N+DvctJuxPcr8b06097a0nq2Ft4O46sCSW1DtU1WW1FtlVUdVV1WW1BtkVT9IqgWkNQLqF6Q1fOonpfVc6iek9V2VNtlFXOly7nSMVe6nCsdc6XLudIxV7qcKx1zZQHXdRfo6QlIR4Cl40ZmvM4jcJmOVzWK7zIpV0C5QspVUK6Scg2Ua6RcB+U6KTdAuUHKTVBuknILlFuk3AblNil3QLlDyl1Q7pJyD5R7pNwH5T4pD0B5QMpDUB6S8giUR6Q8BuUxKU9AeULKU1CekvIMlGekPAflOSkvQHlByktQXpLyCpRXpLwG5TUpb0B5Q0rLdxdBs4l8Cbzvle6AE1MsH/Ucf+fGaMd53+vr+WjZa0OU8nkjOy2pP3zs6XYePplhFglLaveHn7sC9gzeNTdprafXaZ1chNbRuvAqmQ3us2D0uPpZKA20d2xrn+XTYOGssWbopPaujmaojvaujkK9jgakdLDoKdQFczqdkJHIwGZwRnP5EvZ0XYJJtbxnAwQ7vgATUbwVmCrxVYmvSvx/q8RX5bkqz1V5rspzVZ7/j8tz7eypVed2ZTc87632LEYPqJNfT5jBdHlxACyc0UATa2YsDANxRpbYnLmJP8NzRo+nk18JlGOz5QloJgSjgRYWWRJKf8EaqOuNVN777oEzmsvJP53X0fuwrJXsPZgLZ7JleddrsRjt0dJR6W94gyGY02PMs0gSe4wqcw7tDkvHoIHgjAZKjhoJeIMhmJPdbVaMY3arTHUHqjtQ3YHqDlR3oLoD1R2o7kB1B1qj3UHbqXUHlYERcxXqesEaaCDKW8VyNgJVMGcUZSptjMK/QwRznk4hIwe/bgvmPOJ2SwdQnAomFU6VbzBdwciS32Bbc2DhjOaS3PH+SYczijI9b+xh18QZRcnljEi0lJ/y9AguhdK497t5CC8/BKOI20PlwTGIxZkqmlXR7ExZFc2qaFZFsyqaVdGsimZVNNtFc7uraFYXo7oY1cX4H12MTWf6/wFhzhKw7TMAAA==',
-    filter_def: {
-        1: {cateId: '1',lang:'/lang/国语'},
-        2: {cateId: '2',lang:'/lang/国语'},
-        3: {cateId: '3',lang:'/lang/国语'},
-        4: {cateId: '4',lang:'/lang/国语'},
-        5: {cateId: '5',lang:'/lang/国语'},
-        20: {cateId: '20',lang:'/lang/国语'}
-    },
+    filter: 'H4sIAAAAAAAAA+2a2U4jRxSGr4fH6Gsi0zDMdjf7vu8zmgvPyEpGIUQCEgkhJMDYYxjABjF4HJstwx6MzRJiTIxfxtVtv0W6XeXT1X8jYUsoyUVd+vt/n6o6Vd19jtt9TWc0Xbv0tulMn/ZjoFe7pH3o8Hd3a81ap/+ngPWRjawawZD1+Vd/xy8WeNunddo4tFYJrtnY+qD1Nws6k7L8gvqqkXyC1SxmZFvEcyyC1SzGYMwYmHFbBKOBRtdKhRQMxBkNtDrJDg5hIM4oCq1NisIZzSXytZQfgblwVrOU0ytsbMNtEYzmMpoxC2ARTFqROX3oWZHNyLL8ybMiwWi66ZXS0QJMlzOKEp6qJNYhCmcUZW7DWiNE4ayBPTKGNs2ZSbBwRpbgqDH0G1g4o9QdRlkoB6njrGapzE4ZX5fdFsFooJlP5ZE8DMQZ5eVoy5z+kxW2ITWEyRhdKn/DU8MZWSbCLLoDFs7o1BRj1vbCqeHM2amUMTuJO1VlZBkumn/A0gWjBBYmzcPUcUtzKf3v7C/wW4C/K+CX7gCpLBvL13sHWFqtJMK1cexAvlIuzZIFIdCerSSMXOYYnxCcZGeNg6Pj4nGBNji+bKQ2XT6BaMT5detrLodAlKmjCXQIRKPsfkGHQLStn7fRIZBzzv5Ch0DOKFnvKFlXjPEsy6+4Y3BEMYajVsZZZN0dhijNd7loRtPmSMI9ZaLO7WnB+Fy0vuwelCj5Qvulwxm3iSP5gHX4O793Dlg5ky6vDdR7wJIFy18bwA7kE0jaAnQIRBu9s4QOgeiwxAtsPI4mh0qHymPiSDqY6BBIOlQeB0fSkfGsmSMp7Wwr6HZwJKe9N+DvctJuxPcr8b06097a0nq2Ft4O46sCSW1DtU1WW1FtlVUdVV1WW1BtkVT9IqgWkNQLqF6Q1fOonpfVc6iek9V2VNtlFXOly7nSMVe6nCsdc6XLudIxV7qcKx1zZQHXdRfo6QlIR4Cl40ZmvM4jcJmOVzWK7zIpV0C5QspVUK6Scg2Ua6RcB+U6KTdAuUHKTVBuknILlFuk3AblNil3QLlDyl1Q7pJyD5R7pNwH5T4pD0B5QMpDUB6S8giUR6Q8BuUxKU9AeULKU1CekvIMlGekPAflOSkvQHlByktQXpLyCpRXpLwG5TUpb0B5Q0rLdxdBs4l8Cbzvle6AE1MsH/Ucf+fGaMd53+vr+WjZa0OU8nkjOy2pP3zs6XYePplhFglLaveHn7sC9gzeNTdprafXaZ1chNbRuvAqmQ3us2D0uPpZKA20d2xrn+XTYOGssWbopPaujmaojvaujkK9jgakdLDoKdQFczqdkJHIwGZwRnP5EvZ0XYJJtbxnAwQ7vgATUbwVmCrxVYmvSvx/q8RX5bkqz1V5rspzVZ7/j8tzre3UqnO7shue91Z7FqMH1MmvJ8xgurw4ABbOaKCJNTMWhoE4I0tsztzEn+E5o8fTya8EyrHZ8gQ0E4LRQAuLLAmlv2AN1PVGKu9998AZzeXkn87r6H1Y1kr2HsyFM9myvOu1WIz2aOmo9De8wRDM6THmWSSJPUaVOYd2h6Vj0EBwRgMlR40EvMEQzMnuNivGMbtVproD1R2o7kB1B6o7UN2B6g5Ud6C6A63R7uDsqXUHlYERcxXqesEaaCDKW8VyNgJVMGcUZSptjMK/QwRznk4hIwe/bgvmPOJ2SwdQnAomFU6VbzBdwciS32Bbc2DhjOaS3PH+SYczijI9b+xh18QZRcnljEi0lJ/y9AguhdK497t5CC8/BKOI20PlwTGIxZkqmlXR7ExZFc2qaFZFsyqaVdGsimZVNNtFc7uraFYXo7oY1cX4H12MTWf6/wGZ7Rhv7TMAAA==',
     cate_exclude: '网址|专题|全部影片',
-    tab_rename: {'KUAKE1': '夸克1', 'KUAKE11': '夸克2', 'YOUSEE1': 'UC1', 'YOUSEE11': 'UC2',},
+    tab_order:['阿里#1','KUAKE11','YOUSEE1','YOUSEE11'],
     play_parse: true,
     searchable: 1,
     filterable: 1,
@@ -30,23 +18,19 @@ var rule = {
     class_parse: async () => {
         let classes = [{
             type_id: '1',
-            type_name: '多多电影',
+            type_name: '电影',
         }, {
             type_id: '2',
-            type_name: '多多剧集',
-        }, {
-            type_id: '4',
-            type_name: '多多动漫',
+            type_name: '剧集',
         }, {
             type_id: '3',
-            type_name: '多多综艺',
+            type_name: '动漫',
+        }, {
+            type_id: '4',
+            type_name: '综艺',
         }, {
             type_id: '5',
-            type_name: '多多短剧',
-        },
-        {
-            type_id: '20',
-            type_name: '多多记录',
+            type_name: '短剧',
         }
         ];
         return {
@@ -109,7 +93,8 @@ var rule = {
                         playurls.push("资源已经失效，请访问其他资源")
                     }
                 }
-            } if (/drive.uc.cn/.test(link)) {
+            } 
+             if (/drive.uc.cn/.test(link)) {
                 const shareData = UC.getShareData(link);
                 if (shareData) {
                     const videos = await UC.getFilesByShareUrl(shareData);
