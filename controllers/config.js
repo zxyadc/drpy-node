@@ -109,7 +109,7 @@ async function generateSiteJSON(jsDir, configDir, requestHost, sub, subFilePath,
 
     // 合并过滤条件的函数
 function shouldExclude(site) {
-    const excludeKeywords = ['玩偶', '555', '团长', '密', 'ACG', 'Omo', '人人', '好乐', '央视'];
+    const excludeKeywords = ['玩偶哥哥', '哥哥', '团长', '密', 'ACG', 'Omo', '人人', '好乐', '央视'];
   //  const excludeKeywords = ['密'];
     //除了筛选
     return excludeKeywords.some(keyword => site.name.includes(keyword));
