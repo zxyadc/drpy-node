@@ -7,19 +7,17 @@ const aliDownloadingCache = {};
 var rule = {
     title: '多多[盘]',
     host: 'https://tv.yydsys.top',
-    // url: '/index.php/vod/show/id/fyclassfyfilter.html',
     url: '/index.php/vod/show/id/fyfilter.html',
+    filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by or "/by/time"}}{{fl.class}}{{fl.lang or "/lang/国语"}}{{fl.letter}}/page/fypage{{fl.year}}',
     searchUrl: '/index.php/vod/search/page/fypage/wd/**.html',
-    filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by or "/by/time"}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
-    // filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
-    filter: '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',
+    filter: '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',
     filter_def: {
-        1: {cateId: '1',lang:'/lang/国语'},
-        2: {cateId: '2',lang:'/lang/国语'},
-        3: {cateId: '3',lang:'/lang/国语'},
-        4: {cateId: '4',lang:'/lang/国语'},
-        5: {cateId: '5',lang:'/lang/国语'},
-        20: {cateId: '20',lang:'/lang/国语'}
+        1: {cateId: '1'},
+        2: {cateId: '2'},
+        3: {cateId: '3'},
+        4: {cateId: '4'},
+        5: {cateId: '5'},
+        20: {cateId: '20'}
     },
     cate_exclude: '网址|专题|全部影片',
     tab_rename: {'KUAKE1': '夸克1', 'KUAKE11': '夸克2', 'YOUSEE1': 'UC1', 'YOUSEE11': 'UC2',},
@@ -27,31 +25,9 @@ var rule = {
     searchable: 1,
     filterable: 1,
     quickSearch: 0,
+    class_name: '电影&剧集&动漫&综艺&记录',
+    class_url: '1&2&4&3&5&20',
     class_parse: async () => {
-        let classes = [{
-            type_id: '1',
-            type_name: '多多电影',
-        }, {
-            type_id: '2',
-            type_name: '多多剧集',
-        }, {
-            type_id: '4',
-            type_name: '多多动漫',
-        }, {
-            type_id: '3',
-            type_name: '多多综艺',
-        }, {
-            type_id: '5',
-            type_name: '多多短剧',
-        },
-        {
-            type_id: '20',
-            type_name: '多多记录',
-        }
-        ];
-        return {
-            class: classes,
-        }
     },
     预处理: async () => {
         // await Quark.initQuark()

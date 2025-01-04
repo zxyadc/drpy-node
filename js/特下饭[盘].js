@@ -3,27 +3,26 @@ const {
     formatPlayUrl,
 } = misc;
 var rule = {
-    title: '闪电优汐[盘]',
-    host: 'http://1.95.79.193',
+    title: '特下饭[盘]',
+    host: 'http://txfyyds.top',
     url: '/index.php/vod/show/id/fyfilter.html',
     filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
     searchUrl: '/index.php/vod/search/page/fypage/wd/**.html',
-    filter: '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',
+    filter: 'H4sIAAAAAAACA+2Z228TRxTG3/kz9jmVZx3C7Y074X6/VTwYWLVR0yAlBilCkSiJTS4kJlFqk+JQquZKY+xQSsGWk3/Gu2v/F931jM+e+Vw1bsUDbefR3+/LmZ1vxnt8lIeWbR348qH1jTNsHbDu9CeGhqwuayDxrRN8dCdWvdFU8PlBov++0/QNhHJqrTG6FsrBB2ukS6nZfOBXaqxZKaa0lsUf31T1IovSWhbvu2feo6xuURotNLlWq+ZhIanRQquz7scKLCQ1qkJ7Y1WkRs8y/rxWnoBnkVrLUi+suE9f6xal0bNMFv0qWJTGduTPV9p2FGpkWX7StiOl0eMWVmpbr+BxpUZV0nONhXWoIjWq8vJ1sEeoIrW/cUbe4w0/OwsWqZFldNJ7/ANYpEbRVTJu6gNEJ7WWpbE45z1f1i1Ko4WyT+oTZVhIapTL1ht//je3ugnRkEzGzFL9Z7w1UiPLTNrNvAWL1OjWbD8LjhdujdSik8p7i7N4Uk2NLGPb/i+wdaVRgNVZv5L/s61pZORW+AfyFZAYdBLsDZAvuU/Lnb4BllYbC+nWOmGhmJLotFYWvA9FzaGkKOCS93FLryEl2tPWjPuiqjmURAf+6/foUBIdwNQmOpRENXLLXn5DryEl2suP61hDSdGt+h0dSoqetNT+pCWtxnTJLa/oNaRENcYyQcru+LpehlTa8/K2nyn4Ewv6tkmNXkavvKnt4I/1RUklX+p9rZLVTVLi16k/MfBVdJ3qxUJ97VGn1+lFNfC3FggLxZTEjhEdSqLL8nYJHUqiY8xV3ekcmiKVHXebSUrsyqBDSexitjmkxK5M256lxGJ334zqDinx2IedxGAUu5d738i96zD2uIjvbpUPy8SaAqPdSLs5jSONc2ojtTkVSAWj9n6ggcDoPqT7ON2LdC+ne5Du4bQHaQ+nmJXNs7IxK5tnZWNWNs/KxqxsnpWNWdk8K4FZCZ6VwKwEz0pgVoJnJTArwbMSmJXgWQnMSvCsBGYleFYCsxI8K4FZCZ6VwKwCQXtHOcmkw74ubiHnFac7/LocpK9is0rsIJFDQA4ROQzkMJEjQI4QOQrkKJFjQI4ROQ7kOJETQE4Q6QXSS+QkkJNETgE5ReQ0kNNEzgA5Q+QskLNEzgE5R+Q8kPNELgC5QOQikItELgG5ROQykMtErgC5QuQqkKtErgG5RuQ6kOtEbgC5QeQmkJtExBf7gYUK/wrcHmbdYmbOLWfarn/URMI6t4djyb7A3lqiVi57pXlGv+5LDkWNujjmjqcZHbpzb9AJn+BWlxUPlthlJlAzgZoJ9H89ge76FCNoOhX4/3IE3XFs+xRD6s7jYydj7E7DYQdjbLYUTG7u4k96GVLNMPePhzkziJlBzAxiZhAzg5gZxP4bg1i3Noglkk7v3ehh/M2K+3Kq825fK9Mk1nc3xhpI0EaDXstZ9IrwNlaDH0GcxfWfhqadmnZq2qlpp6admnb6ubfT3bydmsZlGpdpXKZxmcZlGtdn/w+5HtO5TOcynct0LtO5TOf693SukT8A3qOeGs0wAAA=',
     filter_def: {
         1: {cateId: '1'},
         2: {cateId: '2'},
         3: {cateId: '3'},
         4: {cateId: '4'},
-        5: {cateId: '5'},
     },
     cate_exclude: '网址|专题|全部影片',
-    // tab_rename: {'KUAKE1': '夸克1', 'KUAKE11': '夸克2', 'YOUSEE1': 'UC1', 'YOUSEE11': 'UC2',},
+    tab_rename: {'KUAKE1': '夸克1', 'KUAKE11': '夸克2', 'YOUSEE1': 'UC1', 'YOUSEE11': 'UC2',},
     play_parse: true,
     searchable: 1,
     filterable: 1,
     quickSearch: 0,
     class_name: '电影&剧集&动漫&综艺',
-    class_url: '1&2&4&3',
+    class_url: '1&2&3&4',
     class_parse: async () => {
     },
     预处理: async () => {

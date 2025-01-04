@@ -3,12 +3,12 @@ const {
     formatPlayUrl,
 } = misc;
 var rule = {
-    title: '闪电优汐[盘]',
-    host: 'http://1.95.79.193',
+    title: '欧哥[盘]',
+    host: 'https://woog.nxog.eu.org',
     url: '/index.php/vod/show/id/fyfilter.html',
     filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
     searchUrl: '/index.php/vod/search/page/fypage/wd/**.html',
-    filter: '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',
+    filter: 'H4sIAAAAAAAAA+2a2U4jRxSG38XXRKZhmO1u9n3fJ5oLz8hKRiFEAhIJjZAAY4/NADaIwePYbBn2YGyWEGPH+GVc3e23mG5X+XT130jYEkpyUZf+/t+nqk5Vd5/j9gef5rv4/QffT8EB30Xfu+5AX5+vzdcT+DlofWSxNT0Utj7/Fuj+NVj39dg4vF4LrdvY+uAbbBN0NmP5BfXXI/kFa1iM6I6I51gEa1j04YQ+NOu2CEYDja1XyxkYiDMaaG2KHZZgIM4oCq1NisIZzSX6pVqMwVw4a1jM7Cob33RbBKO5jOWMMlgEk1ZkzJQ8K7IZWVY+elYkGE03u1o9WoTpckZRItO11AZE4YyizG9aa4QonLWwR/rIljE7BRbOyBIa00d+BwtnlLpSnIULkDrOGpba3LT+ZcVtEYwGmv1oxoowEGeUl6NtY+YvVt6B1BAmY3zZ/IqnhjOyTEZYfBcsnNGpqSSs7YVTw5mzUxl9bgp3qs7IMlox/oSlC0YJLE8ZpcxxS3Mpg2/sL/BbQKA3GJDuAJk8Gy82ewdYXqulIo1x7ED+aiHL0mUh0J6tpvRC7hifEJxk5/XDo+PicYE2OLmiZ7ZcPoFoxIUN62suh0CUqaNJdAhEo+x9RodAtK2fdtAhkHPO/kaHQM4oee8oeVeMiTwrrrpjcEQxRuNWxll0wx2GKM13pWLEs0Ys5Z4yUef2tKh/qlhfdg9KlHzhg2pp1m3iSD5g3YGeH5wDZuay5vpQswcsXbb8jQHsQH6BpC1Ah0C00bvL6BCIDkuyzCaSaHKodKg8Jo6kg4kOgaRD5XFwJB0Zz5o5ktLOtkNuB0dy2geCgV4n7XryoJbcbzLtHe0dZxrh7TD+OpDUTlQ7ZbUD1Q5Z1VDVZLUd1XZJ1S6AagFJPY/qeVk9h+o5WT2L6llZ7UK1S1YxV5qcKw1zpcm50jBXmpwrDXOlybnSMFcWcF13wf7+oHQEWDap5yaaPAKX6HjVo/gvkXIZlMukXAHlCilXQblKyjVQrpFyHZTrpNwA5QYpN0G5ScotUG6RchuU26TcAeUOKXdBuUvKPVDukXIflPukPADlASkPQXlIyiNQHpHyGJTHpDwB5QkpT0F5SsozUJ6R8hyU56S8AOUFKS9BeUnKK1BekfIalNektH93ATSbyJfA2wHpDjg5zYpxz/F3box2nLcD/v73lr0xRLVY1PMzkvrj+/4+5+GTG2XRiKT2vfulN2jP4E2br+O02qyTK9Am+hZeIrPhAxaKH1c8C6WF3o5tH7BiFiyctdYJndTbNdEJNdHbNVGlN9F9VA+XPFW6YE6bE9ZTOdgMzmgunyOelkswqZD3bIBgx1dfIoq3/FL1varvVX3/b9X3qjZXtbmqzVVtrmrz/3Nt3nlKtbld140ueGs9i9Hj6eQ3E0Yoay4NgYUzGmhy3UhEYCDOyJKYN7bwF3jO6OF08tsAMzFnTkIrIRgNtLjE0lD4C9ZCVa9nit7XDpzRXE7+1byJzoflrWTvw1w4ky0re16LxWiPlo+q/8DLC8GcDmOBRdPYYdSZc2R3WTYB7QNnNFB6TE/BywvBnOzusEoSs1tnqjdQvYHqDVRvoHoD1Ruo3kD1Bqo38LXaG5w5pd6gNhQz1qCqF6yF9sHcrpj5KNTAnFGU6aw+Bn8LEcx5NoX1AvyyLZjzgNurHkJpKphUNtW+wnQFI0txk23Pg4Uzmkt61/vvHM4oysyCvo89E2cUpVDQo/FqcdrTIbgUSuP+H0YJXnwIRhF3RszhcYjFmSqZVcnsTFmVzKpkViWzKplVyaxKZlUy2yVzl1Qyq0tRXYrqUvyPLsXBby2qLireMwAA',
     filter_def: {
         1: {cateId: '1'},
         2: {cateId: '2'},
@@ -22,8 +22,8 @@ var rule = {
     searchable: 1,
     filterable: 1,
     quickSearch: 0,
-    class_name: '电影&剧集&动漫&综艺',
-    class_url: '1&2&4&3',
+    class_name: '电影&剧集&动漫&综艺&短剧',
+    class_url: '1&2&3&4&5',
     class_parse: async () => {
     },
     预处理: async () => {

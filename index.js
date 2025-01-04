@@ -4,6 +4,7 @@ import path from 'path';
 import os from 'os';
 import {fileURLToPath} from 'url';
 import formBody from '@fastify/formbody';
+import {validateBasicAuth} from "./utils/api_validate.js";
 
 const {fastify} = fastlogger;
 
@@ -28,6 +29,15 @@ fastify.register(fastifyStatic, {
     root: path.join(__dirname, 'json'),
     prefix: '/json/', // 新的访问路径前缀
     decorateReply: false, // 禁用 sendFile
+});
+
+// 给静态目录插件中心挂载basic验证
+fastify.addHook('preHandler', (req, reply, done) => {
+    if (req.raw.url.startsWith('/apps/')) {
+        validateBasicAuth(req, reply, done);
+    } else {
+        done();
+    }
 });
 
 // 注册插件以支持 application/x-www-form-urlencoded

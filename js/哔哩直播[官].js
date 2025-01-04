@@ -1,6 +1,7 @@
 const {getHtml} = $.require('./_lib.request.js')
 var rule = {
     title: '哔哩直播[官]',
+    desc: '搜索需要配置cookie，并且最好是从网页上复制的cookie，扫码入库的好像没用',
     host: 'https://api.live.bilibili.com',
     homeUrl: '/xlive/web-interface/v1/second/getUserRecommend?page=1&page_size=30&platform=web',//用于"分类获取"和"推荐获取"
     url: '/xlive/web-interface/v1/second/getList?platform=web&parent_area_id=fyclass&area_id=fyfilter&sort_type=online&page=fypage',
@@ -31,12 +32,11 @@ var rule = {
     headers: {
         "User-Agent": PC_UA,
         "Referer": "https://www.bilibili.com",
-        "Cookie": ENV.get('bili_cookie')
     },
     timeout: 5000,
     limit: 8,
     play_parse: true,
-    lazy: async function() {
+    lazy: async function () {
         let {input} = this;
         let ids = input.split('_');
         let dan = 'https://api.bilibili.com/x/v1/dm/list.so?oid=' + ids[1];
@@ -67,7 +67,7 @@ var rule = {
         return result
     },
     double: false,
-    一级: async function() {
+    一级: async function () {
         let {input} = this;
         var d = [];
         let html = (await getHtml(input)).data;
@@ -86,60 +86,63 @@ var rule = {
         });
         return setResult(d);
     },
-    二级: async function(ids){
-            let {input} = this;
-            let aid=input.match(/\d+/g)[0];
-            let html=(await getHtml('https://api.live.bilibili.com/room/v1/Room/get_info?room_id='+aid)).data;
-            let jo=html.data;
-            let title=jo['title'];
-            let pic=jo['keyframe'];
-            let desc=jo['description'];
-            let dire=jo['uid'];
-            let typeName=jo['area_name'];
-            let remark='在线人数:'+jo['online'];
-            let vod={
-                vod_id:aid,
-                vod_name:title,
-                vod_pic:pic,
-                type_name:typeName,
-                vod_area:'bililivedanmu',
-                vod_remarks:remark,
-                vod_actor:'直播间id-'+aid,vod_director:dire,vod_content:desc
-            };
-            vod['vod_play_from']='B站';
-            vod['vod_play_url']='flv线路原画$platform=web&quality=4_'+aid+'#flv线路高清$platform=web&quality=3_'+aid+'#h5线路原画$platform=h5&quality=4_'+aid+'#h5线路高清$platform=h5&quality=3_'+aid;
-            return vod
-        },
-    搜索: async function(wd, quick, pg){
+    二级: async function (ids) {
         let {input} = this;
-        let html=(await getHtml({
-            method:'Get',
-            url:input,
-            headers: rule.headers
+        let aid = input.match(/\d+/g)[0];
+        let html = (await getHtml('https://api.live.bilibili.com/room/v1/Room/get_info?room_id=' + aid)).data;
+        let jo = html.data;
+        let title = jo['title'];
+        let pic = jo['keyframe'];
+        let desc = jo['description'];
+        let dire = jo['uid'];
+        let typeName = jo['area_name'];
+        let remark = '在线人数:' + jo['online'];
+        let vod = {
+            vod_id: aid,
+            vod_name: title,
+            vod_pic: pic,
+            type_name: typeName,
+            vod_area: 'bililivedanmu',
+            vod_remarks: remark,
+            vod_actor: '直播间id-' + aid, vod_director: dire, vod_content: desc
+        };
+        vod['vod_play_from'] = 'B站';
+        vod['vod_play_url'] = 'flv线路原画$platform=web&quality=4_' + aid + '#flv线路高清$platform=web&quality=3_' + aid + '#h5线路原画$platform=h5&quality=4_' + aid + '#h5线路高清$platform=h5&quality=3_' + aid;
+        return vod
+    },
+    搜索: async function (wd, quick, pg) {
+        let {input, publicUrl} = this;
+        let html = (await getHtml({
+            method: 'Get',
+            url: input,
+            headers: Object.assign({}, rule.headers, {"Cookie": ENV.get('bili_cookie')})
         })).data;
-        let msg=html.message;
-        if(msg!=="0"){
-            VODS=[{
-                vod_name:"➢"+msg,
-                vod_id:"no_data",
-                vod_remarks:"别点,缺少bili_cookie",
-                vod_pic:"https://ghproxy.net/https://raw.githubusercontent.com/hjdhnx/dr_py/main/404.jpg"
-            }]
-        }else{
-            let videos=[];
-            let vodList=html.data.result.live_room;
-            vodList.forEach(function(vod){
-                let aid=vod["roomid"];
-                let title="直播间："+vod["title"].replace(/<em class=\"keyword\">/,"").replace("</em>","");
-                let img="https:"+vod["user_cover"];
-                let remark=vod["watched_show"]["text_small"]+"  "+vod["uname"];
+        let msg = html.message;
+        if (msg !== "0") {
+            log(html);
+            let VODS = [{
+                vod_name: "➢" + msg,
+                vod_id: "no_data",
+                vod_remarks: "别点,缺少bili_cookie",
+                vod_pic: urljoin(publicUrl, './images/404.jpg'),
+            }];
+            return VODS
+        } else {
+            let videos = [];
+            let vodList = html.data.result.live_room;
+            vodList.forEach(function (vod) {
+                let aid = vod["roomid"];
+                let title = "直播间：" + vod["title"].replace(/<em class=\"keyword\">/, "").replace("</em>", "");
+                let img = "https:" + vod["user_cover"];
+                let remark = vod["watched_show"]["text_small"] + "  " + vod["uname"];
                 videos.push({
-                    vod_id:aid,
-                    vod_name:title,
-                    vod_pic:img,
-                    vod_remarks:remark
-                })});
-               return videos
+                    vod_id: aid,
+                    vod_name: title,
+                    vod_pic: img,
+                    vod_remarks: remark
+                })
+            });
+            return videos
         }
     },
 }

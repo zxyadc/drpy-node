@@ -25,7 +25,6 @@
         .danmu {
             position: absolute;
             white-space: nowrap;
-            color: red;
             font-size: 18px;
         }
     </style>
@@ -34,11 +33,21 @@
 <div id="danmu-container"></div>
 <script>
     const danmuContainer = document.getElementById('danmu-container');
-    const socket = new WebSocket('ws://localhost:5757/dy-dm');
+    const socket = new WebSocket('ws://{{hostname}}/dy-dm');
     const maxRows = 5;
     let currentRow = 0;
     const rowHeight = 30;
-    const minDuration = 3; // 新增：最小动画持续时间，单位为秒
+    const minDuration = 3; // 最小动画持续时间，单位为秒
+
+    // 随机生成颜色的函数
+    function getRandomColor() {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
 
     function moveDanmu(danmuElement, duration) {
         const start = performance.now();
@@ -66,6 +75,10 @@
             const danmuElement = document.createElement('div');
             danmuElement.textContent = danmu.text;
             danmuElement.className = 'danmu';
+
+            // 设置随机颜色
+            danmuElement.style.color = getRandomColor();
+
             danmuContainer.appendChild(danmuElement);
 
             const y = currentRow * rowHeight;

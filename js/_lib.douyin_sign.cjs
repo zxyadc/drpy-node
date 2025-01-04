@@ -7012,8 +7012,9 @@ function get_sign(md5) {
     return crawler(data)["X-Bogus"];
 }
 
-function getDmHtml(hostUrl) {
-    return pathLib.readFile('./douyin/danmu.html').replace('localhost', hostUrl);
+function getDmHtml(hostname) {
+    let htmlContent = pathLib.readFile('./douyin/danmu.html');
+    return jinja.render(htmlContent, {hostname});
 }
 
 module.exports = {

@@ -5,7 +5,6 @@ const {
 var rule = {
     title: '玩偶哥哥[盘]',
     host: 'https://www.wogg.net',
-    //url: '/index.php/vod/show/id/fyclass/page/fypage.html',
     url: '/vodshow/fyclass-fyfilter.html',
     filter_url: '{{fl.area}}-{{fl.by or "time"}}-{{fl.class}}-----fypage---{{fl.year}}',
     searchUrl: '/vodsearch/**--------fypage---.html',

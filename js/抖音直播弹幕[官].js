@@ -5,7 +5,7 @@
 const url = require('url');
 const fs = require('fs');
 const http = require('http');
-const {get_sign, getDmHtml} = require('../js/_lib.douyin_sign.cjs');
+const { get_sign, getDmHtml } = require('../js/_lib.douyin_sign.cjs');
 eval(fs.readFileSync('./js/_lib.douyin_pb.cjs', 'utf8'));
 
 var rule = {
@@ -30,7 +30,7 @@ var rule = {
         return []
     },
     预处理: async function () {
-        let ck = (await axios({url: rule.host})).headers['set-cookie'];
+        let ck = (await axios({ url: rule.host })).headers['set-cookie'];
         const regex = /ttwid=([^;]+)/;
         const match = ck[0].match(regex);
         if (match) {
@@ -38,7 +38,7 @@ var rule = {
         }
     },
     一级: async function (tid, pg, filter, extend) {
-        let {MY_CATE, MY_FL, MY_PAGE, input} = this;
+        let { MY_CATE, MY_FL, MY_PAGE, input } = this;
         let page = 15 * (MY_PAGE - 1);
         let select_partition = MY_FL.sort || MY_CATE;
         const partition = select_partition.split('$')[0];
@@ -60,7 +60,7 @@ var rule = {
         return setResult(d);
     },
     二级: async function (ids) {
-        let {input} = this;
+        let { input } = this;
         let url = input.split('##')[0];
         let room_id = input.split('##')[1];
         let html = await request(url, {
@@ -91,7 +91,7 @@ var rule = {
         return vod;
     },
     搜索: async function (wd, quick, pg) {
-        let {input} = this;
+        let { input } = this;
         let page = 10 * (pg - 1);
         rule.headers.referer = `${rule.host}/`;
         let url = `https://www.douyin.com/aweme/v1/web/live/search/?device_platform=webapp&aid=6383&channel=channel_pc_web&search_channel=aweme_live&keyword=${wd}&offset=${page}&count=10&os_version=10`;
@@ -117,8 +117,9 @@ var rule = {
         return setResult(d);
     },
     lazy: async function (flag, id, flags) {
-        let {input, hostUrl, getProxyUrl} = this;
+        let { input, hostUrl, hostname,getProxyUrl } = this;
         // log('hostUrl:', hostUrl);
+        // log('hostname:', hostname);
         if (input === 'off') {
             if (currentWs) {
                 console.log("有直播间正在运行弹幕WebSocket服务，即将关闭.");
@@ -134,20 +135,20 @@ var rule = {
             let url = input.split('@@')[0];
             let room_id = input.split('@@')[1];
             let ttwid = rule.headers.cookie;
-            connectWebSocket(hostUrl, room_id, ttwid);
+            connectWebSocket(hostname, room_id, ttwid);
             // let danmu = `web://${hostUrl}:4201/danmu.html`;
             // return {parse: 0, url: url, danmaku: danmu};
-            return {parse: 0, url: url, danmaku: 'web://' + getProxyUrl() + '&url=danmu.html'};
+            return { parse: 0, url: url, danmaku: 'web://' + getProxyUrl() + '&url=danmu.html' };
         }
     },
     proxy_rule: async function () {
-        let {input, hostUrl} = this;
-        // log('hostUrl:', hostUrl);
+        let { input, hostname } = this;
+        // log('hostname:', hostname);
         if (input) {
             input = decodeURIComponent(input);
             log(`${rule.title}代理播放:${input}`);
             if (input.includes('danmu.html')) {
-                const danmuHTML = getDmHtml(hostUrl);
+                const danmuHTML = getDmHtml(hostname);
                 return [200, 'text/html', danmuHTML];
             }
         }
@@ -177,7 +178,7 @@ function generateSignature(wss) {
 let currentWs;
 let startTime;
 
-function connectWebSocket(hostUrl, room_id, ttwid) {
+function connectWebSocket(hostname, room_id, ttwid) {
     // 检查是否已经有WebSocket服务正在运行
     if (currentWs) {
         // 如果有，先关闭这个WebSocket服务
@@ -193,7 +194,7 @@ function connectWebSocket(hostUrl, room_id, ttwid) {
         'Cookie': ttwid,
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     };
-    startServer(hostUrl);//启动弹幕服务
+    startServer(hostname);//启动弹幕服务
     const ws = new WebSocket(wss, {
         headers: headers
     });
@@ -242,7 +243,7 @@ function connectWebSocket(hostUrl, room_id, ttwid) {
                         // let user_name = chatmessage.getUser().getNickname();
                         // let eventTime = chatmessage.getEventtime();
                         let content = chatmessage.getContent();
-                        sendDanmuArray(hostUrl, [{text: content}]);
+                        sendDanmuArray(hostname, [{ text: content }]);
                         //   console.log(`【${user_name}】:${content}`);
                     }
                 }
@@ -268,14 +269,14 @@ function connectWebSocket(hostUrl, room_id, ttwid) {
 let DMwss;
 let isServerStarted = false;
 
-function startServer(hostUrl) {
+function startServer(hostname) {
     if (isServerStarted) {
         return;
     }
     // 原生的server
     // let server = http.createServer((req, res) => {
     //     if (req.url === '/danmu.html') {
-    //         const danmuHTML = getDmHtml(hostUrl);
+    //         const danmuHTML = getDmHtml(hostname);
     //         res.writeHead(200, {'Content-Type': 'text/html'});
     //         res.end(danmuHTML);
     //     } else {
@@ -285,27 +286,17 @@ function startServer(hostUrl) {
     // });
     // fastify的server
     let server = fServer;
-    DMwss = new WebSocketServer({server});
+    DMwss = new WebSocketServer({ server });
     // 监听客户端连接事件
     DMwss.on('connection', (ws, request) => {
         console.log(`Client connected at ${request.url}`);
-        let isAlive = true;
-
         // 检测心跳的定时器
         const interval = setInterval(() => {
-            if (!isAlive) {
-                console.log('Heartbeat timeout, closing connection');
-                ws.terminate(); // 终止连接
-                clearInterval(interval);
-                return;
-            }
-            isAlive = false; // 重置状态，等待下次 pong 响应
             ws.ping(); // 发送 ping 消息
         }, 5000);
 
         // 接收客户端 pong 消息
         ws.on('pong', () => {
-            isAlive = true; // 客户端存活
             // console.log('Heartbeat received');
         });
 
@@ -319,6 +310,13 @@ function startServer(hostUrl) {
         ws.on('close', () => {
             console.log('Client disconnected');
             clearInterval(interval);
+            if (DMwss.clients.size === 0) {
+                console.log("关闭所有websocket");
+                currentWs.close();
+                currentWs = null;
+                DMwss.close();
+                isServerStarted = false;
+            }
         });
 
         // 连接出错时清理
@@ -328,7 +326,7 @@ function startServer(hostUrl) {
         });
     });
     isServerStarted = true;
-    console.log(`[DMwss] WebSocketServer is running on ${hostUrl}:5757/`);
+    console.log(`[DMwss] WebSocketServer is running on ${hostname}`);
     // 原生启动服务需要在此监听端口，直接用fServer则不需要
     // server.listen(4201, () => {
     //     console.log(`Server is running on ${hostUrl}:4201/`);
@@ -336,10 +334,10 @@ function startServer(hostUrl) {
     // });
 }
 
-function sendDanmuArray(hostUrl, danmuArray) {
-    if (!isServerStarted) {
-        startServer(hostUrl);
-    }
+function sendDanmuArray(hostname, danmuArray) {
+    // if (!isServerStarted) {
+    //     startServer(hostname);
+    // }
     const danmuJSON = JSON.stringify(danmuArray);
     DMwss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {

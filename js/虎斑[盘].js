@@ -3,76 +3,33 @@ const {
     formatPlayUrl,
 } = misc;
 var rule = {
-    title: '蜡笔[盘]',
-    host: 'https://duopan.fun',
+    title: '虎斑[盘]',
+    host: 'https://wp.huban.xyz',
     url: '/index.php/vod/show/id/fyfilter.html',
     filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
     searchUrl: '/index.php/vod/search/page/fypage/wd/**.html',
-    filter: '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',
+    filter: 'H4sIAAAAAAAAA+2a2U4jRxSGr2eeIvI1kWlgmOVu9n3fJ5oLz8hKRiFEAhIJjZAAY49hwDaIwePYbBn24IUlxJgYv4yr236LtF3l09V/W6JJUJRIdenv/32q+lS5+px2vz99yqN5Lnzz3vO9v99zwfO2y9fb62nxdPt+8Jsf2eiqHgian3/2df3kr/u6azi4Vg2s1bD5wTPQIuhMyvQL6q1H8grWsBjhLRHPsgjWsOhDMX1wxm4RjAYaWysXUzAQZzTQ6iTbP4CBOKModG1SFM5oLuHP5cIozIWzhqWSXmHjG3aLYDSXsaxRBItg0hUZ0weOK6oxsix/cFyRYDTd9Er5cAGmyxlFCU1VE+sQhTOKMrdhXiNE4ewYa6QPbxozk2DhjCyBMX34F7BwRqk7iLJgHlLHWcNSnZ3SPy/bLYLRQDMfKqMFGIgzysthxpj+nRW3IDWEyRhdqnzBXcMZWSIhFt0GC2e0a0oxc3lh13BmrVRKn53ElaozsoyUjN/g0gWjBBYnjYNUs0uzKQOva1/gR4Cvx++TToBUjo0X3J4AS6vVRKgxTi2Qt5xPs2RRCLRmKwk9n23iE4KV7Jy+f9gsHhdogePLemrT5hOIRpxfN79mcwhEmTqMoEMgGmXnEzoEomX9uIUOgax99gc6BLJGyTlHydliTORYYcUegyOKMRI1M87C6/YwRGm+yyUjmjZGE/YpE7WOpwX9Y8n8sn1QouQL7pUPZuwmjuQN1uXr/tbaYJVsurI26HaDJYumvzFALZBXIGkJ0CEQLfT2EjoEos0SL7KJOJosKm0qh4kjaWOiQyBpUzkcHElbxnHNHElpZ5mA3cGRnPZ+v6/HSrse36vGd12mva217UwjfC2Mtw4ktQPVDlltR7VdVttQbZNVDVVNVltRbZVU7TyoJpDUc6iek9WzqJ6V1U5UO2UVc6XJudIwV5qcKw1zpcm50jBXmpwrDXOlybnSMFcmsP0q/X19fmmDsHRcz0643CAXafPVo3gvknIJlEukXAblMilXQLlCylVQrpJyDZRrpFwH5TopN0C5QcpNUG6ScguUW6TcBuU2KXdAuUPKXVDuknIPlHuk3AflPikPQHlAykNQHpLyCJRHpDwG5TEpT0B5QspTUJ6S8gyUZ6Q8B+U5KS9AeUHKS1BekvIKlFektH59HrQakX8Cb/ql8zEyxQpRx/a3js1anDf93r53pr0xRLlQ0HPTkvrdu75e69aUHWHhkKT2vv2xx1+bweuW01952k6qDTu6QnXR1/ASmg3tsUC0WXEtlGP0fiyzxwppsHB2vE7pqN7PRafkovdzUcW76E7K+4uOKl4wqw0K6oksLAZnNJdPIUdLJphU6DsWQLDm1ZmI4izPVP2v6n9V//9b9b+q3VXtrmp3Vbur2v3/W7uf8rSfUO1eHRw1Vgeh3uZMLhdH5p3loslosplSJRe2WwSjKFNpfQweHQtm3buCeh6qW8GsG+BOeT8G0+VMKquqX2C6gpGlsMEyc2DhjOaS3HY+weeMokzP67v4jw9nFCWf18PRcmHK8ezdplAad381q3lII2cUcWu4MjQOsThTJbUqqa0pq5JaldSqpFYltSqpVUmtSmo3JXXHCZXULuplFy8LGYF0ZREKc8FooMiaEQvBQJyRJTZnbOJLMZzRzevoF3QqsdlKBJ7eC0YDLSyyJDxrF8wqQI58kK6nCs43gTijuRz9IouLPxtYzkz2LsyFM9myvOO0mIzWaOmw/Ce8TyQYRYnMs3ASonBmbdptloaeRjAaKDmmJ6AbEczK7hYrxTG7dda8slOP41XvoHoH1Tuo3kH1Dqp3UL2D6h3+Qe9wRuod1Fmtzmp1VquzWp3V/82zuvPEzmp1GqvTWJ3G6jRWp/HfO40H/gLJWe9DDTwAAA==',
     filter_def: {
         1: {cateId: '1'},
         2: {cateId: '2'},
         3: {cateId: '3'},
         4: {cateId: '4'},
         5: {cateId: '5'},
-        24: {cateId: '24'},
-        29: {cateId: '29'}
+        6: {cateId: '6'},
     },
     cate_exclude: '网址|专题|全部影片',
+    tab_rename: {'KUAKE1': '夸克1', 'KUAKE11': '夸克2', 'YOUSEE1': 'UC1', 'YOUSEE11': 'UC2',},
     play_parse: true,
-    searchable: 1,
-    filterable: 1,
-    quickSearch: 0,
+    class_name: '电影&剧集&动漫&综艺&短剧&4K',
+    class_url: '1&2&4&3&6&5',
     class_parse: async () => {
-        let classes = [{
-            type_id: '1',
-            type_name: '电影',
-        }, {
-            type_id: '2',
-            type_name: '剧集',
-        }, {
-            type_id: '3',
-            type_name: '动漫',
-        }, {
-            type_id: '4',
-            type_name: '综艺',
-        }, {
-            type_id: '5',
-            type_name: '短剧',
-        }, {
-            type_id: '24',
-            type_name: '臻彩4K',
-        },
-            {
-                type_id: '29',
-                type_name: '蜡笔臻彩',
-            }
-        ];
-        return {
-            class: classes,
-        }
     },
     预处理: async () => {
         // await Quark.initQuark()
         return []
     },
-    推荐: async function (tid, pg, filter, extend) {
-        let {MY_CATE, input} = this;
-        let html = (await getHtml('https://duopan.fun/index.php/vod/show/id/24.html')).data
-        const $ = pq(html)
-        let videos = []
-        $('.module-items .module-item').each((index, item) => {
-            const a = $(item).find('a:first')[0];
-            const img = $(item).find('img:first')[0];
-            const content = $(item).find('.video-text:first').text();
-            videos.push({
-                "vod_name": a.attribs.title,
-                "vod_id": a.attribs.href,
-                "vod_remarks": content,
-                "vod_pic": img.attribs['data-src']
-            })
-        })
-        return videos
+    推荐: async () => {
+        return []
     },
     一级: async function (tid, pg, filter, extend) {
         let {MY_CATE, input} = this;
@@ -82,7 +39,7 @@ var rule = {
         $('.module-items .module-item').each((index, item) => {
             const a = $(item).find('a:first')[0];
             const img = $(item).find('img:first')[0];
-            const content = $(item).find('.video-text:first').text();
+            const content = $(item).find('.module-item-text:first').text();
             videos.push({
                 "vod_name": a.attribs.title,
                 "vod_id": a.attribs.href,
@@ -149,10 +106,10 @@ var rule = {
         let html = (await getHtml(input)).data
         const $ = pq(html)
         let videos = []
-        $('.module-search-item').each((index, item) => {
-            const a = $(item).find('.video-serial:first')[0];
+        $('.module-items .module-search-item').each((index, item) => {
+            const a = $(item).find('a:first')[0];
             const img = $(item).find('img:first')[0];
-            const content = $(item).find('.video-text:first').text();
+            const content = $(item).find('.module-item-text:first').text();
             videos.push({
                 "vod_name": a.attribs.title,
                 "vod_id": a.attribs.href,
@@ -177,13 +134,14 @@ var rule = {
                 'referer': 'https://pan.quark.cn/',
                 'Cookie': Quark.cookie
             };
+            urls.push("原画", down.download_url + '#fastPlayMode##threads=10#')
+            // http://ip:port/?thread=线程数&form=url与header编码格式&url=链接&header=所需header
+            urls.push("原代服", mediaProxyUrl + '?thread=6&form=urlcode&randUa=1&url=' + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)))
+            urls.push("原代本", 'http://127.0.0.1:7777/?thread=6&form=urlcode&randUa=1&url=' + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)))
             const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
             transcoding.forEach((t) => {
-                urls.push(t.resolution === 'low' ? "流畅" : t.resolution === 'high' ? "高清" : t.resolution === 'super' ? "超清" : t.resolution === '4k' ? "4K" : t.resolution, t.video_info.url)
+                urls.push(t.resolution === 'low' ? "流畅" : t.resolution === 'high' ? "高清" : t.resolution === 'super' ? "超清" : t.resolution, t.video_info.url)
             });
-            urls.push("原画", down.download_url + '#fastPlayMode##threads=10#');
-            urls.push("原代服", mediaProxyUrl + '?thread=6&form=urlcode&randUa=1&url=' + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)));
-            urls.push("原代本", 'http://127.0.0.1:7777/?thread=6&form=urlcode&randUa=1&url=' + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)));
             return {
                 parse: 0,
                 url: urls,

@@ -237,6 +237,8 @@ var rule = {
                 d.push(getInput('get_thread', '查看播放代理线程数', images.settings));
                 d.push(genMultiInput('now_ai', '设置当前AI', '1: 讯飞星火 2:deepseek 3.讯飞智能体\n如果不填，连续对话默认使用讯飞星火', images.settings));
                 d.push(getInput('get_now_ai', '查看当前AI', images.settings));
+                d.push(genMultiInput('allow_forward', '设置允许代理转发', '设置为1可启用此功能，有一定的使用场景用于突破网络限制', images.settings));
+                d.push(getInput('get_allow_forward', '查看允许代理转发', images.settings));
                 d.push(genMultiInput('spark_ai_authKey', '设置讯飞AI鉴权', '在这个页面的http鉴权信息:\nhttps://console.xfyun.cn/services/bm4', images.settings));
                 d.push(getInput('get_spark_ai_authKey', '查看讯飞AI鉴权', images.settings));
                 d.push(genMultiInput('deepseek_apiKey', '设置deepseek AI鉴权', '在这个页面的http鉴权信息:\nhttps://platform.deepseek.com/api_keys', images.settings));
@@ -836,6 +838,7 @@ var rule = {
             'deepseek_apiKey',
             'sparkBotObject',
             'now_ai',
+            'allow_forward',
         ];
         let get_cookie_sets = [
             'get_quark_cookie',
@@ -848,6 +851,7 @@ var rule = {
             'get_deepseek_apiKey',
             'get_sparkBotObject',
             'get_now_ai',
+            'get_allow_forward',
         ];
         if (cookie_sets.includes(action) && value) {
             try {

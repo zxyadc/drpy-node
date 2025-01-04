@@ -104,6 +104,18 @@ async function generateSiteJSON(jsDir, configDir, requestHost, sub, subFilePath,
     });
     // 等待所有的文件处理完成
     await Promise.all(filePromises);
+    // 订阅再次处理别名的情况
+    if (sub) {
+        if (sub.mode === 0) {
+            sites = sites.filter(it => (new RegExp(sub.reg || '.*')).test(it.name));
+        } else if (sub.mode === 1) {
+            sites = sites.filter(it => !(new RegExp(sub.reg || '.*')).test(it.name));
+        }
+    }
+    // 青少年模式再次处理自定义别名的情况
+    if (ENV.get('hide_adult') === '1') {
+        sites = sites.filter(it => !(new RegExp('\\[[密]\\]|密+')).test(it.name));
+    }
     sites = naturalSort(sites, 'name', sort_list);
     return {sites};
 }
