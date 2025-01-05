@@ -371,6 +371,18 @@ backup_files_and_cookie_auth_code() {
         echo -e "${RED}备份.env文件失败。${NC}"
         exit 1
     fi
+    
+    # 备份map.txt文件
+    local map_txt_path="$REPO_DIR/$PROJECT_NAME/config/map.txt"
+    local map_txt_backup_file="map.txt.backup_$(date +%Y%m%d)"
+    echo -e "${YELLOW}正在备份map.txt文件...${NC}"
+    cp "$map_txt_path" "./$map_txt_backup_file"
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}map.txt文件已备份为 $map_txt_backup_file${NC}"
+    else
+        echo -e "${RED}备份map.txt文件失败。${NC}"
+        exit 1
+    fi
 }
 
 # 定义恢复函数
@@ -406,6 +418,23 @@ restore_env_json_and_cookie_auth_code() {
         fi
     else
         echo -e "${RED}备份文件 $env_backup_file 不存在，无法恢复.env文件。${NC}"
+        exit 1
+    fi
+    
+    # 恢复map.txt文件
+    local map_txt_backup_file="map.txt.backup_$(date +%Y%m%d)"
+    if [ -f "./$map_txt_backup_file" ]; then
+        echo -e "${YELLOW}正在恢复map.txt文件...${NC}"
+        cp "./$map_txt_backup_file" "$REPO_DIR/$PROJECT_NAME/config/map.txt"
+        if [ $? -eq 0 ]; then
+            echo -e "${GREEN}map.txt文件已恢复。${NC}"
+            rm "./$map_txt_backup_file"  # 删除备份文件
+        else
+            echo -e "${RED}恢复map.txt文件失败。${NC}"
+            exit 1
+        fi
+    else
+        echo -e "${RED}备份文件 $map_txt_backup_file 不存在，无法恢复map.txt文件。${NC}"
         exit 1
     fi
 }
