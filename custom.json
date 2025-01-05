@@ -1,5 +1,5 @@
 {
-  "sites_count": 61,
+  "sites_count": 63,
   "sites": [
     {
       "key": "drpyS_设置中心",
@@ -217,6 +217,16 @@
       "ext": ""
     },
     {
+      "key": "drpyS_光速[优]",
+      "name": "光速[优](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/光速[优]",
+      "searchable": 1,
+      "filterable": 0,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
       "key": "drpyS_好乐影视",
       "name": "好乐影视(DS)",
       "type": 4,
@@ -281,6 +291,16 @@
       "name": "金牌影院(DS)",
       "type": 4,
       "api": "http://localhost:5757/api/金牌影院",
+      "searchable": 2,
+      "filterable": 0,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_九七电影网",
+      "name": "九七电影网(DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/九七电影网",
       "searchable": 2,
       "filterable": 0,
       "quickSearch": 0,

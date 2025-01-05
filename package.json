@@ -1,6 +1,6 @@
 {
   "name": "drpy-node",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -30,6 +30,7 @@
     "fastify": "^4.15.0",
     "fastq": "^1.17.1",
     "google-protobuf": "^3.21.4",
+    "iconv-lite": "^0.6.3",
     "lodash": "^4.17.21",
     "lru-cache": "^9.1.2",
     "mime-types": "^2.1.35",

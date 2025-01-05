@@ -662,19 +662,28 @@ async function invokeMethod(filePath, env, method, args = [], injectVars = {}) {
     injectVars['method'] = method;
     // 环境变量扩展进入this区域
     Object.assign(injectVars, env);
-    if (moduleObject[method] && typeof moduleObject[method] === 'function') {
+    if (method === 'lazy') {
+        const tmpLazyFunction = async function () {
+            let {input} = this;
+            return input
+        };
+        if (moduleObject[method] && typeof moduleObject[method] === 'function') {
+            try {
+                return await invokeWithInjectVars(moduleObject, moduleObject[method], injectVars, args);
+            } catch (e) {
+                log(`执行免嗅代码发送了错误: ${e.message}`);
+                return await invokeWithInjectVars(moduleObject, tmpLazyFunction, injectVars, args);
+            }
+        } else if (!moduleObject[method]) {// 新增特性，可以不写lazy属性
+            return await invokeWithInjectVars(moduleObject, tmpLazyFunction, injectVars, args);
+        }
+    } else if (moduleObject[method] && typeof moduleObject[method] === 'function') {
         // console.log('injectVars:', injectVars);
         return await invokeWithInjectVars(moduleObject, moduleObject[method], injectVars, args);
     } else if (!moduleObject[method] && method === 'class_parse') { // 新增特性，可以不写class_parse属性
         const tmpClassFunction = async function () {
         };
         return await invokeWithInjectVars(moduleObject, tmpClassFunction, injectVars, args);
-    } else if (!moduleObject[method] && method === 'lazy') { // 新增特性，可以不写lazy属性
-        const tmpLazyFunction = async function () {
-            let {input} = this;
-            return input
-        };
-        return await invokeWithInjectVars(moduleObject, tmpLazyFunction, injectVars, args);
     } else {
         if (['推荐', '一级', '搜索'].includes(method)) {
             return []

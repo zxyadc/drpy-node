@@ -8,6 +8,7 @@ import _ from './underscore-esm.min.js'
 // import _ from './underscore-esm.js'
 // import _ from 'underscore'
 import tunnel from "tunnel";
+import iconv from 'iconv-lite';
 import {jsonpath, jsoup} from './htmlParser.js';
 import hlsParser from './hls-parser.js'
 
@@ -59,100 +60,111 @@ function localDelete(storage, key) {
 
 async function request(url, opt = {}) {
     try {
-        let _data = opt ? opt.data || null : null;
-        let body = opt ? opt.body || '' : '';
-        var postType = opt ? opt.postType || null : null;
-        var returnBuffer = opt ? opt.buffer || 0 : 0;
-        var timeout = opt ? opt.timeout || 5000 : 5000;
-        var redirect = (opt ? opt.redirect || 1 : 1) == 1;
-        _data = body || _data;
-        var headers = opt ? opt.headers || {} : {};
-        if (postType === 'form') {
-            headers['Content-Type'] = 'application/x-www-form-urlencoded';
+        // 解构参数并设置默认值
+        const {
+            data: _data = null,
+            body = '',
+            postType = null,
+            buffer: returnBuffer = 0,
+            timeout = 5000,
+            redirect = 1,
+            encoding: userEncoding = '',
+            headers: userHeaders = {},
+            method = 'get',
+            proxy = false,
+            stream = null,
+        } = opt;
 
-            if (_data != null) {
-                _data = qs.stringify(data, {encode: false});
-            }
+        let data = body || _data;
+        let encoding = userEncoding;
+
+        // 设置默认 Content-Type
+        const headers = keysToLowerCase({
+            ...userHeaders,
+            ...(postType === 'form' && {'Content-Type': 'application/x-www-form-urlencoded'}),
+            ...(postType === 'form-data' && {'Content-Type': 'multipart/form-data'}),
+        });
+
+        // 尝试从 Content-Type 中提取编码
+        if (headers['content-type'] && /charset=(.*)/i.test(headers['content-type'])) {
+            encoding = headers['content-type'].match(/charset=(.*)/i)[1];
+        }
+
+        // 根据 postType 处理数据
+        if (postType === 'form' && data != null) {
+            data = qs.stringify(data, {encode: false});
         } else if (postType === 'form-data') {
-            headers['Content-Type'] = 'multipart/form-data';
-            _data = toFormData(data);
-        }
-        let respType = returnBuffer === 1 || returnBuffer === 2 ? 'arraybuffer' : undefined;
-        // const agent = tunnel.httpsOverHttp({
-        //     proxy: {
-        //         host: '127.0.0.1', port: 7890,
-        //     }
-        // });
-        let agent;
-        if (opt.proxy) {
-            agent = tunnel.httpsOverHttp({
-                proxy: {
-                    host: '127.0.0.1', port: 7890,
-                }
-            });
-        } else {
-            agent = https.Agent({rejectUnauthorized: false,})
-        }
-        let _url = typeof url === "object" ? url.url : url;
-        console.log(`req:${_url} headers:${JSON.stringify(headers)} data:${JSON.stringify(_data)}`);
-        const _axios = axios.create({
-            httpsAgent: agent
-        });
-        var resp = await _axios(url, {
-            responseType: respType,
-            method: opt ? opt.method || 'get' : 'get',
-            headers: headers,
-            data: _data,
-            timeout: timeout,
-            maxRedirects: !redirect ? 0 : null,
-            // httpsAgent: agent
-        });
-        let data = resp.data;
-        var resHeader = {};
-        for (const hks of resp.headers) {
-            var v = hks[1];
-            resHeader[hks[0]] = Array.isArray(v) ? (v.length == 1 ? v[0] : v) : v;
+            data = toFormData(data);
         }
 
+        // 配置代理或 HTTPS Agent
+        const agent = proxy
+            ? tunnel.httpsOverHttp({proxy: {host: '127.0.0.1', port: 7890}})
+            : new https.Agent({rejectUnauthorized: false});
+
+        // 设置响应类型为 arraybuffer，确保能正确处理编码
+        const respType = returnBuffer ? 'arraybuffer' : 'arraybuffer';
+
+        console.log(`req: ${url} headers: ${JSON.stringify(headers)} data: ${JSON.stringify(data)}`);
+
+        // 发送请求
+        const resp = await axios({
+            url: typeof url === 'object' ? url.url : url,
+            method,
+            headers,
+            data,
+            timeout,
+            responseType: respType,
+            maxRedirects: redirect ? undefined : 0,
+            httpsAgent: agent,
+        });
+
+        let responseData = resp.data;
+
+        // 构建响应头
+        const resHeader = Object.fromEntries(
+            Object.entries(resp.headers).map(([key, value]) => [key, Array.isArray(value) ? (value.length === 1 ? value[0] : value) : value])
+        );
+
+        // 解码逻辑
         if (!returnBuffer) {
-            if (typeof data === 'object') {
-                data = JSON.stringify(data);
-            }
-        } else if (returnBuffer == 1) {
-            return {code: resp.status, headers: resHeader, content: data};
-        } else if (returnBuffer == 2) {
-            return {code: resp.status, headers: resHeader, content: Buffer.from(data).toString('base64')};
-        } else if (returnBuffer == 3) {
-            var stream = opt.stream;
-            if (stream['onResp']) await stream['onResp']({code: resp.status, headers: resHeader});
-            if (stream['onData']) {
-                data.on('data', async (data) => {
-                    await stream['onData'](data);
-                });
-                data.on('end', async () => {
-                    if (stream['onDone']) await stream['onDone']();
-                });
+            const buffer = Buffer.from(responseData);
+
+            if (encoding && encoding.toLowerCase() !== 'utf-8') {
+                // console.log('Detected encoding:', encoding);
+                responseData = iconv.decode(buffer, encoding);
             } else {
-                if (stream['onDone']) await stream['onDone']();
+                responseData = buffer.toString('utf-8');
+            }
+        } else if (returnBuffer === 1) {
+            return {code: resp.status, headers: resHeader, content: responseData};
+        } else if (returnBuffer === 2) {
+            return {code: resp.status, headers: resHeader, content: Buffer.from(responseData).toString('base64')};
+        } else if (returnBuffer === 3 && stream) {
+            if (stream.onResp) await stream.onResp({code: resp.status, headers: resHeader});
+            if (stream.onData) {
+                responseData.on('data', async (chunk) => {
+                    await stream.onData(chunk);
+                });
+                responseData.on('end', async () => {
+                    if (stream.onDone) await stream.onDone();
+                });
+            } else if (stream.onDone) {
+                await stream.onDone();
             }
             return 'stream...';
         }
-        // console.log('返回的data:', data);
-        return {code: resp.status, headers: resHeader, content: data};
+
+        return {code: resp.status, headers: resHeader, content: responseData};
     } catch (error) {
-        resp = error.response
-        console.log(`req error: ${error.message}`);
-        try {
-            return {
-                code: resp.status,
-                headers: resp.headers,
-                content: typeof resp.data === "object" ? JSON.stringify(resp.data) : resp.data
-            };
-        } catch (err) {
-            return {headers: {}, content: ''};
-        }
+        const {response: resp} = error;
+        console.error(`Request error: ${error.message}`);
+        return {
+            code: resp?.status || 500,
+            headers: resp?.headers || {},
+            content: typeof resp?.data === 'object' ? JSON.stringify(resp.data) : resp?.data || '',
+        };
     }
-    return {headers: {}, content: ''};
 }
 
 
@@ -175,6 +187,14 @@ function base64Decode(text) {
 function responseBase64(data) {
     const buffer = Buffer.from(data, 'binary');
     return buffer.toString('base64');
+}
+
+function keysToLowerCase(obj) {
+    return Object.keys(obj).reduce((result, key) => {
+        const newKey = key.toLowerCase();
+        result[newKey] = obj[key]; // 如果值也是对象，可以递归调用本函数
+        return result;
+    }, {});
 }
 
 function md5(text) {
