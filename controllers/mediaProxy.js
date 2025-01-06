@@ -1,5 +1,6 @@
 import {base64Decode} from '../libs_drpy/crypto-util.js';
 import '../utils/random-http-ua.js'
+import {keysToLowerCase} from '../utils/utils.js';
 import http from 'http';
 import https from 'https';
 import axios from 'axios';
@@ -110,7 +111,14 @@ function proxyStreamMedia(videoUrl, headers, reply) {
 
 
 // Helper function for range-based chunk downloading
-async function fetchStream(url, headers, start, end, randUa) {
+async function fetchStream(url, userHeaders, start, end, randUa) {
+    const headers = keysToLowerCase({
+        ...userHeaders,
+    });
+    // 添加accept属性防止获取网页源码编码不正确问题
+    if (!Object.keys(headers).includes('accept')) {
+        headers['accept'] = '*/*';
+    }
     try {
         const response = await _axios.get(url, {
             headers: {
@@ -148,15 +156,23 @@ async function proxyStreamMediaMulti(mediaUrl, reqHeaders, request, reply, threa
             })
             : reqHeaders;
 
+        const headers = keysToLowerCase({
+            ...randHeaders,
+        });
+        // 添加accept属性防止获取网页源码编码不正确问题
+        if (!Object.keys(headers).includes('accept')) {
+            headers['accept'] = '*/*';
+        }
         // 检查请求头中是否包含 Cookie
         const hasCookie = Object.keys(randHeaders).some(key => key.toLowerCase() === 'cookie');
         // console.log(`[proxyStreamMediaMulti] Checking for Cookie in headers: ${hasCookie}`);
+
 
         try {
             if (!hasCookie) {
                 // 优先尝试 HEAD 请求
                 // console.log('[proxyStreamMediaMulti] Attempting HEAD request to fetch content-length...');
-                const headResponse = await _axios.head(mediaUrl, {headers: randHeaders});
+                const headResponse = await _axios.head(mediaUrl, {headers: headers});
                 initialHeaders = headResponse.headers;
                 contentLength = parseInt(initialHeaders['content-length'], 10);
                 console.log(`[proxyStreamMediaMulti] HEAD request successful, content-length: ${contentLength}`);
@@ -169,7 +185,7 @@ async function proxyStreamMediaMulti(mediaUrl, reqHeaders, request, reply, threa
             // 使用 HTTP Range 请求获取 content-length
             try {
                 // console.log('[proxyStreamMediaMulti] Attempting Range GET request to fetch content-length...');
-                const rangeHeaders = {...randHeaders, Range: 'bytes=0-1'};
+                const rangeHeaders = {...headers, Range: 'bytes=0-1'};
                 const rangeResponse = await _axios.get(mediaUrl, {
                     headers: rangeHeaders,
                     responseType: 'stream',
@@ -190,11 +206,11 @@ async function proxyStreamMediaMulti(mediaUrl, reqHeaders, request, reply, threa
                 rangeResponse.data.destroy();
             } catch (rangeError) {
                 console.error('[proxyStreamMediaMulti] Range GET request failed:', rangeError.message);
-                console.log(randHeaders);
+                console.log('[proxyStreamMediaMulti] headers:', headers);
                 // 使用 GET 请求获取 content-length
                 // console.log('[proxyStreamMediaMulti] Falling back to full GET request to fetch content-length...');
                 const getResponse = await _axios.get(mediaUrl, {
-                    headers: randHeaders,
+                    headers: headers,
                     responseType: 'stream',
                 });
                 initialHeaders = getResponse.headers;

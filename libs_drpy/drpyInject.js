@@ -11,6 +11,7 @@ import tunnel from "tunnel";
 import iconv from 'iconv-lite';
 import {jsonpath, jsoup} from './htmlParser.js';
 import hlsParser from './hls-parser.js'
+import {keysToLowerCase} from '../utils/utils.js'
 
 // import {batchFetch1, batchFetch2, batchFetch3} from './drpyBatchFetch.js';
 import {batchFetch3} from './hikerBatchFetch.js';
@@ -84,6 +85,11 @@ async function request(url, opt = {}) {
             ...(postType === 'form' && {'Content-Type': 'application/x-www-form-urlencoded'}),
             ...(postType === 'form-data' && {'Content-Type': 'multipart/form-data'}),
         });
+
+        // 添加accept属性防止获取网页源码编码不正确问题
+        if (!Object.keys(headers).includes('accept')) {
+            headers['accept'] = '*/*';
+        }
 
         // 尝试从 Content-Type 中提取编码
         if (headers['content-type'] && /charset=(.*)/i.test(headers['content-type'])) {
@@ -189,13 +195,6 @@ function responseBase64(data) {
     return buffer.toString('base64');
 }
 
-function keysToLowerCase(obj) {
-    return Object.keys(obj).reduce((result, key) => {
-        const newKey = key.toLowerCase();
-        result[newKey] = obj[key]; // 如果值也是对象，可以递归调用本函数
-        return result;
-    }, {});
-}
 
 function md5(text) {
     return crypto.createHash('md5').update(Buffer.from(text, 'utf8')).digest('hex');
@@ -626,5 +625,6 @@ function cookieToJson(cookieString) {
 
 globalThis.jsonToCookie = jsonToCookie;
 globalThis.cookieToJson = cookieToJson;
+globalThis.keysToLowerCase = keysToLowerCase;
 
 export default {};

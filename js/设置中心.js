@@ -665,7 +665,7 @@ var rule = {
                         qrcode.platformStates[QRCodeHandler.PLATFORM_ALI] = null;
                         return '扫描完成，已成功获取cookie并入库';
                     } else if (scanResult.status === 'EXPIRED') {
-                        log('已过期')
+                        log('已过期');
                         break;
                     } else {
                         await sleep(1000);

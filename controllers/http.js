@@ -2,6 +2,7 @@ import axios from 'axios';
 import http from 'http';
 import https from 'https';
 import {ENV} from '../utils/env.js';
+import {keysToLowerCase} from '../utils/utils.js';
 
 const AgentOption = {keepAlive: true, maxSockets: 64, timeout: 30000}; // 最大连接数64,30秒定期清理空闲连接
 // const AgentOption = {keepAlive: true};
@@ -17,12 +18,18 @@ const _axios = axios.create({
 export default (fastify, options, done) => {
     // 读取 views 目录下的 encoder.html 文件并返回
     fastify.post('/http', async (req, reply) => {
-        const {url, headers = {}, params = {}, method = 'GET', data = {}} = req.body;
-        // console.log('headers:', headers);
+        const {url, headers: userHeaders = {}, params = {}, method = 'GET', data = {}} = req.body;
         if (!url) {
             return reply.status(400).send({error: 'Missing required field: url'});
         }
-
+        const headers = keysToLowerCase({
+            ...userHeaders,
+        });
+        // 添加accept属性防止获取网页源码编码不正确问题
+        if (!Object.keys(headers).includes('accept')) {
+            headers['accept'] = '*/*';
+        }
+        console.log('http headers:', headers);
         try {
             const response = await _axios({
                 url,
@@ -96,11 +103,18 @@ export default (fastify, options, done) => {
                 return reply.code(400).send({error: 'Invalid URL. Must start with http:// or https://'});
             }
             console.log(`Forwarding request to: ${targetUrl}`);
-            delete request.headers['host'];
+            const headers = keysToLowerCase({
+                ...request.headers,
+            });
+            delete headers['host'];
+            // 添加accept属性防止获取网页源码编码不正确问题
+            if (!Object.keys(headers).includes('accept')) {
+                headers['accept'] = '*/*';
+            }
             const response = await _axios({
                 method: request.method,
                 url: targetUrl,
-                headers: request.headers,
+                headers: headers,
                 data: request.body,
                 params: request.query,
                 timeout: 10000,

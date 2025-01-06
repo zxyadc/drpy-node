@@ -1,5 +1,5 @@
 {
-  "sites_count": 63,
+  "sites_count": 66,
   "sites": [
     {
       "key": "drpyS_设置中心",
@@ -397,6 +397,16 @@
       "ext": ""
     },
     {
+      "key": "drpyS_秋霞电影网",
+      "name": "秋霞电影网(DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/秋霞电影网",
+      "searchable": 2,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
       "key": "drpyS_人人视频",
       "name": "人人视频(DS)",
       "type": 4,
@@ -481,6 +491,16 @@
       "name": "玩偶哥哥[盘](DS)",
       "type": 4,
       "api": "http://localhost:5757/api/玩偶哥哥[盘]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_小米[盘]",
+      "name": "小米[盘](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/小米[盘]",
       "searchable": 1,
       "filterable": 1,
       "quickSearch": 0,
@@ -635,6 +655,16 @@
       "filterable": 1,
       "quickSearch": 2,
       "ext": ""
+    },
+    {
+      "key": "drpyS_UC分享[盘]",
+      "name": "UC分享[盘](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/UC分享",
+      "searchable": 2,
+      "filterable": 0,
+      "quickSearch": 0,
+      "ext": "H4sIAAAAAAAAA9PT088qzs/TD3V+2tH2ZNdqPRAPAKubOwMVAAAA"
     },
     {
       "key": "drpyS_x草榴社区[密]",

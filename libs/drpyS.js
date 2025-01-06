@@ -671,8 +671,13 @@ async function invokeMethod(filePath, env, method, args = [], injectVars = {}) {
             try {
                 return await invokeWithInjectVars(moduleObject, moduleObject[method], injectVars, args);
             } catch (e) {
-                log(`执行免嗅代码发送了错误: ${e.message}`);
-                return await invokeWithInjectVars(moduleObject, tmpLazyFunction, injectVars, args);
+                let playUrl = injectVars.input || '';
+                log(`执行免嗅代码发送了错误: ${e.message},原始链接为:${playUrl}`);
+                if (SPECIAL_URL.test(playUrl) || /^(push:)/.test(playUrl) || playUrl.startsWith('http')) {
+                    return await invokeWithInjectVars(moduleObject, tmpLazyFunction, injectVars, args);
+                } else {
+                    throw e
+                }
             }
         } else if (!moduleObject[method]) {// 新增特性，可以不写lazy属性
             return await invokeWithInjectVars(moduleObject, tmpLazyFunction, injectVars, args);

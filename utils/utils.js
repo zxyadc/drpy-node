@@ -38,6 +38,18 @@ export function computeHash(content) {
     return crypto.createHash('sha256').update(content, 'utf8').digest('hex');
 }
 
+/**
+ * 将obj所有key变小写
+ * @param obj
+ */
+export function keysToLowerCase(obj) {
+    return Object.keys(obj).reduce((result, key) => {
+        const newKey = key.toLowerCase();
+        result[newKey] = obj[key]; // 如果值也是对象，可以递归调用本函数
+        return result;
+    }, {});
+}
+
 export const deepCopy = cloneDeep
 
 const resolve = (from, to) => {

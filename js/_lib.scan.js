@@ -270,7 +270,7 @@ async function _checkAliStatus(state, httpUrl) {
         if (status === "CONFIRMED") {
             if (resData.data.content.data.bizExt) {
                 const bizExt = JSON.parse(atob(resData.data.content.data.bizExt));
-                console.log(bizExt.pds_login_result);
+                console.log('[_lib.scan.js]阿里扫码结果:', bizExt.pds_login_result);
                 return {
                     status: QRCodeHandler.STATUS_CONFIRMED,
                     token: bizExt.pds_login_result.refreshToken

@@ -19,38 +19,43 @@ var rule = {
         let {input, orId, publicUrl} = this;
         let playform = []
         let playurls = []
+        // log('[push_agent] orId:', orId);
         input = decodeURIComponent(orId);
         let icon = urljoin(publicUrl, './images/icon_cookie/推送.jpg');
-        // log(input);
         let vod = {
             vod_pic: icon,
             vod_id: orId,
             vod_content: orId || '温馨提醒:宝子们，推送的时候记得确保ids存在哟~',
             vod_name: 'DS推送:道长&秋秋倾情打造',
         }
-        try {
-            let push_vod = JSON.parse(input);
-            push_vod = Array.isArray(push_vod) ? push_vod[0] : push_vod;
-            vod.vod_actor = push_vod.actor || push_vod.vod_actor || '';
-            vod.vod_content = push_vod.content || push_vod.vod_content || '';
-            vod.vod_director = push_vod.director || push_vod.vod_director || '';
-            vod.vod_play_from = push_vod.from || push_vod.vod_play_from || '';
-            vod.vod_name = push_vod.name || push_vod.vod_name || '';
-            vod.vod_pic = push_vod.pic || push_vod.vod_pic || '';
-            vod.vod_play_url = push_vod.url || push_vod.vod_play_url || '';
-            // 推送json兼容依赖播放属性
-            vod.vod_play_api = push_vod.vod_play_api || '';
-            vod.vod_play_flag = push_vod.vod_play_flag || null;
-            vod.vod_play_index = push_vod.vod_play_index || null;
-            vod.vod_play_position = push_vod.vod_play_position || null;
-            return vod
-        } catch (e) {
+        if (/^[\[{]/.test(input.trim())) {
+            try {
+                let push_vod = JSON.parse(input);
+                push_vod = Array.isArray(push_vod) ? push_vod[0] : push_vod;
+                vod.vod_actor = push_vod.actor || push_vod.vod_actor || '';
+                vod.vod_content = push_vod.content || push_vod.vod_content || '';
+                vod.vod_director = push_vod.director || push_vod.vod_director || '';
+                vod.vod_play_from = push_vod.from || push_vod.vod_play_from || '';
+                vod.vod_name = push_vod.name || push_vod.vod_name || '';
+                vod.vod_pic = push_vod.pic || push_vod.vod_pic || '';
+                vod.vod_play_url = push_vod.url || push_vod.vod_play_url || '';
+                // 推送json兼容依赖播放属性
+                vod.vod_play_api = push_vod.vod_play_api || '';
+                vod.vod_play_flag = push_vod.vod_play_flag || null;
+                vod.vod_play_index = push_vod.vod_play_index || null;
+                vod.vod_play_position = push_vod.vod_play_position || null;
+                log('[push_agent] vod success:', vod);
+                return vod
+            } catch (e) {
+                log('[push_agent] vod error:', e.message);
+            }
         }
-        if (input.indexOf('#')) {
+        log('[push_agent] decode input:', input);
+        if (input.indexOf('#') > -1) {
             let list = input.split('#');
-            log(list);
+            // log(list);
             for (let i = 0; i < list.length; i++) {
-                if (/pan.quark.cn|drive.uc.cn|www.alipan.com/.test(list[i])) {
+                if (/pan.quark.cn|drive.uc.cn|www.alipan.com|www.aliyundrive.com/.test(list[i])) {
                     if (/pan.quark.cn/.test(list[i])) {
                         const shareData = Quark.getShareData(list[i]);
                         if (shareData) {
@@ -83,7 +88,7 @@ var rule = {
                             }
                         }
                     }
-                    if (/www.alipan.com/.test(list[i])) {
+                    if (/www.alipan.com|www.aliyundrive.com/.test(list[i])) {
                         const shareData = Ali.getShareData(list[i]);
                         if (shareData) {
                             const videos = await Ali.getFilesByShareUrl(shareData);
@@ -105,7 +110,7 @@ var rule = {
                     playurls.push("推送" + '$' + list[i])
                 }
             }
-        } else if (/pan.quark.cn|drive.uc.cn|www.alipan.com/.test(input)) {
+        } else if (/pan.quark.cn|drive.uc.cn|www.alipan.com|www.aliyundrive.com/.test(input)) {
             if (/pan.quark.cn/.test(input)) {
                 const shareData = Quark.getShareData(input);
                 if (shareData) {
@@ -123,7 +128,7 @@ var rule = {
                 }
             }
             if (/drive.uc.cn/.test(input)) {
-                const shareData = UC.getShareData(link);
+                const shareData = UC.getShareData(input);
                 if (shareData) {
                     const videos = await UC.getFilesByShareUrl(shareData);
                     if (videos.length > 0) {
@@ -138,11 +143,11 @@ var rule = {
                     }
                 }
             }
-            if (/www.alipan.com/.test(input)) {
-                const shareData = Ali.getShareData(link);
+            if (/www.alipan.com|www.aliyundrive.com/.test(input)) {
+                const shareData = Ali.getShareData(input);
                 if (shareData) {
                     const videos = await Ali.getFilesByShareUrl(shareData);
-                    log(videos)
+                    log(videos);
                     if (videos.length > 0) {
                         playform.push('Ali-' + shareData.shareId);
                         playurls.push(videos.map((v) => {
@@ -231,7 +236,7 @@ var rule = {
         return vod
     },
     lazy: async function (flag, id, flags) {
-        let {input} = this;
+        let {input, mediaProxyUrl} = this;
         if (flag === '推送') {
             if (tellIsJx(input)) {
                 return {parse: 1, jx: 1, url: input}
@@ -246,10 +251,17 @@ var rule = {
             let UCDownloadingCache = {};
             let downUrl = ''
             if (flag.startsWith('Quark-')) {
-                console.log("夸克网盘解析开始")
+                log("夸克网盘解析开始")
                 const down = await Quark.getDownload(ids[0], ids[1], ids[2], ids[3], true);
-                // urls.push("go原画代理",'http://127.0.0.1:7777/?thread=20&url='+down.download_url)
-                urls.push("原画", down.download_url + '#fastPlayMode##threads=10#')
+                const headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+                    'origin': 'https://pan.quark.cn',
+                    'referer': 'https://pan.quark.cn/',
+                    'Cookie': Quark.cookie
+                };
+                urls.push("原画", down.download_url + '#fastPlayMode##threads=10#');
+                urls.push("原代服", mediaProxyUrl + `?thread=${ENV.get('thread') || 6}&form=urlcode&randUa=1&url=` + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)));
+                urls.push("原代本", `http://127.0.0.1:7777/?thread=${ENV.get('thread') || 6}&form=urlcode&randUa=1&url=` + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)));
                 const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
                 transcoding.forEach((t) => {
                     urls.push(t.resolution === 'low' ? "流畅" : t.resolution === 'high' ? "高清" : t.resolution === 'super' ? "超清" : t.resolution, t.video_info.url)
@@ -257,16 +269,11 @@ var rule = {
                 return {
                     parse: 0,
                     url: urls,
-                    header: {
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-                        'origin': 'https://pan.quark.cn',
-                        'referer': 'https://pan.quark.cn/',
-                        'Cookie': Quark.cookie
-                    }
+                    header: headers
                 }
             }
             if (flag.startsWith('UC-')) {
-                console.log("UC网盘解析开始")
+                log("UC网盘解析开始")
                 if (!UCDownloadingCache[ids[1]]) {
                     const down = await UC.getDownload(ids[0], ids[1], ids[2], ids[3], true);
                     if (down) UCDownloadingCache[ids[1]] = down;
@@ -292,10 +299,10 @@ var rule = {
                     SD: "540 标清",
                     LD: "360 流畅"
                 };
-                console.log("网盘解析开始")
+                log("网盘解析开始");
                 const down = await Ali.getDownload(ids[0], ids[1], flag === 'down');
-                urls.push("原画", down.url + "#isVideo=true##ignoreMusic=true#")
-                urls.push("极速原画", down.url + "#fastPlayMode##threads=10#")
+                urls.push("原画", down.url + "#isVideo=true##ignoreMusic=true#");
+                urls.push("极速原画", down.url + "#fastPlayMode##threads=10#");
                 const transcoding = (await Ali.getLiveTranscoding(ids[0], ids[1])).sort((a, b) => b.template_width - a.template_width);
                 transcoding.forEach((t) => {
                     if (t.url !== '') {
@@ -316,4 +323,3 @@ var rule = {
         }
     },
 }
-

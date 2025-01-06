@@ -685,18 +685,6 @@ function $require(url) {
     eval(request(url));
 }
 
-/**
- * 将obj所有key变小写
- * @param obj
- */
-globalThis.keysToLowerCase = function (obj) {
-    return Object.keys(obj).reduce((result, key) => {
-        const newKey = key.toLowerCase();
-        result[newKey] = obj[key]; // 如果值也是对象，可以递归调用本函数
-        return result;
-    }, {});
-}
-
 //字符串To对象
 globalThis.parseQueryString = function (query) {
     const params = {};

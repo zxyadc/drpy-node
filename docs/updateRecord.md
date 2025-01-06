@@ -1,5 +1,37 @@
 # drpyS更新记录
 
+### 20250107
+
+更新至V1.1.3
+
+1. 修复 `req` 系列函数获取源码由于没有请求头没有默认 `accept` 属性导致的某些网页获取的源码异常问题
+2. 推送及各个网盘播放的夸克代理线程数绑定设置中心播放线程代理的值，默认为6
+3. 修复js版打包7z脚本命令的日期不正确问题
+4. 增加源 `秋霞电影网.js`
+5. 增加源 `小米[盘].js` 用于演示 `push://` 推送写法
+6. 推送源支持 `www.aliyundrive.com` 这种地址的拦截
+7. lazy执行失败后自动执行嗅探机制调整,仅限于http开头的链接
+
+`小米[盘].js` 使用说明:
+海阔待改推送 增加编码 `encodeURIComponent`
+
+```javascript
+log(detail);
+let state = post(s + 'action', {
+    timeout: 2000,
+    body: {
+        do: 'push',
+        url: encodeURIComponent(JSON.stringify(detail))
+    },
+    headers: {
+        'User-Agent': MOBILE_UA
+    },
+});
+```
+
+装逼壳待改，接受海阔推送json数据时对url数据进行url解码。然后才是判断解析json  
+push:// 选集无法播放，待改
+
 ### 20250106
 
 更新至V1.1.2

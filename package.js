@@ -7,7 +7,7 @@ import url from 'url';
 const EXCLUDE_DIRS = ['.git', '.idea', 'soft', 'pyTools', 'drop_code', 'jstest', 'local', 'logs', '对话1.txt'];
 
 // 要排除的文件列表
-const EXCLUDE_FILES = ['config/env.json', '.env'];
+const EXCLUDE_FILES = ['config/env.json', '.env','js/UC分享.js','json/UC分享.json'];
 
 // 获取脚本所在目录
 const getScriptDir = () => dirname(resolve(url.fileURLToPath(import.meta.url)));
@@ -39,7 +39,7 @@ const filterGreenFiles = (scriptDir) => {
 // 压缩目录
 const compressDirectory = (scriptDir, green) => {
     const currentDir = basename(scriptDir);
-    const currentTime = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const currentTime = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '');
     const archiveSuffix = green ? '-green' : '';
     const archiveName = `${currentDir}-${currentTime}${archiveSuffix}.7z`;
 
