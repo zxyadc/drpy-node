@@ -9,7 +9,7 @@ var rule = {
     headers: {'User-Agent': 'UC_UA'},
     searchable: 1,
     quickSearch: 0,
-    filterable: 0,
+    filterable: 1,
     double: true,
     play_parse: true,
     limit: 6,
@@ -94,7 +94,6 @@ var rule = {
             "filters": filters,
             "list": homedata
         };
-
         return result;
     },
     lazy: async function (flag, id, flags) {

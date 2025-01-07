@@ -2,6 +2,7 @@ import fastifyStatic from '@fastify/static';
 import * as fastlogger from './controllers/fastlogger.js'
 import path from 'path';
 import os from 'os';
+import qs from 'qs';
 import {fileURLToPath} from 'url';
 import formBody from '@fastify/formbody';
 import {validateBasicAuth} from "./utils/api_validate.js";
@@ -31,6 +32,9 @@ fastify.register(fastifyStatic, {
     decorateReply: false, // 禁用 sendFile
 });
 
+// 注册插件以支持 application/x-www-form-urlencoded
+fastify.register(formBody);
+
 // 给静态目录插件中心挂载basic验证
 fastify.addHook('preHandler', (req, reply, done) => {
     if (req.raw.url.startsWith('/apps/')) {
@@ -40,8 +44,15 @@ fastify.addHook('preHandler', (req, reply, done) => {
     }
 });
 
-// 注册插件以支持 application/x-www-form-urlencoded
-fastify.register(formBody);
+// 自定义插件替换 querystring 解析行为.避免出现两个相同参数被解析成列表
+fastify.addHook('onRequest', async (request, reply) => {
+    const rawQuery = request.raw.url.split('?')[1] || '';
+    request.query = qs.parse(rawQuery, {
+        strictNullHandling: true, // 确保 `=` 被解析为空字符串
+        arrayLimit: 100,         // 自定义数组限制
+        allowDots: false,        // 禁止点号表示嵌套对象
+    });
+});
 
 // 注册控制器
 import {registerRoutes} from './controllers/index.js';

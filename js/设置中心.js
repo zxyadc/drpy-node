@@ -10,6 +10,45 @@ const {
 // 访问测试 http://127.0.0.1:5757/api/设置中心?ac=action&action=set-cookie
 // 访问测试 http://127.0.0.1:5757/api/设置中心?ac=action&action=quarkCookieConfig&value={"cookie":"我是cookie"}
 
+
+let gitPublicUrl = 'https://github.catvod.com/https://raw.githubusercontent.com/hjdhnx/drpy-node/refs/heads/main/public/';
+let liveImgUrl = urljoin(gitPublicUrl, './images/lives.jpg');
+let quick_data = {
+    腾讯: 'https://v.qq.com/x/cover/mzc00200vkqr54u/u4100l66fas.html',
+    爱奇艺: 'http://www.iqiyi.com/v_1b0tk1b8tl8.html',
+    夸克: 'https://pan.quark.cn/s/6c8158e258f3',
+    UC: 'https://drive.uc.cn/s/59023f57d3ce4?public=1',
+    阿里: 'https://www.alipan.com/s/vgXMcowK8pQ',
+    直链1: 'https://vdse.bdstatic.com//628ca08719cef5987ea2ae3c6f0d2386.mp4',
+    嗅探1: 'https://www.6080kk.cc/haokanplay/178120-1-1.html',
+    嗅探2: 'https://www.hahads.com/play/537106-3-1.html',
+    多集: 'https://v.qq.com/x/cover/m441e3rjq9kwpsc/m00253deqqo.html#https://pan.quark.cn/s/6c8158e258f3',
+    海阔二级单线路: gzip(JSON.stringify({
+        "actor": "剧集",
+        "content": "【道长DR】　　围绕上世纪30年代的上海滩，讲述了两位坚韧勇敢的女性在波澜诡谲的民国时代相互救赎、完成蜕变的动人故事。 收起",
+        "director": "qingbenjiaren2024",
+        "from": "线路223",
+        "name": "卿本佳人2024",
+        "pic": "https://pic3.yzzyimages.com/upload/vod/2024-11-21/17321619851.jpg",
+        "url": "第01集$https://b.6080z.com/vodplay/101329-4-1.html#第02集$https://b.6080z.com/vodplay/101329-4-2.html#第03集$https://b.6080z.com/vodplay/101329-4-3.html#第04集$https://b.6080z.com/vodplay/101329-4-4.html#第05集$https://b.6080z.com/vodplay/101329-4-5.html#第06集$https://b.6080z.com/vodplay/101329-4-6.html#第07集$https://b.6080z.com/vodplay/101329-4-7.html#第08集$https://b.6080z.com/vodplay/101329-4-8.html#第09集$https://b.6080z.com/vodplay/101329-4-9.html#第10集$https://b.6080z.com/vodplay/101329-4-10.html#第11集$https://b.6080z.com/vodplay/101329-4-11.html#第12集$https://b.6080z.com/vodplay/101329-4-12.html#第12集$https://b.6080z.com/vodplay/101329-4-13.html#第13集$https://b.6080z.com/vodplay/101329-4-14.html#第14集$https://b.6080z.com/vodplay/101329-4-15.html#第15集$https://b.6080z.com/vodplay/101329-4-16.html#第16集$https://b.6080z.com/vodplay/101329-4-17.html#第17集$https://b.6080z.com/vodplay/101329-4-18.html#第18集$https://b.6080z.com/vodplay/101329-4-19.html#第19集$https://b.6080z.com/vodplay/101329-4-20.html#第20集$https://b.6080z.com/vodplay/101329-4-21.html#第21集$https://b.6080z.com/vodplay/101329-4-22.html#第22集$https://b.6080z.com/vodplay/101329-4-23.html"
+    })),
+};
+let quick_data1 = {
+    '大一实习': 'https://fanqienovel.com/page/7421167583522458648',
+    '十日终焉': 'https://fanqienovel.com/page/7143038691944959011',
+    '斩神': 'https://fanqienovel.com/page/6982529841564224526',
+};
+let selectDataList = [];
+let selectDataList1 = [];
+for (let key of Object.keys(quick_data)) {
+    selectDataList.push(`${key}:=${quick_data[key]}`);
+}
+let selectData = selectDataList.join(',');
+for (let key of Object.keys(quick_data1)) {
+    selectDataList1.push(`${key}:=${quick_data1[key]}`);
+}
+let selectData1 = selectDataList1.join(',');
+
 var rule = {
     类型: '设置',
     title: '设置中心',
@@ -38,6 +77,29 @@ var rule = {
     more: {
         sourceTag: '设置,动作',
         actions: [
+            {
+                name: '推送',
+                action: JSON.stringify({
+                    actionId: '推送视频播放',
+                    id: 'push',
+                    type: 'input',
+                    title: '推送视频地址进行播放',
+                    tip: '支持网盘、官链、直链、待嗅探链接',
+                    value: '',
+                    msg: '请输入待推送的视频地址',
+                    imageUrl: liveImgUrl,
+                    imageHeight: 200,
+                    imageType: 'card_pic_3',
+                    keep: true,
+                    button: 4,
+                    width: 640,
+                    // selectData: '腾讯:=https://v.qq.com/x/cover/m441e3rjq9kwpsc/l0045w5hv1k.html,2:=bb输入默认值bbbbb,3:=c输入默认值ddd,4:=输入默认值,5:=111,6:=22222,7:=HOHO,HELLO,world'
+                    selectData: selectData
+                }),
+                vod_name: '推送视频播放',
+                vod_pic: liveImgUrl,
+                vod_tag: 'action'
+            },
             {
                 name: '连续对话', action: JSON.stringify({
                     actionId: '连续对话',
@@ -85,6 +147,10 @@ var rule = {
     class_url: 'push&quark&uc&ali&bili&system&test',
     url: '/fyclass',
 
+    预处理: async function (env) {
+
+    },
+
     一级: async function (tid, pg, filter, extend) {
         let {input, MY_CATE, MY_PAGE, publicUrl} = this;
         // log('publicUrl:', publicUrl);
@@ -105,43 +171,6 @@ var rule = {
         let d = [];
         switch (MY_CATE) {
             case 'push':
-                let quick_data = {
-                    腾讯: 'https://v.qq.com/x/cover/mzc00200vkqr54u/u4100l66fas.html',
-                    爱奇艺: 'http://www.iqiyi.com/v_1b0tk1b8tl8.html',
-                    夸克: 'https://pan.quark.cn/s/6c8158e258f3',
-                    UC: 'https://drive.uc.cn/s/59023f57d3ce4?public=1',
-                    阿里: 'https://www.alipan.com/s/vgXMcowK8pQ',
-                    直链1: 'https://vdse.bdstatic.com//628ca08719cef5987ea2ae3c6f0d2386.mp4',
-                    嗅探1: 'https://www.6080kk.cc/haokanplay/178120-1-1.html',
-                    嗅探2: 'https://www.hahads.com/play/537106-3-1.html',
-                    多集: 'https://v.qq.com/x/cover/m441e3rjq9kwpsc/m00253deqqo.html#https://pan.quark.cn/s/6c8158e258f3',
-                    海阔二级单线路: gzip(JSON.stringify({
-                        "actor": "剧集",
-                        "content": "【道长DR】　　围绕上世纪30年代的上海滩，讲述了两位坚韧勇敢的女性在波澜诡谲的民国时代相互救赎、完成蜕变的动人故事。 收起",
-                        "director": "qingbenjiaren2024",
-                        "from": "线路223",
-                        "name": "卿本佳人2024",
-                        "pic": "https://pic3.yzzyimages.com/upload/vod/2024-11-21/17321619851.jpg",
-                        "url": "第01集$https://b.6080z.com/vodplay/101329-4-1.html#第02集$https://b.6080z.com/vodplay/101329-4-2.html#第03集$https://b.6080z.com/vodplay/101329-4-3.html#第04集$https://b.6080z.com/vodplay/101329-4-4.html#第05集$https://b.6080z.com/vodplay/101329-4-5.html#第06集$https://b.6080z.com/vodplay/101329-4-6.html#第07集$https://b.6080z.com/vodplay/101329-4-7.html#第08集$https://b.6080z.com/vodplay/101329-4-8.html#第09集$https://b.6080z.com/vodplay/101329-4-9.html#第10集$https://b.6080z.com/vodplay/101329-4-10.html#第11集$https://b.6080z.com/vodplay/101329-4-11.html#第12集$https://b.6080z.com/vodplay/101329-4-12.html#第12集$https://b.6080z.com/vodplay/101329-4-13.html#第13集$https://b.6080z.com/vodplay/101329-4-14.html#第14集$https://b.6080z.com/vodplay/101329-4-15.html#第15集$https://b.6080z.com/vodplay/101329-4-16.html#第16集$https://b.6080z.com/vodplay/101329-4-17.html#第17集$https://b.6080z.com/vodplay/101329-4-18.html#第18集$https://b.6080z.com/vodplay/101329-4-19.html#第19集$https://b.6080z.com/vodplay/101329-4-20.html#第20集$https://b.6080z.com/vodplay/101329-4-21.html#第21集$https://b.6080z.com/vodplay/101329-4-22.html#第22集$https://b.6080z.com/vodplay/101329-4-23.html"
-                    })),
-                };
-                let quick_data1 = {
-                    '大一实习': 'https://fanqienovel.com/page/7421167583522458648',
-                    '十日终焉': 'https://fanqienovel.com/page/7143038691944959011',
-                    '斩神': 'https://fanqienovel.com/page/6982529841564224526',
-                };
-                let selectDataList = [];
-                let selectDataList1 = [];
-                for (let key of Object.keys(quick_data)) {
-                    selectDataList.push(`${key}:=${quick_data[key]}`);
-                }
-                let selectData = selectDataList.join(',');
-                // log(selectData);
-                for (let key of Object.keys(quick_data1)) {
-                    selectDataList1.push(`${key}:=${quick_data1[key]}`);
-                }
-                let selectData1 = selectDataList1.join(',');
-                // log(selectData);
                 d.push({
                     vod_id: JSON.stringify({
                         actionId: '推送视频播放',
@@ -262,10 +291,12 @@ var rule = {
         // log(input, orId);
         if (orId === 'proxyStream') {
             let media_url = 'https://vdse.bdstatic.com//628ca08719cef5987ea2ae3c6f0d2386.mp4';
+            let m3u8_url = 'http://kjsp.aikan.miguvideo.com/PLTV/88888888/224/3221236432/1.m3u8';
             return {
                 vod_id: 'proxyStream',
                 vod_name: '测试代理流',
                 vod_play_from: 'drpyS本地流代理',
+                // vod_play_url: '测试播放流$' + getProxyUrl().replace('?do=js', media_url) + '#不代理直接播$' + media_url + '#8k播放$' + m3u8_url,
                 vod_play_url: '测试播放流$' + getProxyUrl().replace('?do=js', media_url) + '#不代理直接播$' + media_url
             }
         }

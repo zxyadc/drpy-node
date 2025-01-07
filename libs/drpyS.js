@@ -25,6 +25,7 @@ import {base64Decode, base64Encode, md5, rc4Decrypt, rc4Encrypt, rc4, rc4_decode
 import {getContentType, getMimeType} from "../utils/mime-type.js";
 import "../utils/random-http-ua.js";
 import template from '../libs_drpy/template.js'
+import batchExecute from '../libs_drpy/batchExecute.js';
 import '../libs_drpy/abba.js'
 import '../libs_drpy/drpyInject.js'
 import '../libs_drpy/crypto-js.js';
@@ -241,6 +242,7 @@ export async function getSandbox(env = {}) {
         JSON5,
         jinja,
         template,
+        batchExecute,
         atob,
         btoa,
         base64Encode,
@@ -405,6 +407,7 @@ export async function init(filePath, env, refresh) {
         // const moduleObject = utils.deepCopy(sandbox.rule);
         const rule = sandbox.rule;
         if (moduleExt) { // 传了参数才覆盖rule参数，否则取rule内置
+            // log('moduleExt:', moduleExt);
             if (moduleExt.startsWith('../json')) {
                 rule.params = urljoin(env.jsonUrl, moduleExt.slice(8));
             } else {
@@ -591,6 +594,8 @@ async function invokeWithInjectVars(rule, method, injectVars, args) {
             console.log(`免嗅 ${injectVars.input} 执行完毕,结果为:`, JSON.stringify(result));
             break;
         case 'proxy_rule':
+            break;
+        case 'action':
             break;
         default:
             console.log(`invokeWithInjectVars: ${injectVars['method']}`);

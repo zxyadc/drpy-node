@@ -13,6 +13,13 @@
         "sourceTag": "设置,动作",
         "actions": [
           {
+            "name": "推送",
+            "action": "{\"actionId\":\"推送视频播放\",\"id\":\"push\",\"type\":\"input\",\"title\":\"推送视频地址进行播放\",\"tip\":\"支持网盘、官链、直链、待嗅探链接\",\"value\":\"\",\"msg\":\"请输入待推送的视频地址\",\"imageUrl\":\"https://github.catvod.com/https://raw.githubusercontent.com/hjdhnx/drpy-node/refs/heads/main/public/images/lives.jpg\",\"imageHeight\":200,\"imageType\":\"card_pic_3\",\"keep\":true,\"button\":4,\"width\":640,\"selectData\":\"腾讯:=https://v.qq.com/x/cover/mzc00200vkqr54u/u4100l66fas.html,爱奇艺:=http://www.iqiyi.com/v_1b0tk1b8tl8.html,夸克:=https://pan.quark.cn/s/6c8158e258f3,UC:=https://drive.uc.cn/s/59023f57d3ce4?public=1,阿里:=https://www.alipan.com/s/vgXMcowK8pQ,直链1:=https://vdse.bdstatic.com//628ca08719cef5987ea2ae3c6f0d2386.mp4,嗅探1:=https://www.6080kk.cc/haokanplay/178120-1-1.html,嗅探2:=https://www.hahads.com/play/537106-3-1.html,多集:=https://v.qq.com/x/cover/m441e3rjq9kwpsc/m00253deqqo.html#https://pan.quark.cn/s/6c8158e258f3,海阔二级单线路:=H4sIAAAAAAAAA52Uy27TQBSGXwUZlsT2GefadZ+AN3ATk7qKL7guUoKQXAQFeoEG6oKaVBUFlBZFbdQ0TXAIeRjPTJwVr8AYCsNyijQbnzPfPz72p3kk6WXf8aQFibzszFsb0l2p7Ni+YfusFAe78/W383C6eC8OmnEQsEVal7NxiEebeLQ/i75oKvl6iccfZwdPWY0OhnR8+uPbdnJ2kUx7ONrAo094skMOD+ZHHbL1nIbHbCf53KdBh7RPaP+Yfm8n5x+S3gWr016TtCb03VUa2Brh6A0Nm8ngVRysk7Nt+mI3aYfk9fs0YfMERxENn+FoKw6e3KJ7V8lgyF6+YnrG9UAPTLu6ZNgrpu4ZNlJRlrXve47FWrNomgzPEdJYydYtIx1/Z0rbXTzps9zrza5ZZo1l33dXFxSFPWlyvdGom5ZeNVblsmMpa27N0SvKQ6eipEwGIINAgYKGIA+lYg7kFbfKkta8Wnpqt6sC+8Z3/kQuyXm1qDZ+RbEMt6bXFVBBQ6UMy5KXfat2O4WQMIQ4pAlDGoeywlCWQzlhKMehvDCU51BBGCpwqCgMFTlUEoZKfyFQxX+uyqkbKMGdAHEnAP0Xxa0AcZWAawHiLgH3AsRlAi4GiNsE3AwQ1wm4GiDuE/zjhrhQiLuBxI1C3A0kbhTibqAb3DK/3ZAe/wSSQMKkPgYAAA==\"}",
+            "vod_name": "推送视频播放",
+            "vod_pic": "https://github.catvod.com/https://raw.githubusercontent.com/hjdhnx/drpy-node/refs/heads/main/public/images/lives.jpg",
+            "vod_tag": "action"
+          },
+          {
             "name": "连续对话",
             "action": "{\"actionId\":\"连续对话\",\"id\":\"talk\",\"type\":\"input\",\"title\":\"连续对话\",\"tip\":\"请输入消息\",\"value\":\"\",\"msg\":\"开始新的对话\",\"button\":3,\"imageUrl\":\"https://img2.baidu.com/it/u=1206278833,3265480730&fm=253&fmt=auto&app=120&f=JPEG?w=800&h=800\",\"imageHeight\":200,\"imageType\":\"card_pic_3\",\"keep\":true,\"width\":680,\"height\":800,\"msgType\":\"long_text\",\"httpTimeout\":60,\"canceledOnTouchOutside\":false}"
           },
@@ -77,24 +84,154 @@
       "ext": ""
     },
     {
-      "key": "drpyS_哔哩大全[官]",
-      "name": "哔哩大全[官](DS)",
+      "key": "drpyS_PTT[优]",
+      "name": "PTT[优](DS)",
       "type": 4,
-      "api": "http://localhost:5757/api/我的哔哩[官]",
+      "api": "http://localhost:5757/api/PTT[优]",
       "searchable": 2,
       "filterable": 1,
       "quickSearch": 0,
-      "ext": "H4sIAAAAAAAAA9PT088qzs/Tfzp5ytPJK58uWf60dYUeSAQAZ2A+OBkAAAA="
+      "ext": ""
     },
     {
-      "key": "drpyS_哔哩教育[官]",
-      "name": "哔哩教育[官](DS)",
+      "key": "drpyS_光速[优]",
+      "name": "光速[优](DS)",
       "type": 4,
-      "api": "http://localhost:5757/api/我的哔哩[官]",
+      "api": "http://localhost:5757/api/光速[优]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_皮皮虾[优]",
+      "name": "皮皮虾[优](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/皮皮虾[优]",
       "searchable": 2,
       "filterable": 1,
       "quickSearch": 0,
-      "ext": "H4sIAAAAAAAAA9PT088qzs/Tfzp5ytPJK59NnfmiaZMeSAQAgv7xPBkAAAA="
+      "ext": ""
+    },
+    {
+      "key": "drpyS_UC分享[盘]",
+      "name": "UC分享[盘](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/UC分享",
+      "searchable": 2,
+      "filterable": 0,
+      "quickSearch": 0,
+      "ext": "H4sIAAAAAAAAA9PT088qzs/TD3V+2tH2ZNdqPRAPAKubOwMVAAAA"
+    },
+    {
+      "key": "drpyS_团长资源[盘]",
+      "name": "团长资源[盘](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/团长资源[盘]",
+      "searchable": 1,
+      "filterable": 0,
+      "quickSearch": 1,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_多多[盘]",
+      "name": "多多[盘](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/多多[盘]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_小米[盘]",
+      "name": "小米[盘](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/小米[盘]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_木偶[盘]",
+      "name": "木偶[盘](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/木偶[盘]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_欧哥[盘]",
+      "name": "欧哥[盘](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/欧哥[盘]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_特下饭[盘]",
+      "name": "特下饭[盘](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/特下饭[盘]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_玩偶哥哥[盘]",
+      "name": "玩偶哥哥[盘](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/玩偶哥哥[盘]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_至臻[盘]",
+      "name": "至臻[盘](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/至臻[盘]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_虎斑[盘]",
+      "name": "虎斑[盘](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/虎斑[盘]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_蜡笔[盘]",
+      "name": "蜡笔[盘](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/蜡笔[盘]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_闪电优汐[盘]",
+      "name": "闪电优汐[盘](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/闪电优汐[盘]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
     },
     {
       "key": "drpyS_哔哩影视[官]",
@@ -113,6 +250,46 @@
       "api": "http://localhost:5757/api/哔哩直播[官]",
       "searchable": 2,
       "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_哔哩教育[官]",
+      "name": "哔哩教育[官](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/我的哔哩[官]",
+      "searchable": 2,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": "H4sIAAAAAAAAA9PT088qzs/Tfzp5ytPJK59NnfmiaZMeSAQAgv7xPBkAAAA="
+    },
+    {
+      "key": "drpyS_哔哩大全[官]",
+      "name": "哔哩大全[官](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/我的哔哩[官]",
+      "searchable": 2,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": "H4sIAAAAAAAAA9PT088qzs/Tfzp5ytPJK58uWf60dYUeSAQAZ2A+OBkAAAA="
+    },
+    {
+      "key": "drpyS_抖音直播弹幕[官]",
+      "name": "抖音直播弹幕[官](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/抖音直播弹幕[官]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "push_agent",
+      "name": "推送(DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/push_agent",
+      "searchable": 0,
+      "filterable": 0,
       "quickSearch": 0,
       "ext": ""
     },
@@ -177,26 +354,6 @@
       "ext": ""
     },
     {
-      "key": "drpyS_抖音直播弹幕[官]",
-      "name": "抖音直播弹幕[官](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/抖音直播弹幕[官]",
-      "searchable": 1,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_多多[盘]",
-      "name": "多多[盘](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/多多[盘]",
-      "searchable": 1,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
       "key": "drpyS_番薯动漫[漫]",
       "name": "番薯动漫[漫](DS)",
       "type": 4,
@@ -217,16 +374,6 @@
       "ext": ""
     },
     {
-      "key": "drpyS_光速[优]",
-      "name": "光速[优](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/光速[优]",
-      "searchable": 1,
-      "filterable": 0,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
       "key": "drpyS_好乐影视",
       "name": "好乐影视(DS)",
       "type": 4,
@@ -242,16 +389,6 @@
       "type": 4,
       "api": "http://localhost:5757/api/黑料不打烊[密]",
       "searchable": 1,
-      "filterable": 0,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_虎斑[盘]",
-      "name": "虎斑[盘](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/虎斑[盘]",
-      "searchable": 0,
       "filterable": 0,
       "quickSearch": 0,
       "ext": ""
@@ -307,16 +444,6 @@
       "ext": ""
     },
     {
-      "key": "drpyS_蜡笔[盘]",
-      "name": "蜡笔[盘](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/蜡笔[盘]",
-      "searchable": 1,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
       "key": "drpyS_蓝莓短剧",
       "name": "蓝莓短剧(DS)",
       "type": 4,
@@ -343,36 +470,6 @@
       "api": "http://localhost:5757/api/美颜怪[擦]",
       "searchable": 0,
       "filterable": 0,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_木偶[盘]",
-      "name": "木偶[盘](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/木偶[盘]",
-      "searchable": 1,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_欧哥[盘]",
-      "name": "欧哥[盘](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/欧哥[盘]",
-      "searchable": 1,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_皮皮虾[优]",
-      "name": "皮皮虾[优](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/皮皮虾[优]",
-      "searchable": 2,
-      "filterable": 1,
       "quickSearch": 0,
       "ext": ""
     },
@@ -437,71 +534,11 @@
       "ext": ""
     },
     {
-      "key": "drpyS_闪电优汐[盘]",
-      "name": "闪电优汐[盘](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/闪电优汐[盘]",
-      "searchable": 1,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
       "key": "drpyS_素白白",
       "name": "素白白(DS)",
       "type": 4,
       "api": "http://localhost:5757/api/素白白",
       "searchable": 2,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_特下饭[盘]",
-      "name": "特下饭[盘](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/特下饭[盘]",
-      "searchable": 1,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_团长资源[盘]",
-      "name": "团长资源[盘](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/团长资源[盘]",
-      "searchable": 1,
-      "filterable": 0,
-      "quickSearch": 1,
-      "ext": ""
-    },
-    {
-      "key": "push_agent",
-      "name": "推送(DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/push_agent",
-      "searchable": 0,
-      "filterable": 0,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_玩偶哥哥[盘]",
-      "name": "玩偶哥哥[盘](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/玩偶哥哥[盘]",
-      "searchable": 1,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
-      "key": "drpyS_小米[盘]",
-      "name": "小米[盘](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/小米[盘]",
-      "searchable": 1,
       "filterable": 1,
       "quickSearch": 0,
       "ext": ""
@@ -567,16 +604,6 @@
       "ext": "H4sIAAAAAAAAA9PT088qzs/Tz8ksSzVKzi3WA/EAuuBHLxUAAAA="
     },
     {
-      "key": "drpyS_至臻[盘]",
-      "name": "至臻[盘](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/至臻[盘]",
-      "searchable": 1,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
       "key": "drpyS_专享影视",
       "name": "专享影视(DS)",
       "type": 4,
@@ -637,16 +664,6 @@
       "ext": ""
     },
     {
-      "key": "drpyS_PTT[优]",
-      "name": "PTT[优](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/PTT[优]",
-      "searchable": 2,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
       "key": "drpyS_TVB云播",
       "name": "TVB云播(DS)",
       "type": 4,
@@ -655,16 +672,6 @@
       "filterable": 1,
       "quickSearch": 2,
       "ext": ""
-    },
-    {
-      "key": "drpyS_UC分享[盘]",
-      "name": "UC分享[盘](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/UC分享",
-      "searchable": 2,
-      "filterable": 0,
-      "quickSearch": 0,
-      "ext": "H4sIAAAAAAAAA9PT088qzs/TD3V+2tH2ZNdqPRAPAKubOwMVAAAA"
     },
     {
       "key": "drpyS_x草榴社区[密]",

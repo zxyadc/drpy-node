@@ -5,6 +5,7 @@ import {naturalSort, urljoin} from '../utils/utils.js'
 import {ENV} from "../utils/env.js";
 import {validatePwd} from "../utils/api_validate.js";
 import {getSitesMap} from "../utils/sites-map.js";
+import batchExecute from '../libs_drpy/batchExecute.js';
 
 const {jsEncoder} = drpy;
 
@@ -44,66 +45,78 @@ async function generateSiteJSON(jsDir, configDir, requestHost, sub, subFilePath,
     }
     let SitesMap = getSitesMap(configDir);
     // console.log(SitesMap);
-    // 使用 Promise.all 并发执行文件的处理
-    const filePromises = valid_files.map(async (file) => {
-        const baseName = path.basename(file, '.js'); // 去掉文件扩展名
-        let api = `${requestHost}/api/${baseName}`;  // 使用请求的 host 地址，避免硬编码端口
-        if (pwd) {
-            api += `?pwd=${pwd}`;
-        }
-        let ruleObject = {
-            searchable: 0, // 固定值
-            filterable: 0, // 固定值
-            quickSearch: 0, // 固定值
-        };
-        try {
-            ruleObject = await drpy.getRuleObject(path.join(jsDir, file));
-            // console.log(file, ruleObject.title);
-        } catch (e) {
-            console.log(`file:${file} error:${e.message}`);
-        }
-        let fileSites = [];
-        if (baseName === 'push_agent') {
-            let key = 'push_agent';
-            let name = `${ruleObject.title}(DS)`;
-            fileSites.push({key, name})
-        } else if (SitesMap.hasOwnProperty(baseName) && Array.isArray(SitesMap[baseName])) {
-            SitesMap[baseName].forEach((it) => {
-                let key = `drpyS_${it.alias}`;
-                let name = `${it.alias}(DS)`;
-                let ext = '';
-                if (it.queryObject.type === 'url') {
-                    ext = it.queryObject.params;
+    const tasks = valid_files.map((file) => {
+        return {
+            func: async ({file, jsDir, requestHost, pwd, drpy, SitesMap, jsEncoder}) => {
+                const baseName = path.basename(file, '.js'); // 去掉文件扩展名
+                let api = `${requestHost}/api/${baseName}`;  // 使用请求的 host 地址，避免硬编码端口
+                if (pwd) {
+                    api += `?pwd=${pwd}`;
+                }
+                let ruleObject = {
+                    searchable: 0, // 固定值
+                    filterable: 0, // 固定值
+                    quickSearch: 0, // 固定值
+                };
+                try {
+                    ruleObject = await drpy.getRuleObject(path.join(jsDir, file));
+                } catch (e) {
+                    throw new Error(`Error parsing rule object for file: ${file}, ${e.message}`);
+                }
+
+                let fileSites = [];
+                if (baseName === 'push_agent') {
+                    let key = 'push_agent';
+                    let name = `${ruleObject.title}(DS)`;
+                    fileSites.push({key, name});
+                } else if (SitesMap.hasOwnProperty(baseName) && Array.isArray(SitesMap[baseName])) {
+                    SitesMap[baseName].forEach((it) => {
+                        let key = `drpyS_${it.alias}`;
+                        let name = `${it.alias}(DS)`;
+                        let ext = it.queryObject.type === 'url' ? it.queryObject.params : it.queryStr;
+                        if (ext) {
+                            ext = jsEncoder.gzip(ext);
+                        }
+                        fileSites.push({key, name, ext});
+                    });
                 } else {
-                    ext = it.queryStr;
+                    let key = `drpyS_${baseName}`;
+                    let name = `${baseName}(DS)`;
+                    fileSites.push({key, name});
                 }
-                if (ext) {
-                    ext = jsEncoder.gzip(ext);
-                }
-                fileSites.push({key: key, name: name, ext: ext})
-            });
-        } else {
-            let key = `drpyS_${baseName}`;
-            let name = `${baseName}(DS)`;
-            fileSites.push({key, name})
-        }
-        fileSites.forEach((fileSite) => {
-            const site = {
-                key: fileSite.key,
-                name: fileSite.name,
-                type: 4, // 固定值
-                api,
-                searchable: ruleObject.searchable,
-                filterable: ruleObject.filterable,
-                quickSearch: ruleObject.quickSearch,
-                more: ruleObject.more,
-                ext: fileSite.ext || "", // 固定为空字符串
-            };
-            sites.push(site);
-        });
+
+                fileSites.forEach((fileSite) => {
+                    const site = {
+                        key: fileSite.key,
+                        name: fileSite.name,
+                        type: 4, // 固定值
+                        api,
+                        searchable: ruleObject.searchable,
+                        filterable: ruleObject.filterable,
+                        quickSearch: ruleObject.quickSearch,
+                        more: ruleObject.more,
+                        ext: fileSite.ext || "", // 固定为空字符串
+                    };
+                    sites.push(site);
+                });
+            },
+            param: {file, jsDir, requestHost, pwd, drpy, SitesMap, jsEncoder},
+            id: file,
+        };
     });
-    // 等待所有的文件处理完成
-    await Promise.all(filePromises);
+
+    const listener = {
+        func: (param, id, error, result) => {
+            if (error) {
+                console.error(`Error processing file ${id}:`, error.message);
+            } else {
+                // console.log(`Successfully processed file ${id}:`, result);
+            }
+        },
+        param: {}, // 外部参数可以在这里传入
+    };
+
+    await batchExecute(tasks, listener);
     // 订阅再次处理别名的情况
     if (sub) {
         if (sub.mode === 0) {

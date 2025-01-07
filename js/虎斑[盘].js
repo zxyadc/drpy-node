@@ -20,6 +20,9 @@ var rule = {
     cate_exclude: '网址|专题|全部影片',
     tab_rename: {'KUAKE1': '夸克1', 'KUAKE11': '夸克2', 'YOUSEE1': 'UC1', 'YOUSEE11': 'UC2',},
     play_parse: true,
+    searchable: 1,
+    filterable: 1,
+    quickSearch: 0,
     class_name: '电影&剧集&动漫&综艺&短剧&4K',
     class_url: '1&2&4&3&6&5',
     class_parse: async () => {
