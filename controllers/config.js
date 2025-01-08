@@ -133,46 +133,77 @@ async function generateSiteJSON(jsDir, configDir, requestHost, sub, subFilePath,
     return {sites};
 }
 
-function generateParseJSON(jxDir, requestHost) {
+async function generateParseJSON(jxDir, requestHost) {
     const files = readdirSync(jxDir);
-    const parses = files
-        .filter((file) => file.endsWith('.js') && !file.startsWith('_')) // 筛选出不是 "_" 开头的 .js 文件
-        .map((file) => {
-            const baseName = path.basename(file, '.js'); // 去掉文件扩展名
-            const api = `${requestHost}/parse/${baseName}?url=`;  // 使用请求的 host 地址，避免硬编码端口
-            return {
-                name: baseName,
-                url: api,
-                type: 1,
-                ext: {
-                    flag: [
-                        "qiyi",
-                        "imgo",
-                        "爱奇艺",
-                        "奇艺",
-                        "qq",
-                        "qq 预告及花絮",
-                        "腾讯",
-                        "youku",
-                        "优酷",
-                        "pptv",
-                        "PPTV",
-                        "letv",
-                        "乐视",
-                        "leshi",
-                        "mgtv",
-                        "芒果",
-                        "sohu",
-                        "xigua",
-                        "fun",
-                        "风行"
-                    ]
-                },
-                header: {
-                    "User-Agent": "Mozilla/5.0"
+    const jx_files = files.filter((file) => file.endsWith('.js') && !file.startsWith('_')) // 筛选出不是 "_" 开头的 .js 文件
+    let parses = [];
+    const tasks = jx_files.map((file) => {
+        return {
+            func: async ({file, jxDir, requestHost, drpy}) => {
+                const baseName = path.basename(file, '.js'); // 去掉文件扩展名
+                const api = `${requestHost}/parse/${baseName}?url=`;  // 使用请求的 host 地址，避免硬编码端口
+
+                let jxObject = {
+                    type: 1, // 固定值
+                    ext: {
+                        flag: [
+                            "qiyi",
+                            "imgo",
+                            "爱奇艺",
+                            "奇艺",
+                            "qq",
+                            "qq 预告及花絮",
+                            "腾讯",
+                            "youku",
+                            "优酷",
+                            "pptv",
+                            "PPTV",
+                            "letv",
+                            "乐视",
+                            "leshi",
+                            "mgtv",
+                            "芒果",
+                            "sohu",
+                            "xigua",
+                            "fun",
+                            "风行"
+                        ]
+                    },
+                    header: {
+                        "User-Agent": "Mozilla/5.0"
+                    }
+                };
+                try {
+                    let _jxObject = await drpy.getJx(path.join(jxDir, file));
+                    jxObject = {...jxObject, ..._jxObject};
+                } catch (e) {
+                    throw new Error(`Error parsing jx object for file: ${file}, ${e.message}`);
                 }
+
+                parses.push({
+                    name: baseName,
+                    url: jxObject.url || api,
+                    type: jxObject.type,
+                    ext: jxObject.ext,
+                    header: jxObject.header
+                });
+            },
+            param: {file, jxDir, requestHost, drpy},
+            id: file,
+        };
+    });
+
+    const listener = {
+        func: (param, id, error, result) => {
+            if (error) {
+                console.error(`Error processing file ${id}:`, error.message);
+            } else {
+                // console.log(`Successfully processed file ${id}:`, result);
             }
-        });
+        },
+        param: {}, // 外部参数可以在这里传入
+    };
+    await batchExecute(tasks, listener);
     return {parses};
 }
 
@@ -263,7 +294,7 @@ export default (fastify, options, done) => {
             }
 
             const siteJSON = await generateSiteJSON(options.jsDir, options.configDir, requestHost, sub, options.subFilePath, pwd);
-            const parseJSON = generateParseJSON(options.jxDir, requestHost);
+            const parseJSON = await generateParseJSON(options.jxDir, requestHost);
             const livesJSON = generateLivesJSON(requestHost);
             const playerJSON = generatePlayerJSON(options.configDir, requestHost);
             const configObj = {sites_count: siteJSON.sites.length, ...siteJSON, ...parseJSON, ...livesJSON, ...playerJSON};

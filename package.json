@@ -1,6 +1,6 @@
 {
   "name": "drpy-node",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -18,7 +18,7 @@
   },
   "repository": "https://github.com/hjdhnx/drpy-node.git",
   "author": "晚风拂柳颜 <434857005@qq.com>",
-  "description": "道长修仙，法力无边。一统江湖，只需半年。",
+  "description": "道长修仙，法力无边。一统江湖，只需半年。\n君子袒蛋蛋，小人藏鸡鸡。",
   "license": "MIT",
   "dependencies": {
     "@fastify/formbody": "^7.4.0",

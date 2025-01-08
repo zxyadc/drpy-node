@@ -350,8 +350,13 @@ export default (fastify, options, done) => {
                 }
                 let t2 = (new Date()).getTime();
                 backResp.cost = t2 - t1;
-                return reply.code(statusCode).type(`${mediaType}; charset=utf-8`).send(JSON.stringify(backResp));
+                let backRespSend = JSON.stringify(backResp);
+                console.log(backRespSend);
+                return reply.code(statusCode).type(`${mediaType}; charset=utf-8`).send(backRespSend);
             } else if (typeof backResp === 'string') {
+                if (backResp.startsWith('redirect://')) {
+                    return reply.redirect(backResp.split('redirect://')[1]);
+                }
                 let statusCode = backResp && backResp !== query.url ? 200 : 404;
                 let msgState = backResp && backResp !== query.url ? '成功' : '失败';
                 let t2 = (new Date()).getTime();
@@ -361,7 +366,9 @@ export default (fastify, options, done) => {
                     msg: `${jxName}解析${msgState}`,
                     cost: t2 - t1
                 }
-                return reply.code(statusCode).type(`${mediaType}; charset=utf-8`).send(JSON.stringify(result));
+                let backRespSend = JSON.stringify(result);
+                console.log(backRespSend);
+                return reply.code(statusCode).type(`${mediaType}; charset=utf-8`).send(backRespSend);
             } else {
                 return reply.status(404).send({error: `${jxName}解析失败`});
             }

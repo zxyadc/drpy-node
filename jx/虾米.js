@@ -1,6 +1,13 @@
 // http://localhost:5757/parse/虾米?url=https://v.qq.com/x/cover/mzc00200vkqr54u/v4100qp69zl.html
 const {getHtml} = $.require('./_lib.request.js')
 
+const jx = {
+    header: {
+        'User-Agent': MOBILE_UA,
+        'Referer': 'https://jx.xmflv.com/?url='
+    },
+};
+
 async function lazy(input, params) {
     console.log('input:', input);
     const t = Date.now()
@@ -16,7 +23,7 @@ async function lazy(input, params) {
         }).toString()
     };
     let reqs = (await getHtml({
-        url: "https://122.228.8.29:4433/xmflv.js",
+        url: 'https://122.228.8.29:4433/xmflv.js',
         method: 'POST',
         headers: {},
         data: qs.stringify({

@@ -21,7 +21,7 @@ import AIS from '../utils/ais.js';
 // const { req } = await import('../utils/req.js');
 import {gbkTool} from '../libs_drpy/gbk.js'
 // import {atob, btoa, base64Encode, base64Decode, md5} from "../libs_drpy/crypto-util.js";
-import {base64Decode, base64Encode, md5, rc4Decrypt, rc4Encrypt, rc4, rc4_decode} from "../libs_drpy/crypto-util.js";
+import {base64Decode, base64Encode, md5, rc4, rc4_decode, rc4Decrypt, rc4Encrypt} from "../libs_drpy/crypto-util.js";
 import {getContentType, getMimeType} from "../utils/mime-type.js";
 import "../utils/random-http-ua.js";
 import template from '../libs_drpy/template.js'
@@ -287,6 +287,7 @@ export async function getSandbox(env = {}) {
         module: {},   // 模块支持
         exports: {},   // 模块支持
         rule: {}, // 用于存放导出的 rule 对象
+        jx: {},// 用于存放导出的 解析 对象
         lazy: async function () {
         }, // 用于导出解析的默认函数
         _asyncGetRule: null,
@@ -489,42 +490,41 @@ export async function initJx(filePath, env, refresh) {
         const fileContent = await readFile(filePath, 'utf-8');
         // 计算文件的 hash 值
         const fileHash = computeHash(fileContent);
+
+        let hashMd5 = md5(filePath + '#pAq#' + (env === {} ? 0 : 1));
+
         // 检查缓存：是否有文件且未刷新且文件 hash 未变化
-        if (jxCache.has(filePath) && !refresh) {
-            const cached = jxCache.get(filePath);
+        if (jxCache.has(hashMd5) && !refresh) {
+            const cached = jxCache.get(hashMd5);
             if (cached.hash === fileHash) {
                 // log(`Module ${filePath} already initialized and unchanged, returning cached instance.`);
-                return cached.lazy;
+                return cached.jxObj;
             }
         }
         log(`Loading jx: ${filePath}`);
         let t1 = utils.getNowTime();
-        const {sandbox, context} = await getSandbox(env)
+        const {sandbox, context} = await getSandbox(env);
         // 执行文件内容，将其放入沙箱中
         const js_code = getOriginalJs(fileContent);
         const js_code_wrapper = `
     _asyncGetLazy  = (async function() {
         ${js_code}
-        return lazy;
+        return {jx,lazy};
     })();
     `;
         const ruleScript = new vm.Script(js_code_wrapper);
         ruleScript.runInContext(context);
-        sandbox.lazy = await sandbox._asyncGetLazy;
-
-        // const js_code = getOriginalJs(fileContent);
-        // const ruleScript = new vm.Script(js_code);
-        // ruleScript.runInContext(context);
-
+        const jxResult = await sandbox._asyncGetLazy;
+        sandbox.lazy = jxResult.lazy;
+        sandbox.jx = jxResult.jx;
         const reqExtendScript = new vm.Script(req_extend_code);
         reqExtendScript.runInContext(context);
-
         let t2 = utils.getNowTime();
-        const lazy = sandbox.lazy;
+        const jxObj = {...sandbox.jx, lazy: sandbox.lazy};
         const cost = t2 - t1;
         console.log(`加载解析:${filePath} 耗时 ${cost}毫秒`)
-        jxCache.set(filePath, {lazy, hash: fileHash});
-        return lazy;
+        jxCache.set(hashMd5, {jxObj, hash: fileHash});
+        return jxObj;
     } catch (error) {
         console.log('Error in drpy.initJx:', error);
         throw new Error(`Failed to initialize jx:${error.message}`);
@@ -877,6 +877,9 @@ async function homeParse(rule) {
         pdfh: jsp.pdfh.bind(jsp),
         pdfa: jsp.pdfa.bind(jsp),
         pd: jsp.pd.bind(jsp),
+        pjfh: jsp.pjfh.bind(jsp),
+        pjfa: jsp.pjfa.bind(jsp),
+        pj: jsp.pj.bind(jsp),
     }
 
 }
@@ -928,6 +931,9 @@ async function homeVodParse(rule) {
         pdfh: jsp.pdfh.bind(jsp),
         pdfa: jsp.pdfa.bind(jsp),
         pd: jsp.pd.bind(jsp),
+        pjfh: jsp.pjfh.bind(jsp),
+        pjfa: jsp.pjfa.bind(jsp),
+        pj: jsp.pj.bind(jsp),
     }
 }
 
@@ -990,6 +996,9 @@ async function cateParse(rule, tid, pg, filter, extend) {
         pdfh: jsp.pdfh.bind(jsp),
         pdfa: jsp.pdfa.bind(jsp),
         pd: jsp.pd.bind(jsp),
+        pjfh: jsp.pjfh.bind(jsp),
+        pjfa: jsp.pjfa.bind(jsp),
+        pj: jsp.pj.bind(jsp),
     }
 }
 
@@ -1036,6 +1045,9 @@ async function detailParse(rule, ids) {
         pdfa: jsp.pdfa.bind(jsp),
         pd: jsp.pd.bind(jsp),
         pdfl: jsp.pdfl.bind(jsp), // 二级绑定pdfl函数
+        pjfh: jsp.pjfh.bind(jsp),
+        pjfa: jsp.pjfa.bind(jsp),
+        pj: jsp.pj.bind(jsp),
     }
 }
 
@@ -1092,6 +1104,9 @@ async function searchParse(rule, wd, quick, pg) {
         pdfh: jsp.pdfh.bind(jsp),
         pdfa: jsp.pdfa.bind(jsp),
         pd: jsp.pd.bind(jsp),
+        pjfh: jsp.pjfh.bind(jsp),
+        pjfa: jsp.pjfa.bind(jsp),
+        pj: jsp.pj.bind(jsp),
     }
 
 }
@@ -1130,6 +1145,9 @@ async function playParse(rule, flag, id, flags) {
         pdfh: jsp.pdfh.bind(jsp),
         pdfa: jsp.pdfa.bind(jsp),
         pd: jsp.pd.bind(jsp),
+        pjfh: jsp.pjfh.bind(jsp),
+        pjfa: jsp.pjfa.bind(jsp),
+        pj: jsp.pj.bind(jsp),
     }
 }
 
@@ -1265,10 +1283,22 @@ export async function getRule(filePath, env) {
 export async function jx(filePath, env, params) {
     params = params || {};
     try {
-        const lazy = await initJx(filePath, env); // 确保模块已初始化
+        const jxObj = await initJx(filePath, env); // 确保模块已初始化
+        const lazy = await jxObj.lazy;
         return await lazy(params.url || '', params)
     } catch (e) {
         return {code: 404, url: '', msg: `${filePath} 代理解析错误:${e.message}`, cost: ''}
+    }
+}
+
+export async function getJx(filePath) {
+    try {
+        // 确保模块已初始化
+        const jxObj = await initJx(filePath, {});
+        // console.log('jxObj:', jxObj);
+        return jxObj;
+    } catch (e) {
+        return {code: 403, error: `${filePath} 获取代理信息错误:${e.message}`}
     }
 }
 

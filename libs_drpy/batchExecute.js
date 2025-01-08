@@ -5,10 +5,12 @@ import fastq from 'fastq';
  * @param {Array} tasks - Array of task objects, each containing func, param, and id.
  * @param {Object} listener - Progress listener object containing func and param.
  * @param {number} [successCount] - Number of successful tasks to wait for before stopping.
+ * @param {number} max_task - Number of task count
  * @returns {Promise<void>} - Resolves when the required tasks are complete or all tasks are processed.
  */
-async function batchExecute(tasks, listener, successCount) {
-    const maxConcurrency = 16; // Maximum number of concurrent tasks
+async function batchExecute(tasks, listener, successCount, max_task = 0) {
+    const maxConcurrency = Number(max_task) || Number(process.env.MAX_TASK) || 2; // Maximum number of concurrent tasks
+    console.log(`batchExecute with max_task: ${maxConcurrency}`);
     let completedSuccess = 0;
     let stopExecution = false;
 

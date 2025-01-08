@@ -4,4 +4,5 @@
 采集之王[合]@?type=url&params=../json/采集静态.json$1@采王道长[合]
 采集之王[合]@?type=url&params=../json/采集[zy]静态.json$1@采王zy[密]
 采集之王[合]@?type=url&params=../json/采集[密]静态.json$1$@采王成人[密]
+采集之王[合]@?type=url&params=../json/采集2024静态.json$1$@采王2024
 UC分享@?type=url&params=../json/UC分享.json@UC分享[盘]
