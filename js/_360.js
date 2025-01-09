@@ -1,9 +1,9 @@
 // js/_360.js
-
 var rule = {
     title: '标题1',
     description: '这是描述',
     category: '视频',
+    searchUrl: '11',
     class_parse: async () => {
         console.log('执行了分类获取')
         log(typeof atob)
@@ -31,16 +31,16 @@ var rule = {
     一级: async () => {
         // await sleep(200);
         sleepSync(200);
-        let html = await req('123');
+        let html = (await req('123')).content;
         console.log('title:', rule.title);
-        console.log('html:' + html);
+        console.log('html:', html);
         return html + '\n' + '这是一级:' + rule.title
     },
     二级: async () => {
         return '这是二级:' + rule.title
     },
     搜索: async () => {
-        return '这是搜索:' + rule.title
+        return ['这是搜索:' + rule.title]
     },
     lazy: async () => {
         return '这是播放:' + rule.title

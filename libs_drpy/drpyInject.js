@@ -60,59 +60,59 @@ function localDelete(storage, key) {
 }
 
 async function request(url, opt = {}) {
+    // console.log('进入了req...');
+    // 解构参数并设置默认值
+    const {
+        data: _data = null,
+        body = '',
+        postType = null,
+        buffer: returnBuffer = 0,
+        timeout = 5000,
+        redirect = 1,
+        encoding: userEncoding = '',
+        headers: userHeaders = {},
+        method = 'get',
+        proxy = false,
+        stream = null,
+    } = opt;
+
+    let data = body || _data;
+    let encoding = userEncoding;
+
+    // 设置默认 Content-Type
+    const headers = keysToLowerCase({
+        ...userHeaders,
+        ...(postType === 'form' && {'Content-Type': 'application/x-www-form-urlencoded'}),
+        ...(postType === 'form-data' && {'Content-Type': 'multipart/form-data'}),
+    });
+
+    // 添加accept属性防止获取网页源码编码不正确问题
+    if (!Object.keys(headers).includes('accept')) {
+        headers['accept'] = '*/*';
+    }
+
+    // 尝试从 Content-Type 中提取编码
+    if (headers['content-type'] && /charset=(.*)/i.test(headers['content-type'])) {
+        encoding = headers['content-type'].match(/charset=(.*)/i)[1];
+    }
+
+    // 根据 postType 处理数据
+    if (postType === 'form' && data != null) {
+        data = qs.stringify(data, {encode: false});
+    } else if (postType === 'form-data') {
+        data = toFormData(data);
+    }
+
+    // 配置代理或 HTTPS Agent
+    const agent = proxy
+        ? tunnel.httpsOverHttp({proxy: {host: '127.0.0.1', port: 7890}})
+        : new https.Agent({rejectUnauthorized: false});
+
+    // 设置响应类型为 arraybuffer，确保能正确处理编码
+    const respType = returnBuffer ? 'arraybuffer' : 'arraybuffer';
+
+    console.log(`req: ${url} headers: ${JSON.stringify(headers)} data: ${JSON.stringify(data)}`);
     try {
-        // 解构参数并设置默认值
-        const {
-            data: _data = null,
-            body = '',
-            postType = null,
-            buffer: returnBuffer = 0,
-            timeout = 5000,
-            redirect = 1,
-            encoding: userEncoding = '',
-            headers: userHeaders = {},
-            method = 'get',
-            proxy = false,
-            stream = null,
-        } = opt;
-
-        let data = body || _data;
-        let encoding = userEncoding;
-
-        // 设置默认 Content-Type
-        const headers = keysToLowerCase({
-            ...userHeaders,
-            ...(postType === 'form' && {'Content-Type': 'application/x-www-form-urlencoded'}),
-            ...(postType === 'form-data' && {'Content-Type': 'multipart/form-data'}),
-        });
-
-        // 添加accept属性防止获取网页源码编码不正确问题
-        if (!Object.keys(headers).includes('accept')) {
-            headers['accept'] = '*/*';
-        }
-
-        // 尝试从 Content-Type 中提取编码
-        if (headers['content-type'] && /charset=(.*)/i.test(headers['content-type'])) {
-            encoding = headers['content-type'].match(/charset=(.*)/i)[1];
-        }
-
-        // 根据 postType 处理数据
-        if (postType === 'form' && data != null) {
-            data = qs.stringify(data, {encode: false});
-        } else if (postType === 'form-data') {
-            data = toFormData(data);
-        }
-
-        // 配置代理或 HTTPS Agent
-        const agent = proxy
-            ? tunnel.httpsOverHttp({proxy: {host: '127.0.0.1', port: 7890}})
-            : new https.Agent({rejectUnauthorized: false});
-
-        // 设置响应类型为 arraybuffer，确保能正确处理编码
-        const respType = returnBuffer ? 'arraybuffer' : 'arraybuffer';
-
-        console.log(`req: ${url} headers: ${JSON.stringify(headers)} data: ${JSON.stringify(data)}`);
-
         // 发送请求
         const resp = await axios({
             url: typeof url === 'object' ? url.url : url,
@@ -160,19 +160,31 @@ async function request(url, opt = {}) {
             }
             return 'stream...';
         }
-
         return {code: resp.status, headers: resHeader, content: responseData};
     } catch (error) {
         const {response: resp} = error;
         console.error(`Request error: ${error.message}`);
+        let responseData = '';
+        // console.log('responseData:',responseData);
+        try {
+            const buffer = Buffer.from(resp.data);
+            if (encoding && encoding.toLowerCase() !== 'utf-8') {
+                // console.log('Detected encoding:', encoding);
+                responseData = iconv.decode(buffer, encoding);
+            } else {
+                responseData = buffer.toString('utf-8');
+            }
+        } catch (e) {
+            console.error(`get error response Text failed: ${e.message}`);
+        }
+        // console.log('responseData:',responseData);
         return {
             code: resp?.status || 500,
             headers: resp?.headers || {},
-            content: typeof resp?.data === 'object' ? JSON.stringify(resp.data) : resp?.data || '',
+            content: responseData || '',
         };
     }
 }
-
 
 function base64EncodeBuf(buff, urlsafe = false) {
     return buff.toString(urlsafe ? 'base64url' : 'base64');

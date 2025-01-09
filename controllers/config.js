@@ -5,6 +5,7 @@ import {naturalSort, urljoin} from '../utils/utils.js'
 import {ENV} from "../utils/env.js";
 import {validatePwd} from "../utils/api_validate.js";
 import {getSitesMap} from "../utils/sites-map.js";
+import {getParsesDict} from "../utils/file.js";
 import batchExecute from '../libs_drpy/batchExecute.js';
 
 const {jsEncoder} = drpy;
@@ -136,6 +137,7 @@ async function generateSiteJSON(jsDir, configDir, requestHost, sub, subFilePath,
 async function generateParseJSON(jxDir, requestHost) {
     const files = readdirSync(jxDir);
     const jx_files = files.filter((file) => file.endsWith('.js') && !file.startsWith('_')) // 筛选出不是 "_" 开头的 .js 文件
+    const jx_dict = getParsesDict();
     let parses = [];
     const tasks = jx_files.map((file) => {
         return {
@@ -204,6 +206,9 @@ async function generateParseJSON(jxDir, requestHost) {
         param: {}, // 外部参数可以在这里传入
     };
     await batchExecute(tasks, listener);
+    let sorted_parses = naturalSort(parses, 'name', ['JSON并发', 'JSON合集', '虾米', '奇奇']);
+    let sorted_jx_dict = naturalSort(jx_dict, 'name', ['J', 'W']);
+    parses = sorted_parses.concat(sorted_jx_dict);
     return {parses};
 }
 

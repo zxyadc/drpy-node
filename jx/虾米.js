@@ -1,10 +1,10 @@
 // http://localhost:5757/parse/虾米?url=https://v.qq.com/x/cover/mzc00200vkqr54u/v4100qp69zl.html
+// https://jx.xmflv.com/?url=https://v.qq.com/x/cover/mzc00200qon7vo3/b4100sccuyb.html
 const {getHtml} = $.require('./_lib.request.js')
-
 const jx = {
     header: {
-        'User-Agent': MOBILE_UA,
-        'Referer': 'https://jx.xmflv.com/?url='
+        'User-Agent': PC_UA,
+        'Referer': 'https://jx.xmflv.com'
     },
 };
 
@@ -22,24 +22,32 @@ async function lazy(input, params) {
             padding: CryptoJS.pad.ZeroPadding
         }).toString()
     };
+    let ua = randomUa.generateUa();
     let reqs = (await getHtml({
-        url: 'https://122.228.8.29:4433/xmflv.js',
+        url: "https://122.228.8.29:4433/xmflv.js",
         method: 'POST',
-        headers: {},
+        headers: {'User-Agent': ua, 'Origin': 'https://jx.xmflv.com'},
         data: qs.stringify({
             'wap': '',
             'url': encodeURIComponent(input),
             'time': t,
             'key': sign(a)
         }),
-    })).data
+    })).data;
     let key = reqs.aes_key
     let iv = reqs.aes_iv
     let play_url = reqs.url
     // let m3u8 = (await axios.request({
     //     url:m3u8_url
     // })).data
-    return decrypt(play_url, key, iv)
+    return {
+        url: decrypt(play_url, key, iv),
+        header: {
+            'origin': 'https://jx.xmflv.cc/',
+            // 'Origin': 'https://jx.xmflv.com',
+            'User-Agent': ua,
+        }
+    }
 }
 
 function decrypt(text, aes_key, aes_iv) {

@@ -24,13 +24,13 @@ console.log('__dirname:', __dirname);
         const result3 = await drpy.cate(modulePath); // 调用 cate 方法
 
         console.log('Calling detail...');
-        const result4 = await drpy.detail(modulePath); // 调用 detail 方法
+        const result4 = await drpy.detail(modulePath, {}, [1]); // 调用 detail 方法
 
         console.log('Calling search...');
-        const result5 = await drpy.search(modulePath); // 调用 search 方法
+        const result5 = await drpy.search(modulePath, {}, '我的'); // 调用 search 方法
 
         console.log('Calling play...');
-        const result6 = await drpy.play(modulePath); // 调用 play 方法
+        const result6 = await drpy.play(modulePath, {}, 'flag', '11'); // 调用 play 方法
 
         console.log('Result1:', result1);
         console.log('Result2:', result2);

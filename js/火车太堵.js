@@ -3,10 +3,13 @@ var rule = {
     title: '火车太堵',
     alias: '电影猎手',
     desc: 'mxpro模板纯js写法',
-    host: 'https://tdgo.shop',
+    // host: 'https://tdgo.shop',
+    host: 'https://tdwin.wiki',
     url: '/vodshow/fyclass--------fypage---.html',
     searchUrl: '/vodsearch/**----------fypage---.html',
-    headers: {'User-Agent': 'UC_UA'},
+    headers: {
+        'User-Agent': 'PC_UA',
+    },
     searchable: 1, quickSearch: 0, filterable: 0, double: true, play_parse: true, limit: 6,
     class_name: '电影&电视剧&动漫&短剧&综艺',
     class_url: '20&21&22&24&23',
@@ -31,6 +34,7 @@ var rule = {
     推荐: async function () {
         let {input, pdfa, pdfh, pd} = this;
         let html = await request(input);
+        // log(html);
         let d = [];
         let data = pdfa(html, '.tab-list.active');
         data.forEach((it) => {

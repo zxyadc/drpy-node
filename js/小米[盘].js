@@ -93,7 +93,7 @@ var rule = {
                 title: pdfh(it, 'img&&alt'),
                 pic_url: pd(it, 'img&&data-src'),
                 desc: pdfh(it, '.video-serial&&Text'),
-                url: pd(it, 'a&&href'),
+                url: pd(it, 'a:eq(-1)&&href'),
                 content: pdfh(it, '.video-info-items:eq(-1)&&Text'),
             })
         });

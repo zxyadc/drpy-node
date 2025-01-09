@@ -4,7 +4,8 @@ const {
 } = misc;
 var rule = {
     title: '虎斑[盘]',
-    host: 'https://wp.huban.xyz',
+    // host: 'https://wp.huban.xyz',
+    host: 'http://45.207.212.215:12121',
     url: '/index.php/vod/show/id/fyfilter.html',
     filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
     searchUrl: '/index.php/vod/search/page/fypage/wd/**.html',
@@ -105,22 +106,22 @@ var rule = {
         return vod
     },
     搜索: async function (wd, quick, pg) {
-        let {input} = this
-        let html = (await getHtml(input)).data
-        const $ = pq(html)
-        let videos = []
-        $('.module-items .module-search-item').each((index, item) => {
-            const a = $(item).find('a:first')[0];
-            const img = $(item).find('img:first')[0];
-            const content = $(item).find('.module-item-text:first').text();
-            videos.push({
-                "vod_name": a.attribs.title,
-                "vod_id": a.attribs.href,
-                "vod_remarks": content,
-                "vod_pic": img.attribs['data-src']
+        let {input, pdfa, pdfh, pd} = this;
+        let html = await request(input);
+        let d = [];
+        let data = pdfa(html, '.module-items .module-search-item');
+        data.forEach((it) => {
+            d.push({
+                title: pdfh(it, 'a&&title'),
+                pic_url: pd(it, 'img&&data-src'),
+                desc: pdfh(it, '.video-text&&Text'),
+                url: pd(it, 'a:eq(-1)&&href'),
+                content: pdfh(it, '.video-info-items:eq(-1)&&Text'),
             })
-        })
-        return videos
+        });
+        return setResult(d);
+
+
     },
     lazy: async function (flag, id, flags) {
         let {input, mediaProxyUrl} = this;

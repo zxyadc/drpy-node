@@ -1,6 +1,4 @@
 // http://localhost:5757/parse/爱奇艺?url=https://www.iqiyi.com/v_ir1vbyxi4w.html
-const axios = require('axios');
-
 async function lazy(input, params) {
     const url = 'http://api.zn0534.com/';
     const tidData = {

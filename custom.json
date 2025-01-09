@@ -1,5 +1,5 @@
 {
-  "sites_count": 69,
+  "sites_count": 70,
   "sites": [
     {
       "key": "drpyS_设置中心",
@@ -134,16 +134,6 @@
       "ext": "H4sIAAAAAAAAA9PT088qzs/TD3V+2tH2ZNdqPRAPAKubOwMVAAAA"
     },
     {
-      "key": "drpyS_多多[盘]",
-      "name": "多多[盘](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/多多[盘]",
-      "searchable": 1,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
       "key": "drpyS_团长资源[盘]",
       "name": "团长资源[盘](DS)",
       "type": 4,
@@ -151,6 +141,16 @@
       "searchable": 1,
       "filterable": 0,
       "quickSearch": 1,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_多多[盘]",
+      "name": "多多[盘](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/多多[盘]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
       "ext": ""
     },
     {
@@ -362,6 +362,16 @@
       "filterable": 1,
       "quickSearch": 0,
       "ext": "H4sIAAAAAAAAA9PT088qzs/Tf9ne/nJ2W3RVZezLuTOfNTTqgURVDAGu/MCKHwAAAA=="
+    },
+    {
+      "key": "drpyS_大嫂TV[密]",
+      "name": "大嫂TV[密](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/大嫂TV[密]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
     },
     {
       "key": "drpyS_动漫巴士[漫]",
@@ -726,9 +736,9 @@
   ],
   "parses": [
     {
-      "name": "json1",
-      "url": "http://localhost:5757/parse/json1?url=",
-      "type": 1,
+      "name": "JSON并发",
+      "url": "http://localhost:5757/parse/JSON并发?url=",
+      "type": 2,
       "ext": {
         "flag": [
           "qiyi",
@@ -739,22 +749,18 @@
           "qq 预告及花絮",
           "腾讯",
           "youku",
-          "优酷"
-        ]
-      },
-      "header": {
-        "User-Agent": "Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.91 Mobile Safari/537.36"
-      }
-    },
-    {
-      "name": "奇奇",
-      "url": "http://localhost:5757/parse/奇奇?url=",
-      "type": 1,
-      "ext": {
-        "flag": [
-          "qiyi",
-          "爱奇艺",
-          "奇艺"
+          "优酷",
+          "pptv",
+          "PPTV",
+          "letv",
+          "乐视",
+          "leshi",
+          "mgtv",
+          "芒果",
+          "sohu",
+          "xigua",
+          "fun",
+          "风行"
         ]
       },
       "header": {
@@ -762,9 +768,9 @@
       }
     },
     {
-      "name": "web1",
-      "url": "https://bfq.cfwlgzs.cn/player?url=",
-      "type": 0,
+      "name": "JSON合集",
+      "url": "http://localhost:5757/parse/JSON合集?url=",
+      "type": 3,
       "ext": {
         "flag": [
           "qiyi",
@@ -775,11 +781,22 @@
           "qq 预告及花絮",
           "腾讯",
           "youku",
-          "优酷"
+          "优酷",
+          "pptv",
+          "PPTV",
+          "letv",
+          "乐视",
+          "leshi",
+          "mgtv",
+          "芒果",
+          "sohu",
+          "xigua",
+          "fun",
+          "风行"
         ]
       },
       "header": {
-        "User-Agent": "Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.91 Mobile Safari/537.36"
+        "User-Agent": "Mozilla/5.0"
       }
     },
     {
@@ -811,8 +828,105 @@
         ]
       },
       "header": {
-        "User-Agent": "Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.91 Mobile Safari/537.36",
-        "Referer": "https://jx.xmflv.com/?url="
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36",
+        "Referer": "https://jx.xmflv.com"
+      }
+    },
+    {
+      "name": "奇奇",
+      "url": "http://localhost:5757/parse/奇奇?url=",
+      "type": 1,
+      "ext": {
+        "flag": [
+          "qiyi",
+          "爱奇艺",
+          "奇艺"
+        ]
+      },
+      "header": {
+        "User-Agent": "Mozilla/5.0"
+      }
+    },
+    {
+      "name": "json1",
+      "url": "http://localhost:5757/parse/json1?url=",
+      "type": 1,
+      "ext": {
+        "flag": [
+          "qiyi",
+          "imgo",
+          "爱奇艺",
+          "奇艺",
+          "qq",
+          "qq 预告及花絮",
+          "腾讯",
+          "youku",
+          "优酷"
+        ]
+      },
+      "header": {
+        "User-Agent": "Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.91 Mobile Safari/537.36"
+      }
+    },
+    {
+      "name": "web1",
+      "url": "https://bfq.cfwlgzs.cn/player?url=",
+      "type": 0,
+      "ext": {
+        "flag": [
+          "qiyi",
+          "imgo",
+          "爱奇艺",
+          "奇艺",
+          "qq",
+          "qq 预告及花絮",
+          "腾讯",
+          "youku",
+          "优酷"
+        ]
+      },
+      "header": {
+        "User-Agent": "Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.91 Mobile Safari/537.36"
+      }
+    },
+    {
+      "name": "J1",
+      "url": "https://zy.qiaoji8.com/gouzi.php?url=",
+      "type": 1,
+      "header": {
+        "User-Agent": "Mozilla/5.0"
+      }
+    },
+    {
+      "name": "J2",
+      "url": "https://jxjson.icu/neibu.php?url=",
+      "type": 1,
+      "header": {
+        "User-Agent": "Mozilla/5.0"
+      }
+    },
+    {
+      "name": "W1",
+      "url": "https://jx.xymp4.cc/?url=",
+      "type": 0,
+      "header": {
+        "User-Agent": "Mozilla/5.0"
+      }
+    },
+    {
+      "name": "W11",
+      "url": "https://www.ckplayer.vip/jiexi/?url=",
+      "type": 0,
+      "header": {
+        "User-Agent": "Mozilla/5.0"
+      }
+    },
+    {
+      "name": "HGvip",
+      "url": "http://1.94.221.189:88/algorithm.php?url=",
+      "type": 1,
+      "header": {
+        "User-Agent": "Mozilla/5.0"
       }
     }
   ],

@@ -23,6 +23,7 @@ import {gbkTool} from '../libs_drpy/gbk.js'
 // import {atob, btoa, base64Encode, base64Decode, md5} from "../libs_drpy/crypto-util.js";
 import {base64Decode, base64Encode, md5, rc4, rc4_decode, rc4Decrypt, rc4Encrypt} from "../libs_drpy/crypto-util.js";
 import {getContentType, getMimeType} from "../utils/mime-type.js";
+import {getParsesDict} from "../utils/file.js";
 import "../utils/random-http-ua.js";
 import template from '../libs_drpy/template.js'
 import batchExecute from '../libs_drpy/batchExecute.js';
@@ -155,7 +156,7 @@ export async function getSandbox(env = {}) {
         getProxyUrl,
         hostUrl,
         fServer,
-        getContentType, getMimeType,
+        getContentType, getMimeType, getParsesDict
     };
     const drpySanbox = {
         jsp,
@@ -327,14 +328,14 @@ export async function getSandbox(env = {}) {
  * @param refresh 强制清除缓存
  * @returns {Promise<object>} - 返回初始化后的模块对象
  */
-export async function init(filePath, env, refresh) {
+export async function init(filePath, env = {}, refresh) {
     try {
         // 读取文件内容
         const fileContent = await readFile(filePath, 'utf-8');
         // 计算文件的 hash 值
         const fileHash = computeHash(fileContent);
         const moduleName = path.basename(filePath, '.js');
-        let moduleExt = env.ext;
+        let moduleExt = env.ext || '';
         // log('moduleName:', moduleName);
         // log('moduleExt:', moduleExt);
         let SitesMap = getSitesMap(_config_path);
@@ -501,7 +502,7 @@ export async function initJx(filePath, env, refresh) {
                 return cached.jxObj;
             }
         }
-        log(`Loading jx: ${filePath}`);
+        log(`Loading jx: ${filePath}, hash:${hashMd5}`);
         let t1 = utils.getNowTime();
         const {sandbox, context} = await getSandbox(env);
         // 执行文件内容，将其放入沙箱中
@@ -1013,7 +1014,7 @@ async function cateParseAfter(d, pg) {
 }
 
 async function detailParse(rule, ids) {
-    let vid = ids[0];
+    let vid = ids[0].toString();
     let orId = vid;
     let fyclass = '';
     log('orId:' + orId);
