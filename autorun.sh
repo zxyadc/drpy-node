@@ -383,6 +383,18 @@ backup_files_and_cookie_auth_code() {
         echo -e "${RED}备份map.txt文件失败。${NC}"
         exit 1
     fi
+
+    # 备份parses.conf文件
+    local parses_conf_path="$REPO_DIR/$PROJECT_NAME/config/parses.conf"
+    local parses_conf_backup_file="parses.conf.backup_$(date +%Y%m%d)"
+    echo -e "${YELLOW}正在备份parses.conf文件...${NC}"
+    cp "$parses_conf_path" "./$parses_conf_backup_file"
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}parses.conf文件已备份为 $parses_conf_backup_file${NC}"
+    else
+        echo -e "${RED}备份parses.conf文件失败。${NC}"
+        exit 1
+    fi
 }
 
 # 定义恢复函数
@@ -437,6 +449,23 @@ restore_env_json_and_cookie_auth_code() {
         echo -e "${RED}备份文件 $map_txt_backup_file 不存在，无法恢复map.txt文件。${NC}"
         exit 1
     fi
+    
+    # 恢复parses.conf文件
+    local parses_conf_backup_file="parses.conf.backup_$(date +%Y%m%d)"
+    if [ -f "./$parses_conf_backup_file" ]; then
+        echo -e "${YELLOW}正在恢复parses.conf文件...${NC}"
+        cp "./$parses_conf_backup_file" "$REPO_DIR/$PROJECT_NAME/config/parses.conf"
+        if [ $? -eq 0 ]; then
+            echo -e "${GREEN}parses.conf文件已恢复。${NC}"
+            rm "./$parses_conf_backup_file"  # 删除备份文件
+        else
+            echo -e "${RED}恢复parses.conf文件失败。${NC}"
+            exit 1
+        fi
+    else
+        echo -e "${RED}备份文件 $parses_conf_backup_file 不存在，无法恢复parses.conf文件。${NC}"
+        exit 1
+    fi 
 }
 
 # 尝试次数限制，避免无限循环
