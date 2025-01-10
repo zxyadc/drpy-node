@@ -9,7 +9,7 @@ const {
 } = $.require('./_lib.scan.js');
 // 访问测试 http://127.0.0.1:5757/api/设置中心?ac=action&action=set-cookie
 // 访问测试 http://127.0.0.1:5757/api/设置中心?ac=action&action=quarkCookieConfig&value={"cookie":"我是cookie"}
-
+const AI_Cache = {};
 
 let gitPublicUrl = 'https://github.catvod.com/https://raw.githubusercontent.com/hjdhnx/drpy-node/refs/heads/main/public/';
 let liveImgUrl = urljoin(gitPublicUrl, './images/lives.jpg');
@@ -119,6 +119,7 @@ var rule = {
                     msgType: 'long_text',
                     httpTimeout: 60,
                     canceledOnTouchOutside: false,
+                    selectData: '新的对话:=清空AI对话记录'
                 })
             },
             {name: '查看夸克cookie', action: '查看夸克cookie'},
@@ -264,7 +265,7 @@ var rule = {
                 d.push(getInput('get_hide_adult', '查看青少年模式', images.settings));
                 d.push(genMultiInput('thread', '设置播放代理线程数', '默认为1，可自行配置成其他值如:10', images.settings));
                 d.push(getInput('get_thread', '查看播放代理线程数', images.settings));
-                d.push(genMultiInput('now_ai', '设置当前AI', '1: 讯飞星火 2:deepseek 3.讯飞智能体\n如果不填，连续对话默认使用讯飞星火', images.settings));
+                d.push(genMultiInput('now_ai', '设置当前AI', '1: 讯飞星火 2:deepseek 3.讯飞智能体 4.Kimi \n如果不填，连续对话默认使用讯飞星火', images.settings));
                 d.push(getInput('get_now_ai', '查看当前AI', images.settings));
                 d.push(genMultiInput('allow_forward', '设置允许代理转发', '设置为1可启用此功能，有一定的使用场景用于突破网络限制', images.settings));
                 d.push(getInput('get_allow_forward', '查看允许代理转发', images.settings));
@@ -374,10 +375,23 @@ var rule = {
                     toast: '你要去看视频了'
                 });
             }
+            if (prompt.startsWith('清空AI对话记录')) {
+                Object.keys(AI_Cache).forEach(key => {
+                    delete AI_Cache[key];
+                });
+                return JSON.stringify({
+                    action: {
+                        actionId: '__keep__',
+                        msg: '准备开始新的对话...',
+                        reset: true
+                    },
+                    toast: '记录已清除，可以开始新的对话了'
+                });
+            }
             let user1 = '你';
             let user2 = 'AI';
             let replyContent = prompt;
-            if (ENV.get('spark_ai_authKey')) {
+            if (['1', '2', '3', '4'].includes(ENV.get('now_ai', '1'))) {
                 if (rule.askLock) {
                     return JSON.stringify({
                         action: {
@@ -391,23 +405,41 @@ var rule = {
                 let AI = null;
                 switch (ENV.get('now_ai', '1')) {
                     case '1':
-                        AI = new AIS.SparkAI({
-                            authKey: ENV.get('spark_ai_authKey'),
-                            baseURL: 'https://spark-api-open.xf-yun.com',
-                        });
+                        if (!AI_Cache['1']) {
+                            AI_Cache['1'] = new AIS.SparkAI({
+                                authKey: ENV.get('spark_ai_authKey'),
+                                baseURL: 'https://spark-api-open.xf-yun.com',
+                            });
+                        }
+                        AI = AI_Cache['1'];
                         user2 = '讯飞星火';
                         break;
                     case '2':
-                        AI = new AIS.DeepSeek({
-                            apiKey: ENV.get('deepseek_apiKey'),
-                        });
+                        if (!AI_Cache['2']) {
+                            AI_Cache['2'] = new AIS.DeepSeek({
+                                apiKey: ENV.get('deepseek_apiKey'),
+                            });
+                        }
+                        AI = AI_Cache['2'];
                         user2 = 'deepSeek';
                         break;
                     case '3':
-                        const sparkBotObject = ENV.get('sparkBotObject', {}, 1);
-                        // log('sparkBotObject:', sparkBotObject);
-                        AI = new AIS.SparkAIBot(sparkBotObject.appId, sparkBotObject.uid, sparkBotObject.assistantId);
+                        if (!AI_Cache['3']) {
+                            const sparkBotObject = ENV.get('sparkBotObject', {}, 1);
+                            log('sparkBotObject:', sparkBotObject);
+                            AI_Cache['3'] = new AIS.SparkAIBot(sparkBotObject.appId, sparkBotObject.uid, sparkBotObject.assistantId);
+                        }
+                        AI = AI_Cache['3'];
                         user2 = '讯飞智能体';
+                        break;
+                    case '4':
+                        if (!AI_Cache['4']) {
+                            AI_Cache['4'] = new AIS.Kimi({
+                                apiKey: ENV.get('kimi_apiKey'),
+                            });
+                        }
+                        AI = AI_Cache['4'];
+                        user2 = 'Kimi';
                         break;
                 }
                 if (!AI) {
@@ -415,7 +447,7 @@ var rule = {
                 }
                 rule.askLock = 1;
                 try {
-                    replyContent = await AI.ask(prompt, {temperature: 1.0});
+                    replyContent = await AI.ask('道长', prompt, {temperature: 1.0});
                 } catch (error) {
                     replyContent = error.message;
                 }

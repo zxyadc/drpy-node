@@ -1,5 +1,5 @@
 {
-  "sites_count": 70,
+  "sites_count": 72,
   "sites": [
     {
       "key": "drpyS_设置中心",
@@ -21,7 +21,7 @@
           },
           {
             "name": "连续对话",
-            "action": "{\"actionId\":\"连续对话\",\"id\":\"talk\",\"type\":\"input\",\"title\":\"连续对话\",\"tip\":\"请输入消息\",\"value\":\"\",\"msg\":\"开始新的对话\",\"button\":3,\"imageUrl\":\"https://img2.baidu.com/it/u=1206278833,3265480730&fm=253&fmt=auto&app=120&f=JPEG?w=800&h=800\",\"imageHeight\":200,\"imageType\":\"card_pic_3\",\"keep\":true,\"width\":680,\"height\":800,\"msgType\":\"long_text\",\"httpTimeout\":60,\"canceledOnTouchOutside\":false}"
+            "action": "{\"actionId\":\"连续对话\",\"id\":\"talk\",\"type\":\"input\",\"title\":\"连续对话\",\"tip\":\"请输入消息\",\"value\":\"\",\"msg\":\"开始新的对话\",\"button\":3,\"imageUrl\":\"https://img2.baidu.com/it/u=1206278833,3265480730&fm=253&fmt=auto&app=120&f=JPEG?w=800&h=800\",\"imageHeight\":200,\"imageType\":\"card_pic_3\",\"keep\":true,\"width\":680,\"height\":800,\"msgType\":\"long_text\",\"httpTimeout\":60,\"canceledOnTouchOutside\":false,\"selectData\":\"新的对话:=清空AI对话记录\"}"
           },
           {
             "name": "查看夸克cookie",
@@ -161,6 +161,16 @@
       "searchable": 1,
       "filterable": 1,
       "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_小米盘搜[盘]",
+      "name": "小米盘搜[盘](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/小米盘搜[盘]",
+      "searchable": 1,
+      "filterable": 0,
+      "quickSearch": 1,
       "ext": ""
     },
     {
@@ -364,6 +374,16 @@
       "ext": "H4sIAAAAAAAAA9PT088qzs/Tf9ne/nJ2W3RVZezLuTOfNTTqgURVDAGu/MCKHwAAAA=="
     },
     {
+      "key": "drpyS_草榴社区[密]",
+      "name": "草榴社区[密](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/草榴社区[密]",
+      "searchable": 2,
+      "filterable": 0,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
       "key": "drpyS_大嫂TV[密]",
       "name": "大嫂TV[密](DS)",
       "type": 4,
@@ -410,6 +430,16 @@
       "api": "http://localhost:5757/api/瓜子H5",
       "searchable": 2,
       "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_鬼片之家",
+      "name": "鬼片之家(DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/鬼片之家",
+      "searchable": 2,
+      "filterable": 0,
       "quickSearch": 0,
       "ext": ""
     },
@@ -714,16 +744,6 @@
       "ext": ""
     },
     {
-      "key": "drpyS_x草榴社区[密]",
-      "name": "x草榴社区[密](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/x草榴社区[密]",
-      "searchable": 2,
-      "filterable": 0,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
       "key": "drpyS_xvideos[密]",
       "name": "xvideos[密](DS)",
       "type": 4,
@@ -941,6 +961,11 @@
       "logo": "https://live.mxdyeah.top/logo/{name}.png"
     }
   ],
+  "wallpaper": "https://api.likepoems.com/img/bing/",
+  "spider": "",
+  "homepage": "https://github.com/hjdhnx/drpy-node",
+  "aiLogo": "https://image.baidu.com/search/index?tn=baiduimage&ct=201326592&lm=-1&cl=2&word=%E7%8B%97%E4%BD%9C%E4%B8%BA%E8%BD%AF%E4%BB%B6%E5%9B%BE%E6%A0%87&dyTabStr=MCwxMiwzLDEsMiwxMyw3LDYsNSw5",
+  "homeLogo": "https://github.catvod.com/https://raw.githubusercontent.com/hjdhnx/drpy-node/refs/heads/main/public/images/logo500x200-1.png",
   "sniffer": {
     "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.27",
     "isVideoFormat": "http((?!http).){26,}\\.(m3u8|mp4|flv|avi|mkv|wmv|mpg|mpeg|mov|ts|3gp|rm|rmvb|asf|m4a|mp3|wma)",

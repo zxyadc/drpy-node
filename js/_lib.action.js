@@ -18,6 +18,7 @@ const action_data = [
             msgType: 'long_text',
             httpTimeout: 60,
             canceledOnTouchOutside: false,
+            selectData: '新的对话:=清空AI对话记录'
         }),
         vod_name: '连续对话',
         vod_pic: 'https://img2.baidu.com/it/u=1206278833,3265480730&fm=253&fmt=auto&app=120&f=JPEG?w=800&h=800',

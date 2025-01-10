@@ -1,4 +1,9 @@
 {
+  "wallpaper": "https://api.likepoems.com/img/bing/",
+  "spider": "",
+  "homepage": "https://github.com/hjdhnx/drpy-node",
+  "aiLogo": "https://image.baidu.com/search/index?tn=baiduimage&ct=201326592&lm=-1&cl=2&word=%E7%8B%97%E4%BD%9C%E4%B8%BA%E8%BD%AF%E4%BB%B6%E5%9B%BE%E6%A0%87&dyTabStr=MCwxMiwzLDEsMiwxMyw3LDYsNSw5",
+  "homeLogo": "https://github.catvod.com/https://raw.githubusercontent.com/hjdhnx/drpy-node/refs/heads/main/public/images/logo500x200-1.png",
   "sniffer": {
     "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.27",
     "isVideoFormat": "http((?!http).){26,}\\.(m3u8|mp4|flv|avi|mkv|wmv|mpg|mpeg|mov|ts|3gp|rm|rmvb|asf|m4a|mp3|wma)",

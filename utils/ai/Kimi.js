@@ -1,14 +1,14 @@
 import axios from 'axios';
 
-// https://console.xfyun.cn/services/bm4
-// https://xinghuo.xfyun.cn/botcenter/private-dataset
-class SparkAI {
-    constructor({authKey, baseURL}) {
-        if (!authKey) {
+// https://platform.moonshot.cn/console/api-keys
+// https://platform.moonshot.cn/console/limits
+class Kimi {
+    constructor({apiKey, baseURL}) {
+        if (!apiKey) {
             throw new Error('Missing required configuration parameters.');
         }
-        this.authKey = authKey;
-        this.baseURL = baseURL || 'https://spark-api-open.xf-yun.com'; // 默认的API基础URL
+        this.apiKey = apiKey;
+        this.baseURL = baseURL || 'https://api.moonshot.cn/v1';
         this.userContexts = {}; // 存储每个用户的上下文
     }
 
@@ -34,7 +34,7 @@ class SparkAI {
         this.initUserContext(userId); // 初始化用户上下文
 
         const payload = {
-            model: '4.0Ultra', // 使用的模型名称
+            model: 'moonshot-v1-8k', // 使用的模型名称
             messages: this.userContexts[userId].concat([{
                 role: 'user',
                 content: prompt
@@ -42,11 +42,13 @@ class SparkAI {
             ...options, // 其他选项，如 temperature、max_tokens 等
         };
 
+        console.log(payload);
+
         try {
-            const response = await axios.post(`${this.baseURL}/v1/chat/completions`, payload, {
+            const response = await axios.post(`${this.baseURL}/chat/completions`, payload, {
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${this.authKey}`, // 使用鉴权信息
+                    Authorization: `Bearer ${this.apiKey}`, // 使用鉴权信息
                 },
             });
 
@@ -56,14 +58,14 @@ class SparkAI {
                 return assistantMessage.content;
             } else {
                 throw new Error(
-                    `Error from Spark AI: ${response.data.error || 'Unknown error'}`
+                    `Error from Kimi AI: ${response.data.error || 'Unknown error'}`
                 );
             }
         } catch (error) {
-            console.error('Error while communicating with Spark AI:', error.message);
+            console.error('Error while communicating with Kimi AI:', error.message);
             throw error;
         }
     }
 }
 
-export default SparkAI;
+export default Kimi;

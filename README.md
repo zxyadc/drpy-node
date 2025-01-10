@@ -1,7 +1,7 @@
 # drpyS(drpy-node)
 
 nodejs作为服务端的drpy实现。全面升级异步写法  
-积极开发中，每日一更，当前进度 `34%`
+积极开发中，每日一更，当前进度 `35%`
 
 * [本地配置接口-动态本地](/config?pwd=)
 * [本地配置接口-动态外网/局域网](/config/1?pwd=)
@@ -16,12 +16,12 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 
 ## 更新记录
 
-### 20250110
+### 20250111
 
-更新至V1.1.6
+更新至V1.1.7
 
-1. 更新了一些解析相关的东西
-2. 测试了一些bug
+1. 修复lazy函数里input变量bug
+2. 设置中心AI增强
 
 [点此查看完整更新记录](docs/updateRecord.md)
 
@@ -54,8 +54,6 @@ todo:
 * [puppeteer使用教程](docs/pupInstall.md)
 * [drpyS源属性说明](docs/ruleAttr.md)
 * [drpy2写源简述](docs/ruleDesc.md)
-* [讯飞星火开放平台](https://console.xfyun.cn/services/bm4)
-* [讯飞星火智能体数据集](https://xinghuo.xfyun.cn/botcenter/private-dataset)
 
 ## 问题说明
 
@@ -117,6 +115,15 @@ pm2 restart drpys
 
 * [猫影视git文件加速](https://github.catvod.com/)
 * [猫影视多功能主页](https://catvod.com/)
+
+## AI接入
+
+* [讯飞星火](https://console.xfyun.cn/services/bm4)
+* [deepseek](https://platform.deepseek.com/api_keys) | [对话](https://chat.deepseek.com/)
+* [讯飞智能体](https://xinghuo.xfyun.cn/botcenter/createbot)
+  | [对话](https://xinghuo.xfyun.cn/botweb/0b83d4b1c0447e82ea00fe9485bd9353)
+  | [数据集](https://xinghuo.xfyun.cn/botcenter/private-dataset)
+* [KIMI](https://platform.moonshot.cn/console/info) | [对话](https://kimi.moonshot.cn/)
 
 ## 版权
 

@@ -434,7 +434,7 @@ export async function init(filePath, env = {}, refresh) {
         moduleCache.set(hashMd5, {moduleObject, hash: fileHash});
         return moduleObject;
     } catch (error) {
-        console.log('Error in drpy.init:', error);
+        console.log(`Error in drpy.init :${filePath}`, error);
         throw new Error(`Failed to initialize module:${error.message}`);
     }
 }
@@ -527,7 +527,7 @@ export async function initJx(filePath, env, refresh) {
         jxCache.set(hashMd5, {jxObj, hash: fileHash});
         return jxObj;
     } catch (error) {
-        console.log('Error in drpy.initJx:', error);
+        console.log(`Error in drpy.initJx:${filePath}`, error);
         throw new Error(`Failed to initialize jx:${error.message}`);
     }
 }
@@ -869,6 +869,7 @@ async function homeParse(rule) {
         TYPE: 'home',
         input: url,
         MY_URL: url,
+        HOST: rule.host,
         classes: classes,
         filters: rule.filter,
         cate_exclude: rule.cate_exclude,
@@ -991,6 +992,7 @@ async function cateParse(rule, tid, pg, filter, extend) {
         TYPE: 'cate',
         input: url,
         MY_URL: url,
+        HOST: rule.host,
         MY_PAGE: pg,
         fetch_params: deepCopy(rule.rule_fetch_params),
         jsp: jsp,
@@ -1040,6 +1042,7 @@ async function detailParse(rule, ids) {
         orId: orId,
         fyclass: fyclass,
         MY_URL: url,
+        HOST: rule.host,
         fetch_params: deepCopy(rule.rule_fetch_params),
         jsp: jsp,
         pdfh: jsp.pdfh.bind(jsp),
@@ -1099,6 +1102,7 @@ async function searchParse(rule, wd, quick, pg) {
         KEY: wd,
         input: url,
         MY_URL: url,
+        HOST: rule.host,
         detailUrl: rule.detailUrl || '',
         fetch_params: deepCopy(rule.rule_fetch_params),
         jsp: jsp,
@@ -1124,7 +1128,7 @@ async function searchParseAfter(d, pg) {
 
 async function playParse(rule, flag, id, flags) {
     let url = id;
-    // log('playParse:', url)
+    log('playParse:', url)
     if (!/http/.test(url)) {
         try {
             url = base64Decode(url);
@@ -1133,6 +1137,9 @@ async function playParse(rule, flag, id, flags) {
         }
     }
     url = decodeURIComponent(url);
+    if (!/^http/.test(url)) {
+        url = id;
+    }
     // log('playParse:', url)
     const jsp = new jsoup(url);
     return {
@@ -1141,6 +1148,7 @@ async function playParse(rule, flag, id, flags) {
         flag: flag,
         input: url,
         MY_URL: url,
+        HOST: rule.host,
         fetch_params: deepCopy(rule.rule_fetch_params),
         jsp: jsp,
         pdfh: jsp.pdfh.bind(jsp),
