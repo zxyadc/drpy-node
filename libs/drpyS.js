@@ -1128,11 +1128,10 @@ async function searchParseAfter(d, pg) {
 
 async function playParse(rule, flag, id, flags) {
     let url = id;
-    log('playParse:', url)
     if (!/http/.test(url)) {
         try {
             url = base64Decode(url);
-            log('base64')
+            log('[playParse]: id is base64 data');
         } catch (e) {
         }
     }
@@ -1140,7 +1139,11 @@ async function playParse(rule, flag, id, flags) {
     if (!/^http/.test(url)) {
         url = id;
     }
-    // log('playParse:', url)
+    if (id !== url) {
+        log(`[playParse]: ${id} => ${url}`);
+    } else {
+        log(`[playParse]: ${url}`);
+    }
     const jsp = new jsoup(url);
     return {
         TYPE: 'play',

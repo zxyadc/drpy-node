@@ -1,5 +1,5 @@
 {
-  "sites_count": 72,
+  "sites_count": 73,
   "sites": [
     {
       "key": "drpyS_设置中心",
@@ -309,6 +309,16 @@
       "type": 4,
       "api": "http://localhost:5757/api/抖音直播弹幕[官]",
       "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_百忙无果[官]",
+      "name": "百忙无果[官](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/百忙无果[官]",
+      "searchable": 2,
       "filterable": 1,
       "quickSearch": 0,
       "ext": ""

@@ -111,6 +111,7 @@ export default (fastify, options, done) => {
                 // 根据 query 参数决定执行逻辑
                 if ('play' in query) {
                     // 处理播放逻辑
+                    // console.log('play query:', query);
                     const result = await drpy.play(modulePath, env, query.flag, query.play);
                     return reply.send(result);
                 }

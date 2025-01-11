@@ -46,12 +46,19 @@ fastify.addHook('preHandler', (req, reply, done) => {
 
 // 自定义插件替换 querystring 解析行为.避免出现两个相同参数被解析成列表
 fastify.addHook('onRequest', async (request, reply) => {
-    const rawQuery = request.raw.url.split('?')[1] || '';
+    // 获取原始 URL 中的 query 部分
+    const rawUrl = request.raw.url;
+    const urlParts = rawUrl.split('?');
+    const path = urlParts[0];
+    let rawQuery = urlParts.slice(1).join('?'); // 处理可能存在的多个 '?' 情况
+    // log('rawQuery:', rawQuery);
+    // 使用 qs 库解析 query 参数，确保兼容参数值中包含 '?' 的情况
     request.query = qs.parse(rawQuery, {
         strictNullHandling: true, // 确保 `=` 被解析为空字符串
         arrayLimit: 100,         // 自定义数组限制
         allowDots: false,        // 禁止点号表示嵌套对象
     });
+    // 如果需要，可以在这里对 request.query 进行进一步处理
 });
 
 // 注册控制器
