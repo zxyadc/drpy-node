@@ -173,7 +173,7 @@ var rule = {
         let html = await request(input);
         let json = JSON.parse(html);
         let data = pjfa(json, '.data.docinfos');
-        log('data:', data);
+        // log('data:', data);
         data.forEach((it) => {
             d.push({
                 title: pjfh(it, '.albumDocInfo.albumTitle'),

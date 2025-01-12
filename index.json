@@ -1,5 +1,5 @@
 {
-  "sites_count": 73,
+  "sites_count": 74,
   "sites": [
     {
       "key": "drpyS_设置中心",
@@ -132,6 +132,16 @@
       "filterable": 0,
       "quickSearch": 0,
       "ext": "H4sIAAAAAAAAA9PT088qzs/TD3V+2tH2ZNdqPRAPAKubOwMVAAAA"
+    },
+    {
+      "key": "drpyS_低端[盘]",
+      "name": "低端[盘](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/低端[盘]",
+      "searchable": 2,
+      "filterable": 0,
+      "quickSearch": 0,
+      "ext": ""
     },
     {
       "key": "drpyS_团长资源[盘]",

@@ -2,10 +2,10 @@ var rule = {
     类型: '影视',
     title: '好乐影视',
     host: 'https://www.haolev.com',
-    url: '/haoshow/fyfilter.html',
+    url: '/haoshow/fyfilter',
     searchUrl: '/lesearch/**----------fypage---.html',
-    headers: {'User-Agent': 'UC_UA'},
-    searchable: 1, quickSearch: 0, filterable: 1, play_parse: true, double: false, play_parse: true, limit: 6,
+    headers: {'User-Agent': 'MOBILE_UA'},
+    searchable: 1, quickSearch: 0, filterable: 1, play_parse: true, double: false, limit: 6,
     filter_url: '{{fl.cateId}}-{{fl.area}}-{{fl.by}}-{{fl.class}}-----fypage---{{fl.year}}.html',
     filter_def: {
         '1': {cateId: '1'}, '2': {cateId: '2'}, '3': {cateId: '3'}, '4': {cateId: '4'}

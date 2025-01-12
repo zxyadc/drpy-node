@@ -1,6 +1,7 @@
 import axios, {toFormData} from 'axios';
 import axiosX from './axios.min.js';
 import crypto from 'crypto';
+import http from "http";
 import https from 'https';
 import fs from 'node:fs';
 import qs from 'qs';
@@ -21,6 +22,54 @@ globalThis.axios = axios;
 globalThis.axiosX = axiosX;
 globalThis.hlsParser = hlsParser;
 globalThis.qs = qs;
+
+const AgentOption = {keepAlive: true, maxSockets: 64, timeout: 30000}; // 最大连接数64,30秒定期清理空闲连接
+const httpAgent = new http.Agent(AgentOption);
+let httpsAgent = new https.Agent({rejectUnauthorized: false, ...AgentOption});
+
+// 配置 axios 使用代理
+const _axios = axios.create({
+    httpAgent,  // 用于 HTTP 请求的代理
+    httpsAgent, // 用于 HTTPS 请求的代理
+});
+
+// 请求拦截器
+_axios.interceptors.request.use((config) => {
+    // 生成 curl 命令
+    const curlCommand = generateCurlCommand(config);
+    console.log(`Generated cURL command:\n${curlCommand}`);
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
+
+/**
+ * 生成 curl 命令
+ * @param {Object} config Axios 请求配置
+ * @returns {string} curl 命令
+ */
+function generateCurlCommand(config) {
+    const {method, url, headers, data} = config;
+    let curlCommand = `curl -X ${method.toUpperCase()} '${url}'`;
+
+    // 添加 headers
+    if (headers) {
+        for (const [key, value] of Object.entries(headers)) {
+            curlCommand += ` -H '${key}: ${value}'`;
+        }
+    }
+
+    // 添加 body 数据
+    if (data) {
+        if (typeof data === 'object') {
+            curlCommand += ` -d '${JSON.stringify(data)}'`;
+        } else {
+            curlCommand += ` -d '${data}'`;
+        }
+    }
+
+    return curlCommand;
+}
 
 
 const confs = {};
@@ -104,9 +153,8 @@ async function request(url, opt = {}) {
     }
 
     // 配置代理或 HTTPS Agent
-    const agent = proxy
-        ? tunnel.httpsOverHttp({proxy: {host: '127.0.0.1', port: 7890}})
-        : new https.Agent({rejectUnauthorized: false});
+    // httpsAgent = new https.Agent({rejectUnauthorized: false});
+    const agent = proxy ? tunnel.httpsOverHttp({proxy: {host: '127.0.0.1', port: 7890}}) : httpsAgent;
 
     // 设置响应类型为 arraybuffer，确保能正确处理编码
     const respType = returnBuffer ? 'arraybuffer' : 'arraybuffer';
@@ -114,7 +162,7 @@ async function request(url, opt = {}) {
     console.log(`req: ${url} headers: ${JSON.stringify(headers)} data: ${JSON.stringify(data)}`);
     try {
         // 发送请求
-        const resp = await axios({
+        const resp = await _axios({
             url: typeof url === 'object' ? url.url : url,
             method,
             headers,
