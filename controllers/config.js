@@ -1,7 +1,7 @@
 import {readdirSync, readFileSync, writeFileSync, existsSync} from 'fs';
 import path from 'path';
 import * as drpy from '../libs/drpyS.js';
-import {naturalSort, urljoin} from '../utils/utils.js'
+import {naturalSort, urljoin, updateQueryString} from '../utils/utils.js'
 import {ENV} from "../utils/env.js";
 import {validatePwd} from "../utils/api_validate.js";
 import {getSitesMap} from "../utils/sites-map.js";
@@ -11,7 +11,7 @@ import batchExecute from '../libs_drpy/batchExecute.js';
 const {jsEncoder} = drpy;
 
 // 工具函数：生成 JSON 数据
-async function generateSiteJSON(jsDir, configDir, requestHost, sub, subFilePath, pwd) {
+async function generateSiteJSON(jsDir, dr2Dir, configDir, requestHost, sub, subFilePath, pwd) {
     const files = readdirSync(jsDir);
     let valid_files = files.filter((file) => file.endsWith('.js') && !file.startsWith('_')); // 筛选出不是 "_" 开头的 .js 文件
     let sort_list = [];
@@ -118,6 +118,77 @@ async function generateSiteJSON(jsDir, configDir, requestHost, sub, subFilePath,
     };
 
     await batchExecute(tasks, listener);
+
+    // 根据用户是否启用dr2源去生成对应配置
+    if (ENV.get('enable_dr2', '1') === '1') {
+        const dr2_files = readdirSync(dr2Dir);
+        let dr2_valid_files = dr2_files.filter((file) => file.endsWith('.js') && !file.startsWith('_')); // 筛选出不是 "_" 开头的 .js 文件
+        // log(dr2_valid_files);
+        log(`开始生成dr2的t3配置，dr2Dir:${dr2Dir},源数量: ${dr2_valid_files.length}`);
+
+        const dr2_tasks = dr2_valid_files.map((file) => {
+            return {
+                func: async ({file, dr2Dir, requestHost, pwd, drpy, SitesMap}) => {
+                    const baseName = path.basename(file, '.js'); // 去掉文件扩展名
+                    let api = `./drpy2.min.js`;  // 使用内置drpy2
+                    let ext = `${requestHost}/js/${file}`;
+                    if (pwd) {
+                        ext += `?pwd=${pwd}`;
+                    }
+                    let ruleObject = {
+                        searchable: 0, // 固定值
+                        filterable: 0, // 固定值
+                        quickSearch: 0, // 固定值
+                    };
+                    try {
+                        // console.log('file:', path.join(dr2Dir, file));
+                        ruleObject = await drpy.getRuleObject(path.join(dr2Dir, file));
+                    } catch (e) {
+                        throw new Error(`Error parsing rule object for file: ${file}, ${e.message}`);
+                    }
+
+                    let fileSites = [];
+                    if (baseName === 'push_agent') {
+                        let key = 'push_agent';
+                        let name = `${ruleObject.title}(DR2)`;
+                        fileSites.push({key, name, ext});
+                    } else if (SitesMap.hasOwnProperty(baseName) && Array.isArray(SitesMap[baseName])) {
+                        SitesMap[baseName].forEach((it) => {
+                            let key = `drpy2_${it.alias}`;
+                            let name = `${it.alias}(DR2)`;
+                            let _ext = updateQueryString(ext, it.queryStr);
+                            fileSites.push({key, name, ext: _ext});
+                        });
+                    } else {
+                        let key = `drpy2_${baseName}`;
+                        let name = `${baseName}(DR2)`;
+                        fileSites.push({key, name, ext});
+                    }
+
+                    fileSites.forEach((fileSite) => {
+                        const site = {
+                            key: fileSite.key,
+                            name: fileSite.name,
+                            type: 3, // 固定值
+                            api,
+                            searchable: ruleObject.searchable,
+                            filterable: ruleObject.filterable,
+                            quickSearch: ruleObject.quickSearch,
+                            more: ruleObject.more,
+                            ext: fileSite.ext || "", // 固定为空字符串
+                        };
+                        sites.push(site);
+                    });
+                },
+                param: {file, dr2Dir, requestHost, pwd, drpy, SitesMap},
+                id: file,
+            };
+        });
+
+        await batchExecute(dr2_tasks, listener);
+
+    }
+
     // 订阅再次处理别名的情况
     if (sub) {
         if (sub.mode === 0) {
@@ -298,7 +369,7 @@ export default (fastify, options, done) => {
                 }
             }
 
-            const siteJSON = await generateSiteJSON(options.jsDir, options.configDir, requestHost, sub, options.subFilePath, pwd);
+            const siteJSON = await generateSiteJSON(options.jsDir, options.dr2Dir, options.configDir, requestHost, sub, options.subFilePath, pwd);
             const parseJSON = await generateParseJSON(options.jxDir, requestHost);
             const livesJSON = generateLivesJSON(requestHost);
             const playerJSON = generatePlayerJSON(options.configDir, requestHost);

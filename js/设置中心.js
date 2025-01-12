@@ -19,6 +19,7 @@ let quick_data = {
     夸克: 'https://pan.quark.cn/s/6c8158e258f3',
     UC: 'https://drive.uc.cn/s/59023f57d3ce4?public=1',
     阿里: 'https://www.alipan.com/s/vgXMcowK8pQ',
+    天翼: 'https://cloud.189.cn/web/share?code=INJbU3NbqyUj',
     直链1: 'https://vdse.bdstatic.com//628ca08719cef5987ea2ae3c6f0d2386.mp4',
     嗅探1: 'https://www.6080kk.cc/haokanplay/178120-1-1.html',
     嗅探2: 'https://www.hahads.com/play/537106-3-1.html',
@@ -144,8 +145,8 @@ var rule = {
     aliScanCheck: null,
     biliScanCheck: null,
     host: 'http://empty',
-    class_name: '推送&夸克&UC&阿里&哔哩&系统配置&测试',
-    class_url: 'push&quark&uc&ali&bili&system&test',
+    class_name: '推送&夸克&UC&阿里&天翼&哔哩&系统配置&测试',
+    class_url: 'push&quark&uc&ali&cloud&bili&system&test',
     url: '/fyclass',
 
     预处理: async function (env) {
@@ -163,6 +164,7 @@ var rule = {
             'uc': urljoin(publicUrl, './images/icon_cookie/UC.png'),
             'ali': urljoin(publicUrl, './images/icon_cookie/阿里.png'),
             'bili': urljoin(publicUrl, './images/icon_cookie/哔哩.png'),
+            'cloud': urljoin(publicUrl, './images/icon_cookie/天翼.png'),
             'adult': urljoin(publicUrl, './images/icon_cookie/chat.webp'),
             'test': urljoin(publicUrl, './icon.svg'),
             'lives': urljoin(publicUrl, './images/lives.jpg'),
@@ -249,6 +251,14 @@ var rule = {
                     vod_tag: 'action'
                 });
                 break;
+            case 'cloud':
+                d.push(genMultiInput('cloud_account', '设置天翼 账号', null, images.cloud));
+                d.push(genMultiInput('cloud_password', '设置天翼 密码', null, images.cloud));
+                d.push(genMultiInput('cloud_cookie', '设置天翼 cookie', null, images.cloud));
+                d.push(getInput('get_cloud_account', '查看天翼 账号', images.cloud));
+                d.push(getInput('get_cloud_password', '查看天翼 密码', images.cloud));
+                d.push(getInput('get_cloud_cookie', '查看天翼 cookie', images.cloud));
+                break;
             case 'bili':
                 d.push(genMultiInput('bili_cookie', '设置哔哩 cookie', null, images.bili));
                 d.push(getInput('get_bili_cookie', '查看哔哩 cookie', images.bili));
@@ -265,6 +275,8 @@ var rule = {
                 d.push(getInput('get_hide_adult', '查看青少年模式', images.settings));
                 d.push(genMultiInput('thread', '设置播放代理线程数', '默认为1，可自行配置成其他值如:10', images.settings));
                 d.push(getInput('get_thread', '查看播放代理线程数', images.settings));
+                d.push(genMultiInput('enable_dr2', '设置drpy2源启用状态', '设置为1可启用此功能(默认没设置也属于启动，设置其他值关闭)', images.settings));
+                d.push(getInput('get_enable_dr2', '查看drpy2源启用状态', images.settings));
                 d.push(genMultiInput('now_ai', '设置当前AI', '1: 讯飞星火 2:deepseek 3.讯飞智能体 4.Kimi \n如果不填，连续对话默认使用讯飞星火', images.settings));
                 d.push(getInput('get_now_ai', '查看当前AI', images.settings));
                 d.push(genMultiInput('allow_forward', '设置允许代理转发', '设置为1可启用此功能，有一定的使用场景用于突破网络限制', images.settings));
@@ -894,9 +906,13 @@ var rule = {
             'quark_cookie',
             'uc_cookie',
             'ali_token',
+            'cloud_account',
+            'cloud_password',
+            'cloud_cookie',
             'bili_cookie',
             'hide_adult',
             'thread',
+            'enable_dr2',
             'spark_ai_authKey',
             'deepseek_apiKey',
             'sparkBotObject',
@@ -907,9 +923,13 @@ var rule = {
             'get_quark_cookie',
             'get_uc_cookie',
             'get_ali_token',
+            'get_cloud_account',
+            'get_cloud_password',
+            'get_cloud_cookie',
             'get_bili_cookie',
             'get_hide_adult',
             'get_thread',
+            'get_enable_dr2',
             'get_spark_ai_authKey',
             'get_deepseek_apiKey',
             'get_sparkBotObject',

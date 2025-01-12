@@ -55,7 +55,7 @@ var rule = {
             let list = input.split('#');
             // log(list);
             for (let i = 0; i < list.length; i++) {
-                if (/pan.quark.cn|drive.uc.cn|www.alipan.com|www.aliyundrive.com/.test(list[i])) {
+                if (/pan.quark.cn|drive.uc.cn|www.alipan.com|www.aliyundrive.com|cloud.189.cn/.test(list[i])) {
                     if (/pan.quark.cn/.test(list[i])) {
                         const shareData = Quark.getShareData(list[i]);
                         if (shareData) {
@@ -105,12 +105,32 @@ var rule = {
                             }
                         }
                     }
+                    if (/cloud.189.cn/.test(list[i])) {
+                        let data = await Cloud.getShareList(list[i])
+                        if (Array.isArray(data)) {
+                            playform.push('Cloud-球球啦')
+                            playurls.push(data.map((it) => {
+                                const urls = [it.fileId, it.shareId]
+                                return it.name + "$" + urls.join('*')
+                            }).join('#'))
+                        } else {
+                            Object.keys(data).forEach(it => {
+                                playform.push('Cloud-' + it)
+                                data[it].forEach(item => {
+                                    playurls.push(item.map((it) => {
+                                        const urls = [it.fileId, it.shareId]
+                                        return it.name + "$" + urls.join('*')
+                                    }).join('#'))
+                                })
+                            })
+                        }
+                    }
                 } else {
                     playform.push('推送');
                     playurls.push("推送" + '$' + list[i])
                 }
             }
-        } else if (/pan.quark.cn|drive.uc.cn|www.alipan.com|www.aliyundrive.com/.test(input)) {
+        } else if (/pan.quark.cn|drive.uc.cn|www.alipan.com|www.aliyundrive.com|cloud.189.cn/.test(input)) {
             if (/pan.quark.cn/.test(input)) {
                 const shareData = Quark.getShareData(input);
                 if (shareData) {
@@ -160,74 +180,27 @@ var rule = {
                     }
                 }
             }
-        }
-            // else if((typeof JSON.parse(input) === 'object'&& JSON.parse(input).url !=='')){
-            //     let json = JSON.parse(input);
-            //     let list = JSON.parse(input).url.split('#');
-            //     vod = {
-            //         vod_name: json.vod_name || '',
-            //         vod_pic: json.vod_pic || '',
-            //         vod_content: json.vod_content || '',
-            //         vod_remarks: json.vod_remarks || '',
-            //     }
-            //     for (let i = 0; i < list.length; i++) {
-            //         if(/pan.quark.cn|drive.uc.cn|www.alipan.com/.test(list[i])){
-            //             if (/pan.quark.cn/.test(list[i])) {
-            //                 const shareData = Quark.getShareData(list[i]);
-            //                 if (shareData) {
-            //                     const videos = await Quark.getFilesByShareUrl(shareData);
-            //                     if (videos.length > 0) {
-            //                         playform.push('Quark-' + shareData.shareId);
-            //                         playurls.push(videos.map((v) => {
-            //                             const list = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle ? v.subtitle.fid : '', v.subtitle ? v.subtitle.share_fid_token : ''];
-            //                             return v.file_name + '$' + list.join('*');
-            //                         }).join('#'))
-            //                     } else {
-            //                         playform.push('Quark-' + shareData.shareId);
-            //                         playurls.push("资源已经失效，请访问其他资源")
-            //                     }
-            //                 }
-            //             }
-            //             if (/drive.uc.cn/.test(list[i])) {
-            //                 const shareData = UC.getShareData(list[i]);
-            //                 if (shareData) {
-            //                     const videos = await UC.getFilesByShareUrl(shareData);
-            //                     if (videos.length > 0) {
-            //                         playform.push('UC-' + shareData.shareId);
-            //                         playurls.push(videos.map((v) => {
-            //                             const list = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle ? v.subtitle.fid : '', v.subtitle ? v.subtitle.share_fid_token : ''];
-            //                             return v.file_name + '$' + list.join('*');
-            //                         }).join('#'))
-            //                     } else {
-            //                         playform.push('UC-' + shareData.shareId);
-            //                         playurls.push("资源已经失效，请访问其他资源")
-            //                     }
-            //                 }
-            //             }
-            //             if (/www.alipan.com/.test(list[i])) {
-            //                 const shareData = Ali.getShareData(list[i]);
-            //                 if (shareData) {
-            //                     const videos = await Ali.getFilesByShareUrl(shareData);
-            //                     log(videos)
-            //                     if (videos.length > 0) {
-            //                         playform.push('Ali-' + shareData.shareId);
-            //                         playurls.push(videos.map((v) => {
-            //                             const ids = [v.share_id, v.file_id, v.subtitle ? v.subtitle.file_id : ''];
-            //                             return formatPlayUrl('', v.name) + '$' + ids.join('*');
-            //                         }).join('#'))
-            //                     } else {
-            //                         playform.push('Ali-' + shareData.shareId);
-            //                         playurls.push("资源已经失效，请访问其他资源")
-            //                     }
-            //                 }
-            //             }
-            //         }else {
-            //             playform.push('推送');
-            //             playurls.push("推送"+'$'+list[i])
-            //         }
-            //     }
-        // }
-        else {
+            if (/cloud.189.cn/.test(input)) {
+                let data = await Cloud.getShareList(input)
+                if (Array.isArray(data)) {
+                    playform.push('Cloud-球球啦')
+                    playurls.push(data.map((it) => {
+                        const urls = [it.fileId, it.shareId]
+                        return it.name + "$" + urls.join('*')
+                    }).join('#'))
+                } else {
+                    Object.keys(data).forEach(it => {
+                        playform.push('Cloud-' + it)
+                        data[it].forEach(item => {
+                            playurls.push(item.map((it) => {
+                                const urls = [it.fileId, it.shareId]
+                                return it.name + "$" + urls.join('*')
+                            }).join('#'))
+                        })
+                    })
+                }
+            }
+        } else {
             playform.push('推送');
             playurls.push("推送" + '$' + input)
         }
@@ -245,7 +218,7 @@ var rule = {
             } else {
                 return {parse: 1, url: input}
             }
-        } else if (/Quark-|UC-|Ali-/.test(flag)) {
+        } else if (/Quark-|UC-|Ali-|Cloud-/.test(flag)) {
             const ids = input.split('*');
             const urls = [];
             let UCDownloadingCache = {};
@@ -316,6 +289,18 @@ var rule = {
                         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
                         'Referer': 'https://www.aliyundrive.com/',
                     },
+                }
+            }
+            if (flag.startsWith('Cloud-')) {
+                log("天翼云盘解析开始")
+                const url = await Cloud.getShareUrl(ids[0], ids[1]);
+                return {
+                    url: url + "#isVideo=true#",
+                    header: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+                        'Accept-Encoding': 'identity;q=1, *;q=0',
+                        'referer': 'https://cloud.189.cn/'
+                    }
                 }
             }
         } else {

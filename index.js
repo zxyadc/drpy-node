@@ -5,7 +5,7 @@ import os from 'os';
 import qs from 'qs';
 import {fileURLToPath} from 'url';
 import formBody from '@fastify/formbody';
-import {validateBasicAuth} from "./utils/api_validate.js";
+import {validateBasicAuth, validatePwd} from "./utils/api_validate.js";
 
 const {fastify} = fastlogger;
 
@@ -32,6 +32,12 @@ fastify.register(fastifyStatic, {
     decorateReply: false, // 禁用 sendFile
 });
 
+fastify.register(fastifyStatic, {
+    root: path.join(__dirname, 'js_dr2'),
+    prefix: '/js/', // 新的访问路径前缀
+    decorateReply: false, // 禁用 sendFile
+});
+
 // 注册插件以支持 application/x-www-form-urlencoded
 fastify.register(formBody);
 
@@ -39,6 +45,8 @@ fastify.register(formBody);
 fastify.addHook('preHandler', (req, reply, done) => {
     if (req.raw.url.startsWith('/apps/')) {
         validateBasicAuth(req, reply, done);
+    } else if (req.raw.url.startsWith('/js/')) {
+        validatePwd(req, reply, done).then(r => done());
     } else {
         done();
     }
@@ -68,6 +76,7 @@ registerRoutes(fastify, {
     rootDir: __dirname,
     docsDir: path.join(__dirname, 'docs'),
     jsDir: path.join(__dirname, 'js'),
+    dr2Dir: path.join(__dirname, 'js_dr2'),
     jxDir: path.join(__dirname, 'jx'),
     viewsDir: path.join(__dirname, 'views'),
     configDir: path.join(__dirname, 'config'),
