@@ -130,7 +130,7 @@ async function generateSiteJSON(jsDir, dr2Dir, configDir, requestHost, sub, subF
             return {
                 func: async ({file, dr2Dir, requestHost, pwd, drpy, SitesMap}) => {
                     const baseName = path.basename(file, '.js'); // 去掉文件扩展名
-                    let api = `https://gitee.com/zj521jj/little-tiger-spot/raw/master/drpy_libs/drpy2.min.js`;  // 使用内置drpy2
+                    let api = `https://gitee.com/zhxyad/little-tiger-spot/raw/master/drpy_libs/drpy2.min.js`;  // 使用内置drpy2
                     let ext = `${requestHost}/js/${file}`;
                     if (pwd) {
                         ext += `?pwd=${pwd}`;
@@ -200,21 +200,28 @@ sites.forEach(site => {
     .replace(/腾云驾雾/g, '腾讯')
     .replace(/百忙无果/g, '芒果')  
     .replace(/特下饭/g, '下饭')
-    .replace(/ikanbot/g, '爱看')
+    .replace(/ikanbot/g, '爱看[虫]')
     .replace(/hdmoli/g, '莫离')
     .replace(/素白白/g, '素白[优]')
-    .replace(/瓜子H5/g, '瓜子H5[优]')
+    .replace(/瓜子H5/g, '瓜子[优]')
     .replace(/^(.*?短剧)(?!.*\[短\])/gm, '$1[短]')
     .replace(/\b动漫/g, '动漫[漫]')
-    .replace(/小米盘搜[\[盘\]]/g, '小米盘搜[搜]')
+    .replace(/盘搜\[盘\]/g, '盘搜[搜]')
+    .replace(/随身听/, '随身')
+    .replace(/DR2/, 'DR')
+    .replace(/(\[[^]]*\])\[.*?\]/, '$1')
+   // .replace(/\[[^]]*\].*/, site.name.match(/\[[^]]*\]/)[0])
+ //   .replace(/[\[短\]][\[盘\]]/g, '[短]')
+// .replace(/\[搜\]盘\]/, '[搜]')
+    .replace(/\[短\]\[盘\]/, '[短]')
     ;
 });
     
     //排序
 function customSort(a, b) {
     // 定义排序顺序
-    let order = ['[优]', '💿', '中心', '交互', '[合]', '直播', '🏠', '官', '[短]', '📻', '[听]', '[书]', '[漫]', '[儿]', '[磁]', '[搜]'];
-    let js_order = ['🏆瓜子APP[优]', '🏆瓜子H5[优]', '🏆皮皮[优]'];
+    let order = ['[APP]','[优]', '💿', '中心', '交互', '[合]', '直播', '🏠', '官', '[短]', '📻', '[听]', '[书]', '[漫]', '[儿]', '[磁]', '[搜]'];
+    let js_order = ['🏆瓜子[APP]', '🏆瓜子[优]', '🏆皮皮[优]'];
 
     // 先按照 js_order 排序
     let i = js_order.indexOf(a.name.split('(')[0]);
@@ -262,26 +269,12 @@ function customSort(a, b) {
 }
 //过滤
 
-function shouldExclude(site) {
-    const excludeKeywords = ['KKK', 'KKK', '虎牙直播[官](DR2)','奥秘', '玩偶','擦', '多多', '团长', '豆瓣', 'ACG', 'Omo', '人人', '好乐', '央视'];
-    const order = ['中心', '交互', '推', '爱看'];
-    const regex = /\[[^]]*\]/;
 
-    // 检查是否包含需要排除的关键词，排除包含 order 数组中关键词的情况
-    const hasExcludeKeyword = excludeKeywords.some(keyword => {
-        return site.name.includes(keyword) &&!order.some(orderWord => site.name.includes(orderWord));
-    });
-
-    // 检查是否不包含 [字符串] 形式，排除包含 order 数组中关键词的情况
-    const hasNoBrackets =!regex.test(site.name) &&!order.some(orderWord => site.name.includes(orderWord));
-
-    return hasExcludeKeyword || hasNoBrackets;
-}
- sites = sites.filter(site =>!shouldExclude(site));
 
 
 let emojiMap = {
     "[儿]": "👶",
+    "[APP]": "🏆",
     "[优]": "🏆",
     "[合]": "🎁",
     "短": "📲",
@@ -335,7 +328,13 @@ let addedEmoji = '';
 });
 
 //console.log(sites);
-
+function shouldExclude(site) {
+    const excludeKeywords = ['6587', '低端', '金牌[优](DS)', '📺', '虎牙直播[官](DR)', '奥秘', '玩偶', '擦', '多多', '团长', '豆瓣', 'ACG', 'Omo', '人人', '好乐', '央视'];
+    // 判断 site.name 是否包含任何一个排除关键词
+    return excludeKeywords.some(keyword => site.name.includes(keyword));
+}
+// 使用 filter 方法对 sites 数组进行过滤
+sites = sites.filter(site =>!shouldExclude(site));
 
     // 订阅再次处理别名的情况
     if (sub) {
@@ -440,7 +439,63 @@ async function generateParseJSON(jxDir, requestHost) {
     return {parses};
 }
 
+const fs = require('fs');
+const currentDir = process.cwd();
+//const filePath = path.join(currentDir, 'live_config.json');
+const filePath = path.join(currentDir, 'config', 'live_config.json');
+// 检查文件是否存在
+if (!fs.existsSync(filePath)) {
+    console.error('The live_config.json file does not exist at:', filePath);
+}
 
+function generateLivesJSON(requestHost) {
+        const fileContent = fs.readFileSync(filePath, 'utf8');
+        const config = JSON.parse(fileContent);
+        const live_urls = config.live_urls || [];
+        const epg_url = config.epg_url || '';
+        const logo_url = config.logo_url || '';
+        const names = config.names || [];
+
+        function processUrl(url) {
+            if (url &&!url.startsWith('http')) {
+                const public_url = urljoin(requestHost, 'public/');
+                return urljoin(public_url, url);
+            }
+            return url;
+        }
+
+        function createLiveObject(url, name) {
+            return {
+                name,
+                type: 0,
+                url,
+                playerType: 1,
+                ua: "okhttp/3.12.13",
+                epg: epg_url,
+                logo: logo_url
+            };
+        }
+
+        const lives = live_urls.map((url, index) => {
+            const processedUrl = processUrl(url);
+            if (processedUrl) {
+                return createLiveObject(processedUrl, names[index]);
+            }
+            return null;
+        }).filter(Boolean);
+
+        return { lives };
+        
+    
+}
+
+
+/*
+
+
+// 测试
+
+/*
 function generateLivesJSON(requestHost) {
     const live_urls = [
         process.env.LIVE_URL1,
@@ -450,7 +505,7 @@ function generateLivesJSON(requestHost) {
     ];
     const epg_url = process.env.EPG_URL || '';
     const logo_url = process.env.LOGO_URL || '';
-    const names = ["yuanzl77", "范明明V6", "直播", "一起看"];
+    const names = ["yuanzl77", "范明明V6", "直播", "广播", "一起看"];
 
     function processUrl(url) {
         if (url &&!url.startsWith('http')) {
@@ -482,7 +537,7 @@ function generateLivesJSON(requestHost) {
 
     return { lives };
 }
-
+*/
 /*
 function generateLivesJSON(requestHost) {
     let lives = [];
