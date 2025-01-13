@@ -130,7 +130,7 @@ async function generateSiteJSON(jsDir, dr2Dir, configDir, requestHost, sub, subF
             return {
                 func: async ({file, dr2Dir, requestHost, pwd, drpy, SitesMap}) => {
                     const baseName = path.basename(file, '.js'); // 去掉文件扩展名
-                    let api = `./drpy2.min.js`;  // 使用内置drpy2
+                    let api = `https://gitee.com/zj521jj/little-tiger-spot/raw/master/drpy_libs/drpy2.min.js`;  // 使用内置drpy2
                     let ext = `${requestHost}/js/${file}`;
                     if (pwd) {
                         ext += `?pwd=${pwd}`;
@@ -263,7 +263,7 @@ function customSort(a, b) {
 //过滤
 
 function shouldExclude(site) {
-    const excludeKeywords = ['KKK', '奥秘', '玩偶','擦', '多多', '团长', '豆瓣', 'ACG', 'Omo', '人人', '好乐', '央视'];
+    const excludeKeywords = ['KKK', 'KKK', '虎牙直播[官](DR2)','奥秘', '玩偶','擦', '多多', '团长', '豆瓣', 'ACG', 'Omo', '人人', '好乐', '央视'];
     const order = ['中心', '交互', '推', '爱看'];
     const regex = /\[[^]]*\]/;
 
