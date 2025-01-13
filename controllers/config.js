@@ -130,7 +130,7 @@ async function generateSiteJSON(jsDir, dr2Dir, configDir, requestHost, sub, subF
             return {
                 func: async ({file, dr2Dir, requestHost, pwd, drpy, SitesMap}) => {
                     const baseName = path.basename(file, '.js'); // 去掉文件扩展名
-                    let api = `https://gitee.com/zj521jj/little-tiger-spot/raw/master/drpy_libs/drpy2.min.js`;  // 使用内置drpy2
+                    let api = `https://gitee.com/zhxyad/little-tiger-spot/raw/master/drpy_libs/drpy2.min.js`;  // 使用内置drpy2
                     let ext = `${requestHost}/js/${file}`;
                     if (pwd) {
                         ext += `?pwd=${pwd}`;
@@ -206,7 +206,14 @@ sites.forEach(site => {
     .replace(/瓜子H5/g, '瓜子[优]')
     .replace(/^(.*?短剧)(?!.*\[短\])/gm, '$1[短]')
     .replace(/\b动漫/g, '动漫[漫]')
-    .replace(/小米盘搜[\[盘\]]/g, '小米盘搜[搜]')
+    .replace(/盘搜\[盘\]/g, '盘搜[搜]')
+    .replace(/随身听/, '随身')
+    .replace(/DR2/, 'DR')
+    .replace(/(\[[^]]*\])\[.*?\]/, '$1')
+   // .replace(/\[[^]]*\].*/, site.name.match(/\[[^]]*\]/)[0])
+ //   .replace(/[\[短\]][\[盘\]]/g, '[短]')
+// .replace(/\[搜\]盘\]/, '[搜]')
+    .replace(/\[短\]\[盘\]/, '[短]')
     ;
 });
     
@@ -322,7 +329,7 @@ let addedEmoji = '';
 
 //console.log(sites);
 function shouldExclude(site) {
-    const excludeKeywords = ['低端', 'KKK', '📺', '虎牙直播[官](DR2)', '奥秘', '玩偶', '擦', '多多', '团长', '豆瓣', 'ACG', 'Omo', '人人', '好乐', '央视'];
+    const excludeKeywords = ['6587', '低端', '金牌[优](DS)', '📺', '虎牙直播[官](DR)', '奥秘', '玩偶', '擦', '多多', '团长', '豆瓣', 'ACG', 'Omo', '人人', '好乐', '央视'];
     // 判断 site.name 是否包含任何一个排除关键词
     return excludeKeywords.some(keyword => site.name.includes(keyword));
 }
@@ -432,7 +439,63 @@ async function generateParseJSON(jxDir, requestHost) {
     return {parses};
 }
 
+const fs = require('fs');
+const currentDir = process.cwd();
+//const filePath = path.join(currentDir, 'live_config.json');
+const filePath = path.join(currentDir, 'config', 'live_config.json');
+// 检查文件是否存在
+if (!fs.existsSync(filePath)) {
+    console.error('The live_config.json file does not exist at:', filePath);
+}
 
+function generateLivesJSON(requestHost) {
+        const fileContent = fs.readFileSync(filePath, 'utf8');
+        const config = JSON.parse(fileContent);
+        const live_urls = config.live_urls || [];
+        const epg_url = config.epg_url || '';
+        const logo_url = config.logo_url || '';
+        const names = config.names || [];
+
+        function processUrl(url) {
+            if (url &&!url.startsWith('http')) {
+                const public_url = urljoin(requestHost, 'public/');
+                return urljoin(public_url, url);
+            }
+            return url;
+        }
+
+        function createLiveObject(url, name) {
+            return {
+                name,
+                type: 0,
+                url,
+                playerType: 1,
+                ua: "okhttp/3.12.13",
+                epg: epg_url,
+                logo: logo_url
+            };
+        }
+
+        const lives = live_urls.map((url, index) => {
+            const processedUrl = processUrl(url);
+            if (processedUrl) {
+                return createLiveObject(processedUrl, names[index]);
+            }
+            return null;
+        }).filter(Boolean);
+
+        return { lives };
+        
+    
+}
+
+
+/*
+
+
+// 测试
+
+/*
 function generateLivesJSON(requestHost) {
     const live_urls = [
         process.env.LIVE_URL1,
@@ -474,7 +537,7 @@ function generateLivesJSON(requestHost) {
 
     return { lives };
 }
-
+*/
 /*
 function generateLivesJSON(requestHost) {
     let lives = [];

@@ -944,7 +944,7 @@ var rule = {
                 if (!auth_code || !cookie) {
                     return '入库授权码或cookie值不允许为空!'
                 }
-                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'drpys';
+                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'zhxy';
                 if (auth_code !== COOKIE_AUTH_CODE) {
                     return `您输入的入库授权码【${auth_code}】不正确`
                 }
@@ -970,7 +970,7 @@ var rule = {
                 if (!auth_code) {
                     return '入库授权码不允许为空!'
                 }
-                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'drpys';
+                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'zhxy';
                 if (auth_code !== COOKIE_AUTH_CODE) {
                     return `您输入的入库授权码【${auth_code}】不正确`
                 }
