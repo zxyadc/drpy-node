@@ -23,6 +23,7 @@ class CloudDrive {
         this.shareId = '';
         this.shareMode = '';
         this.isFolder = '';
+        this.index = 0;
     }
 
     // 初始化方法，加载本地配置
@@ -167,7 +168,7 @@ class CloudDrive {
         let fileList = data.match(/<id>(.*?)<\/id>/g);
         let filename = data.match(/<name>(.*?)<\/name>/g);
         let mediaType = data.match(/<mediaType>\d+<\/mediaType>/g)
-        if (count > 0 && mediaType) {
+        if (count >= 0 && mediaType) {
             for (let i = 0; i < fileList.length; i++) {
                 if (!filename[i].replace(/<name>|<\/name>/g, '').endsWith('.txt')) {
                     videos.push({
@@ -203,7 +204,7 @@ class CloudDrive {
         let fileList = data.match(/<id>(.*?)<\/id>/g);
         let filename = data.match(/<name>(.*?)<\/name>/g);
         let videos = []
-        if (count > 0) {
+        if (count >= 0) {
             for (let i = 0; i < fileList.length; i++) {
                 if (!filename[i].replace(/<name>|<\/name>/g, '').endsWith('.txt')) {
                     videos.push({
@@ -223,7 +224,7 @@ class CloudDrive {
             'Accept': 'application/json;charset=UTF-8',
             'Accept-Encoding': 'gzip, deflate, br, zstd',
         }
-        if (!this.cookie && this.account && this.password) {
+        if (!this.cookie && this.account && this.password && this.index < 2) {
             await this.login(this.account, this.password);
             headers['Cookie'] = this.cookie;
         } else {
@@ -235,15 +236,30 @@ class CloudDrive {
                     headers: headers
                 }
             );
-            return resp.data.normal.url;
+            let location = await axios.get(resp.data.normal.url, {
+                maxRedirects: 0, // 禁用自动重定向
+                validateStatus: function (status) {
+                    return status >= 200 && status < 400; // 只处理 2xx 和 3xx 状态码
+                }
+            })
+            let link = ''
+            if (location.status >= 300 && location.status < 400 && location.headers.location) {
+                link = location.headers.location
+            } else {
+                link = resp.data.normal.url
+            }
+            return link;
         } catch (error) {
-            if (error.status === 400) {
+            if (error.status === 400 && this.index < 2) {
                 ENV.set('cloud_cookie', '')
-                await this.getShareUrl(fileId, shareId)
+                this.index += 1;
+                return await this.getShareUrl(fileId, shareId)
             } else {
                 console.error('Error during getShareUrl:', error);
             }
 
+        } finally {
+            this.index = 0;
         }
     }
 

@@ -63,8 +63,6 @@ var rule = {
         let html = await req_(input, 'get', {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36',
         })
-        log(input);
-        // log(html)
         const $ = pq(html)
         let vod = {
             "vod_name": $('.title').text().trim(),
@@ -79,6 +77,8 @@ var rule = {
             if (link && link.length > 0) {
                 // 提取 span 标签中的 URL
                 link = link[0].match(/https:\/\/cloud\.189\.cn\/[^<]*/)[0];
+            } else {
+                link = content_html.match(/https:\/\/cloud\.189\.cn\/[^<]*/)[0]
             }
         } else {
             // 提取 a 标签中的 URL
@@ -88,7 +88,6 @@ var rule = {
         let playurls = []
         if (/cloud.189.cn/.test(link)) {
             log("云盘解析开始")
-            console.log(link)
             let data = await Cloud.getShareList(link)
             if (Array.isArray(data)) {
                 playform.push('Cloud-球球啦')

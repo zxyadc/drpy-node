@@ -5,108 +5,99 @@
 const {getPublicIp} = $.require('_lib.request.js');
 var rule = {
     类型: '影视',
+    host: 'https://jiekou-1314054699.cos.ap-chongqing.myqcloud.com/jiekou.txt',
     title: '人人视频',
     desc: '人人视频纯js版本',
     homeUrl: '',
     class_name: '电视剧&电影&动漫',
     class_url: '2&1&3',
-    url: '/api.php/getappapi.index/typeFilterVodList',
-    searchUrl: '/api.php/getappapi.index/searchList',
-    searchable: 2,
+    url: '/api.php/getappapi.index/typeFilterVodList?fyfilter',
+    filter_url: 'area=全部&year={{fl.year or "全部"}}&type_id=fyclass&page=fypage&sort={{fl.sort or "最新"}}&lang=全部&class=全部',
+    detailUrl: '/api.php/getappapi.index/vodDetail?vod_id=fyid',
+    searchUrl: '/api.php/getappapi.index/searchList?keywords=**&type_id=0&page=fypage',
+    searchable: 1,
+    filterable: 1,
     quickSearch: 0,
     headers: {
         'User-Agent': 'okhttp/3.14.9',
-        'Connection': 'Keep-Alive',
-        'Accept-Encoding': 'gzip',
-        'app-version-code': '167',
-        'app-ui-mode': 'light',
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
     },
     timeout: 5000,
     play_parse: true,
-    class_parse: async () => {
-        // let classes = [{"type_id": "2", "type_name": "剧集"}, {"type_id": "1", "type_name": "电影"}, {
-        //     "type_id": "3",
-        //     "type_name": "动漫"
-        // },];
-        // return {
-        //     class: classes,
-        // }
+    hostJs: async function () {
+        let {HOST} = this;
+        HOST = await request(HOST, {headers: {'User-Agent': 'MOBILE_UA'}});
+        return HOST;
     },
-    预处理: async () => {
-        let domain_config = {
-            method: 'GET',
-            url: 'http://111.180.203.165:9999/d/115/jiekou.txt',
+    class_parse: async function () {
+        let filters = {};
+        let years = '2025&2024&2023&2022&2021&2020&2019&2018&2017&2016&2015&2014&2013&2012&2011&2010&2009&2008&2007&2006&2005&2004&2003&2002&2001&2000'.split('&');
+        let yearArea = years.map((it) => {
+            return {n: it, v: it}
+        });
+        let sorts = '最新&最热&最赞'.split('&');
+        let sortArea = sorts.map((it) => {
+            return {n: it, v: it}
+        });
+        for (let tid of rule.class_url.split('&')) {
+            filters[tid] = [
+                {key: 'year', name: '年份', value: yearArea},
+                {key: 'sort', name: '排序', value: sortArea},
+            ]
         }
-        let homeUrl = (await req(domain_config.url, {headers: {'User-Agent': 'okhttp/3.14.9'}})).content;
-        log('homeUrl:', homeUrl);
-        if (homeUrl) {
-            rule.homeUrl = homeUrl;
-        }
-        let _ip = await getPublicIp();
-        rule.ip = _ip;
-        log('_ip:', _ip);
+        return {filters}
     },
-    推荐: async () => {
+    预处理: async function (env) {
+        rule.headers['Host'] = rule.host.split('//')[1];
+    },
+    推荐: async function () {
         return []
     },
     一级: async function (tid, pg, filter, extend) {
-        let {MY_CATE, input} = this;
-        let page = pg || 1;
-        if (page === 0) page = 1;
-        const data = {
-            'area': '全部',
-            'year': '全部',
-            'type_id': MY_CATE,
-            'page': page,
-            'sort': '最新',
-            'lang': '全部',
-            'class': '全部'
-        }
+        let {input} = this;
+        log(input);
         let d = [];
-        const html = JSON.parse((await req(rule.homeUrl + input, {method: 'post', data: data})).content);
-        let videos = JSON.parse(category_decrypt(html.data)).recommend_list
-        videos.forEach(it => {
+        let html = await post(input.split('?')[0], {
+            body: input.split('?')[1],
+        });
+        // log(html);
+        let html1 = Decrypt(JSON.parse(html).data);
+        let list = JSON.parse(html1).recommend_list;
+        list.forEach(item => {
             d.push({
-                title: it.vod_name,
-                url: it.vod_id,
-                desc: it.vod_blurb,
-                pic_url: it.vod_pic
+                title: item.vod_name,
+                desc: item.vod_remarks,
+                pic_url: item.vod_pic,
+                url: item.vod_id,
             })
-        })
-        return setResult(d)
+        });
+        return setResult(d);
     },
     二级: async function (ids) {
         let {input} = this;
-        let data = {
-            'vod_id': ids[0]
-        }
-        let html = JSON.parse((await req(`${rule.homeUrl}/api.php/getappapi.index/vodDetail`, {
-            method: 'post', headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': 'okhttp/3.14.9',
-                // 'Host': `${rule.homeUrl.replace('https://','')}`
-            }, data: data
-        })).content);
-        let list = JSON.parse(detail_decrypt(html.data));
+        let html = await post(input.split('?')[0], {
+            body: input.split('?')[1],
+        });
+        let html1 = Decrypt(JSON.parse(html).data);
+        let list = JSON.parse(html1);
         const vod = {
             vod_id: list.vod.vod_id,
             vod_name: list.vod.vod_name,
             vod_pic: list.vod.vod_pic,
-            vod_remarks: list.vod.vod_remarks
+            vod_remarks: list.vod.vod_remarks,
+            vod_content: list.vod.vod_content
         };
-        const playlist = list.vod_play_list
+        const playlist = list.vod_play_list;
         let playmap = {};
         for (const i in playlist) {
-            let form = playlist[i].player_info.show
-            let user_agent = playlist[i].player_info.user_agent
-            const list = playlist[i].urls
+            let form = playlist[i].player_info.show;
+            let parse = playlist[i].player_info.parse;
+            let user_agent = playlist[i].player_info.user_agent;
+            const list = playlist[i].urls;
             if (!playmap.hasOwnProperty(form)) {
                 playmap[form] = [];
             }
             for (const i in list) {
-                playmap[form].push(list[i].name.trim() + '$' + encodeURIComponent(list[i].parse_api_url + '#' + user_agent));
-
+                playmap[form].push(list[i].name.trim() + '$' + encodeURIComponent(list[i].url + '#' + parse + '#' + user_agent));
             }
         }
         vod.vod_play_from = Object.keys(playmap).join('$$$');
@@ -118,147 +109,108 @@ var rule = {
         return vod
     },
     搜索: async function (wd, quick, pg) {
-        let html = JSON.parse((await req(`${rule.homeUrl}/api.php/getappapi.index/searchList`, {
-            method: 'post',
-            data: {
-                'keywords': wd,
-                'type_id': '0',
-                'page': pg
-            }
-        })).content);
+        let {input} = this;
         let d = [];
-        let videos = JSON.parse(detail_decrypt(html.data)).search_list
-        videos.forEach(it => {
-            d.push({
-                title: it.vod_name,
-                url: it.vod_id,
-                desc: it.vod_blurb,
-                pic_url: it.vod_pic
-            })
-        })
-        return setResult(d)
+        let html = await post(input.split('?')[0], {
+            body: input.split('?')[1]
+        });
+        try {
+            let html1 = Decrypt(JSON.parse(html).data);
+            let list = JSON.parse(html1).search_list;
+            list.forEach(it => {
+                d.push({
+                    title: it.vod_name,
+                    url: it.vod_id,
+                    desc: it.vod_remarks,
+                    content: it.vod_blurb,
+                    pic_url: it.vod_pic,
+                });
+            });
+        } catch (e) {
+            log(e.message);
+        }
+        return setResult(d);
     },
     lazy: async function (flag, id, flags) {
         let {getProxyUrl, input} = this;
-        if (input.indexOf('m3u8') < 0) {
-            if (input.indexOf('json.php') > 0) {
-                let html = JSON.parse((await req(input.split('#')[0], {
-                    method: 'post',
-                    headers: {
-                        'User-Agent': input.split('#')[1]
-                    }
-                })).content)
-                let link = html.url
-                return {parse: 0, url: getProxyUrl() + '&url=' + encodeURIComponent(link), js: ''}
-            } else if (input.indexOf('parse.php') > 0) {
-                let html = JSON.parse((await req(input.split('#')[0], {
-                    method: 'post',
-                    headers: {
-                        // 'User-Agent': input.split('#')[1],
-                        'User-Agent': '7788',
-                        'Connection': 'Keep-Alive',
-                        'Accept-Encoding': 'gzip',
-                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-                    }
-                })).content)
-                let link = html.url
-                return {parse: 0, url: link, js: ''}
-            } else {
-                let html = JSON.parse((await req(input.split('#')[0], {
-                    method: 'post',
-                    headers: {
-                        // 'User-Agent': input.split('#')[1],
-                        'User-Agent': '7788',
-                        'Connection': 'Keep-Alive',
-                        'Accept-Encoding': 'gzip',
-                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-                    }
-                })).content)
-                let link = html.url
-                return {parse: 0, url: link, js: ''}
+        let params = decodeURIComponent(input).split('#');
+        log(params);
+        input = params[0];
+        let parse = params[1];
+        let ua = params[2];
+        if (/mp4/.test(input)) {
+            return input
+        }
+        if (/m3u8/.test(input)) {
+            return {parse: 0, url: getProxyUrl() + '&url=' + input}
+        }
+        if (parse.includes('http')) {
+            let html = await post(parse + input, {
+                headers: {
+                    'User-Agent': ua
+                },
+            });
+            try {
+                let url = JSON.parse(html).url + '#isVideo=true#'
+                if (url.includes('&vkey=')) {
+                    return {parse: 0, url: getProxyUrl() + '&url=' + url}
+                }
+                return {parse: 0, url: url}
+            } catch (e) {
+                log(e.message)
             }
-        } else {
-            return {parse: 0, url: getProxyUrl() + '&url=' + encodeURIComponent(input.split('#')[0]), js: ''}
+        }
+
+        let html = await post(rule.host + '/api.php/getappapi.index/vodParse', {
+            headers: {
+                'User-Agent': ua
+            },
+            body: 'parse_api=' + parse + '&url=' + Encrypt(input) + '&token=',
+        });
+        try {
+            let json = JSON.parse(html);
+            if (json.code === 1) {
+                let url = JSON.parse(JSON.parse(Decrypt(json.data)).json).url + '#isVideo=true#';
+                if (url.includes('.m3u8')) {
+                    return {parse: 0, url: getProxyUrl() + '&url=' + url}
+                }
+                return {parse: 0, url: url}
+            }
+        } catch (e) {
+            log(e.message);
         }
     },
     proxy_rule: async function () {
         let {input} = this;
-        if (input.indexOf('m3u8') < 0) {
-            let m3u8_content = (await req(decodeURIComponent(input))).content
-            let m3u8 = m3u8_content.replace(/#EXTINF:10\.333333,\s*https?:\/\/[^\s]+\n#EXT-X-DISCONTINUITY/, '')
+        if (input) {
+            let html1 = await request(input);
+            let m3u8 = html1.includes('http') ? html1.replace(/#EXT-X-DISCONTINUITY[\s\S]*?#EXT-X-DISCONTINUITY/, '#EXT-X-DISCONTINUITY') : html1.replace(/#EXT-X-DISCONTINUITY[\s\S]*?#EXT-X-DISCONTINUITY/, '#EXT-X-DISCONTINUITY').replace(/^(\w.*?)$/gm, input.match(/http.*\//)[0] + '$1');
             return [200, 'application/vnd.apple.mpegurl', m3u8]
-        } else {
-            let m3u8_content = (await req(decodeURIComponent(input))).content.replace(/#EXTINF:10\.333333,\s*https?:\/\/[^\s]+\n#EXT-X-DISCONTINUITY/, '')
-            //https?:\/\/[^\s]+piantou\.(txt|zip)|piantou.txt|piantou.zip
-            if (m3u8_content.match(/https?:\/\/[^\s]+piantou\.(txt|zip|psd)|piantou.txt|piantou.zip|piantou.psd/)) {
-                const lines = m3u8_content.split('\n');
-                const tsUrls = [];
-                let link_start = ''
-                lines.forEach(line => {
-                    if (line.trim().startsWith('http') && line.trim().indexOf('piantou') < 0 && /txt|zip|psd/.test(line.trim())) {
-                        tsUrls.push(line)
-                    }
-                    if (/txt|zip|psd/.test(line.trim()) && line.trim().indexOf('piantou') < 0) {
-                        link_start = input.split('?')[0].replace('playlist.m3u8', '')
-                        tsUrls.push(link_start + line.trim())
-                    } else {
-                        tsUrls.push(line)
-                    }
-                })
-                let m3u8_text = tsUrls.join('\n')
-                log(m3u8_text)
-                return [200, 'application/vnd.apple.mpegurl', m3u8_text]
-            } else {
-                const lines = m3u8_content.split('\n');
-                const tsUrls = [];
-                let link_start = ''
-                lines.forEach(line => {
-                    if (line.trim().startsWith('http') && /txt|zip|psd/.test(line.trim())) {
-                        tsUrls.push(line)
-                    }
-                    if (/txt|zip|psd/.test(line.trim())) {
-                        link_start = input.split('?')[0].replace('playlist.m3u8', '')
-                        tsUrls.push(link_start + line.trim())
-                    } else {
-                        tsUrls.push(line)
-                    }
-                })
-                let m3u8_text = tsUrls.join('\n')
-                return [200, 'application/vnd.apple.mpegurl', m3u8_text]
-            }
         }
     }
 };
 
-function encrypt(word) {
-    const key = CryptoJSW.enc.Utf8.parse("31c93c7bc211d778");
-    const iv = CryptoJSW.enc.Utf8.parse("31c93c7bc211d778");
-    const encrypted = CryptoJSW.AES.encrypt(CryptoJSW.enc.Utf8.parse(word), key, {
+
+function Decrypt(word) {
+    const key = CryptoJS.enc.Utf8.parse("F51F5D52D23CBF27");
+    const iv = CryptoJS.enc.Utf8.parse("F51F5D52D23CBF27");
+    let decrypt = CryptoJS.AES.decrypt(word, key, {
         iv: iv,
-        mode: CryptoJSW.mode.CBC,
-        padding: CryptoJSW.pad.Pkcs7
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
     });
-    return encrypted.toString();
+    let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
+    return decryptedStr.toString();
 }
 
-function category_decrypt(word) {
-    const key = CryptoJSW.enc.Utf8.parse("31c93c7bc211d778");
-    const iv = CryptoJSW.enc.Utf8.parse("33520 USB Digita");
-    const decrypt = CryptoJSW.AES.decrypt(word, key, {
+function Encrypt(word) {
+    const key = CryptoJS.enc.Utf8.parse("F51F5D52D23CBF27");
+    const iv = CryptoJS.enc.Utf8.parse("F51F5D52D23CBF27");
+    let encrypt = CryptoJS.AES.encrypt(word, key, {
         iv: iv,
-        mode: CryptoJSW.mode.CBC,
-        padding: CryptoJSW.pad.Pkcs7
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
     });
-    return decrypt.toString(CryptoJSW.enc.Utf8);
-}
-
-function detail_decrypt(word) {
-    const key = CryptoJSW.enc.Utf8.parse("31c93c7bc211d778");
-    const iv = CryptoJSW.enc.Utf8.parse("31c93c7bc211d778");
-    const decrypt = CryptoJSW.AES.decrypt(word, key, {
-        iv: iv,
-        mode: CryptoJSW.mode.CBC,
-        padding: CryptoJSW.pad.Pkcs7
-    });
-    return decrypt.toString(CryptoJSW.enc.Utf8);
+    let encryptedStr = encrypt.toString(CryptoJS.enc.base64);
+    return encryptedStr.toString();
 }

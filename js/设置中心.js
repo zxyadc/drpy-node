@@ -39,16 +39,35 @@ let quick_data1 = {
     '十日终焉': 'https://fanqienovel.com/page/7143038691944959011',
     '斩神': 'https://fanqienovel.com/page/6982529841564224526',
 };
+let quick_data2 = {
+    '推送': 'push',
+    '夸克': 'quark',
+    'UC': 'uc',
+    '阿里': 'ali',
+    '天翼': 'cloud',
+    '哔哩': 'bili',
+    '系统配置': 'system',
+    '测试': 'test',
+};
+
 let selectDataList = [];
 let selectDataList1 = [];
+let selectDataList2 = [];
+
 for (let key of Object.keys(quick_data)) {
     selectDataList.push(`${key}:=${quick_data[key]}`);
 }
 let selectData = selectDataList.join(',');
+
 for (let key of Object.keys(quick_data1)) {
     selectDataList1.push(`${key}:=${quick_data1[key]}`);
 }
 let selectData1 = selectDataList1.join(',');
+
+for (let key of Object.keys(quick_data2)) {
+    selectDataList2.push(`${key}:=${quick_data2[key]}`);
+}
+let selectData2 = selectDataList2.join(',');
 
 var rule = {
     类型: '设置',
@@ -57,8 +76,24 @@ var rule = {
         let {publicUrl} = this;
         // log('publicUrl:', publicUrl);
         let setIcon = urljoin(publicUrl, './images/icon_cookie/设置.png');
+        let searchIcon = urljoin(publicUrl, './images/icon_cookie/搜索.jpg');
         let chatIcon = urljoin(publicUrl, './images/icon_cookie/chat.webp');
-        action_data.forEach(it => {
+        const data = deepCopy(action_data);
+        data.push({
+            vod_id: JSON.stringify({
+                actionId: '源内搜索',
+                id: 'wd',
+                type: 'input',
+                title: '源内搜索',
+                tip: '请输入搜索内容',
+                value: '',
+                selectData: selectData2
+            }),
+            vod_name: '源内搜索',
+            vod_pic: searchIcon,
+            vod_tag: 'action',
+        });
+        data.forEach(it => {
             if (!it.vod_pic) {
                 it.vod_pic = setIcon;
             }
@@ -66,7 +101,7 @@ var rule = {
                 it.vod_pic = chatIcon;
             }
         });
-        return action_data;
+        return data;
     },
     // 推荐样式
     hikerListCol: 'icon_round_4',
@@ -254,7 +289,7 @@ var rule = {
             case 'cloud':
                 d.push(genMultiInput('cloud_account', '设置天翼 账号', null, images.cloud));
                 d.push(genMultiInput('cloud_password', '设置天翼 密码', null, images.cloud));
-                d.push(genMultiInput('cloud_cookie', '设置天翼 cookie', null, images.cloud));
+                // d.push(genMultiInput('cloud_cookie', '设置天翼 cookie', null, images.cloud));
                 d.push(getInput('get_cloud_account', '查看天翼 账号', images.cloud));
                 d.push(getInput('get_cloud_password', '查看天翼 密码', images.cloud));
                 d.push(getInput('get_cloud_cookie', '查看天翼 cookie', images.cloud));
@@ -356,6 +391,20 @@ var rule = {
             } catch (e) {
                 return '发生错误：' + e;
             }
+        }
+        if (action === '源内搜索') {
+            let content = JSON.parse(value);
+            return JSON.stringify({
+                action: {
+                    actionId: '__self_search__',
+                    skey: '', //目标源key，可选，未设置或为空则使用当前源
+                    // skey: 'drpyS_小米盘搜[盘]', //目标源key，可选，未设置或为空则使用当前源 | 跳一级并非跳搜索
+                    name: '搜索: ' + content.wd,
+                    tid: content.wd,
+                    flag: '0-0-S',
+                    msg: '源内搜索'
+                }
+            });
         }
 
         if (action === '连续对话') {

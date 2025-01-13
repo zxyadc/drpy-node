@@ -130,7 +130,7 @@ async function generateSiteJSON(jsDir, dr2Dir, configDir, requestHost, sub, subF
             return {
                 func: async ({file, dr2Dir, requestHost, pwd, drpy, SitesMap}) => {
                     const baseName = path.basename(file, '.js'); // 去掉文件扩展名
-                    let api = `./drpy2.min.js`;  // 使用内置drpy2
+                    let api = `assets://js/lib/drpy2.js`;  // 使用内置drpy2
                     let ext = `${requestHost}/js/${file}`;
                     if (pwd) {
                         ext += `?pwd=${pwd}`;
