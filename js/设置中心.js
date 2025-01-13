@@ -12,7 +12,7 @@ const {
 const AI_Cache = {};
 
 let gitPublicUrl = 'https://github.catvod.com/https://raw.githubusercontent.com/hjdhnx/drpy-node/refs/heads/main/public/';
-let liveImgUrl = urljoin(gitPublicUrl, './images/lives.jpg');
+let liveImgUrl = urljoin(gitPublicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/lives.jpg');
 let quick_data = {
     腾讯: 'https://v.qq.com/x/cover/mzc00200vkqr54u/u4100l66fas.html',
     爱奇艺: 'http://www.iqiyi.com/v_1b0tk1b8tl8.html',
@@ -56,8 +56,8 @@ var rule = {
     推荐: async function () {
         let {publicUrl} = this;
         // log('publicUrl:', publicUrl);
-        let setIcon = urljoin(publicUrl, './images/icon_cookie/设置.png');
-        let chatIcon = urljoin(publicUrl, './images/icon_cookie/chat.webp');
+        let setIcon = urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/设置.png');
+        let chatIcon = urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/chat.webp');
         action_data.forEach(it => {
             if (!it.vod_pic) {
                 it.vod_pic = setIcon;
@@ -160,16 +160,16 @@ var rule = {
             return []
         }
         let images = {
-            'quark': urljoin(publicUrl, './images/icon_cookie/夸克.webp'),
-            'uc': urljoin(publicUrl, './images/icon_cookie/UC.png'),
-            'ali': urljoin(publicUrl, './images/icon_cookie/阿里.png'),
-            'bili': urljoin(publicUrl, './images/icon_cookie/哔哩.png'),
-            'cloud': urljoin(publicUrl, './images/icon_cookie/天翼.png'),
-            'adult': urljoin(publicUrl, './images/icon_cookie/chat.webp'),
+            'quark': urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/夸克.webp'),
+            'uc': urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/UC.png'),
+            'ali': urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/阿里.png'),
+            'bili': urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/哔哩.png'),
+            'cloud': urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/天翼.png'),
+            'adult': urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/chat.webp'),
             'test': urljoin(publicUrl, './icon.svg'),
-            'lives': urljoin(publicUrl, './images/lives.jpg'),
-            'settings': urljoin(publicUrl, './images/icon_cookie/设置.png'),
-            'read': urljoin(publicUrl, './images/icon_cookie/阅读.png'),
+            'lives': urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/lives.jpg'),
+            'settings': urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/设置.png'),
+            'read': urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/阅读.png'),
         };
         let d = [];
         switch (MY_CATE) {
@@ -992,7 +992,7 @@ var rule = {
             }
         }
         if (action === '查看夸克cookie') {
-            return {action: getInput('get_quark_cookie', '查看夸克 cookie', urljoin(publicUrl, './images/icon_cookie/夸克.webp')).vod_id};
+            return {action: getInput('get_quark_cookie', '查看夸克 cookie', urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/夸克.webp')).vod_id};
         }
         if (action === '设置夸克cookie') {
             return {action: genMultiInput('quark_cookie', '设置夸克 cookie', null).vod_id};
