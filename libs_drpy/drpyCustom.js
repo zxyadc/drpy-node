@@ -10,6 +10,7 @@ globalThis.TAB_EXCLUDE = '猜你|喜欢|下载|剧情|榜|评论';
 globalThis.OCR_RETRY = 3;//ocr验证重试次数
 globalThis.OCR_API = 'https://api.nn.ci/ocr/b64/text';//ocr在线识别接口
 globalThis.nodata = {
+/*
     list: [{
         vod_name: '无数据,防无限请求',
         vod_id: 'no_data',
@@ -17,6 +18,7 @@ globalThis.nodata = {
         vod_pic: 'https://ghproxy.net/https://raw.githubusercontent.com/hjdhnx/dr_py/main/404.jpg'
     }],
     total: 1, pagecount: 1, page: 1, limit: 1
+    */
 };
 globalThis.SPECIAL_URL = /^(ftp|magnet|thunder|ws):/;
 

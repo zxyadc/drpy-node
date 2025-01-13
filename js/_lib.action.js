@@ -27,19 +27,21 @@ const action_data = [
     {
         vod_id: '夸克扫码',
         vod_name: '夸克扫码',
-        vod_pic: 'https://pic.qisuidc.cn/s/2024/10/23/6718c212f1fdd.webp',
+        vod_pic: 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/夸克.webp',
         vod_remarks: '夸克',
         vod_tag: 'action'
     },
     {
         vod_id: '基础Action指令',
         vod_name: '基础Action',
+        vod_pic: 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/设置.png',
         vod_tag: 'action'
+        
     },
     {
         vod_id: 'set-cookie',
         vod_name: '设置Cookie',
-        vod_pic: 'https://pic.qisuidc.cn/s/2024/10/23/6718c212f1fdd.webp',
+        vod_pic: 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/夸克.webp',
         vod_remarks: '夸克',
         vod_tag: 'action'
     },
@@ -57,6 +59,7 @@ const action_data = [
             imageType: 'card_pic_3',
         }),
         vod_name: '单项输入带图',
+        vod_pic: 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/设置.png',
         vod_tag: 'action'
     },
     {
@@ -72,6 +75,7 @@ const action_data = [
             //initAction: 'initAction'
         }),
         vod_name: '扫码初始动作',
+        vod_pic: 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/设置.png',
         vod_tag: 'action'
     },
     {
@@ -87,6 +91,7 @@ const action_data = [
             selectData: '1:=aaa输入默认值,2:=bb输入默认值bbbbb,3:=c输入默认值ddd,4:=输入默认值,5:=111,6:=22222,7:=HOHO,HELLO,world'
         }),
         vod_name: '单项快速输入',
+        vod_pic: 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/设置.png',
         vod_tag: 'action'
     },
     {
@@ -118,6 +123,7 @@ const action_data = [
             ]
         }),
         vod_name: '多项输入',
+        vod_pic: 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/设置.png',
         vod_tag: 'action'
     },
     {
@@ -148,6 +154,7 @@ const action_data = [
             selectedIndex: 3
         }),
         vod_name: '单选菜单',
+        vod_pic: 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/设置.png',
         vod_tag: 'action'
     },
     {
@@ -215,6 +222,7 @@ const action_data = [
             ]
         }),
         vod_name: '多选菜单',
+        vod_pic: 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/设置.png',
         vod_tag: 'action'
     },
 ];

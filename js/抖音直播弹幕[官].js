@@ -5,8 +5,8 @@
 const url = require('url');
 const fs = require('fs');
 const http = require('http');
-const { get_sign, getDmHtml } = require('../js/_lib.douyin_sign.cjs');
-eval(fs.readFileSync('./js/_lib.douyin_pb.cjs', 'utf8'));
+//const { get_sign, getDmHtml } = require('../js/_lib.douyin_sign.cjs');
+//eval(fs.readFileSync('./js/_lib.douyin_pb.cjs', 'utf8'));
 
 var rule = {
     类型: '影视',

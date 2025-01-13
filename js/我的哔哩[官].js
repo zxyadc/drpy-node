@@ -27,7 +27,8 @@
 var rule = {
     title: '我的哔哩[官]',
     host: 'https://api.bilibili.com',
-    homeUrl: '/x/web-interface/ranking/v2?rid=0&type=origin',
+   // homeUrl: '/x/web-interface/ranking/v2?rid=0&type=origin',
+    homeUrl:'/x/web-interface/search/type?search_type=video&keyword=演唱会&page=1',
     url: '/x/web-interface/search/type?search_type=video&fyfilter',
     filter_url: 'keyword=fyclass{{fl.tid}}&page=fypage&duration={{fl.duration}}&order={{fl.order}}',
     class_parse: async function () {
@@ -100,8 +101,8 @@ var rule = {
     推荐: async function () {
         let {input} = this;
         let html = await request(input);
-        let vodList = JSON.parse(html).data.list;
         let videos = [];
+        let vodList = JSON.parse(html).data.result; //list
         vodList.forEach(function (vod) {
             let aid = vod.aid;
             let title = misc.stripHtmlTag(vod.title);
@@ -109,7 +110,7 @@ var rule = {
             if (img.startsWith('//')) {
                 img = 'https:' + img;
             }
-            let remark = turnDHM(vod.duration) + ' ▶' + ConvertNum(vod.stat.view) + ' 🆙' + vod.owner.name;
+            let remark = turnDHM(vod.duration);
             videos.push({
                 vod_id: aid,
                 vod_name: title,
@@ -226,6 +227,7 @@ var rule = {
             vod_actor: '▶' + stat.view + '　' + '💬' + stat.danmaku + '　' + '👍' + stat.like + '　' + '💰' + stat.coin + '　' + '⭐' + stat.favorite,
             vod_content: desc
         };
+        
         let ja = jo.pages;
         let treeMap = {};
         let playurls = [];
@@ -250,7 +252,15 @@ var rule = {
         treeMap['相关推荐'] = playurls.join('#');
         vod.vod_play_from = Object.keys(treeMap).join("$$$");
         vod.vod_play_url = Object.values(treeMap).join("$$$");
-        return vod;
+   //     return vod;
+        return {url: JSON.stringify({
+    urls: ['http://xxx/1.mp4', 'http://xxx/2.mp4'],
+    names: ["1080p", "720p"],
+    audioUrls:[],
+    subtitle:"",
+    danmu:"",
+    is:"#isVideo=true#"
+})}
     },
     搜索: async function () {
         let {input} = this;

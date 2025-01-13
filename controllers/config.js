@@ -188,6 +188,154 @@ async function generateSiteJSON(jsDir, dr2Dir, configDir, requestHost, sub, subF
         await batchExecute(dr2_tasks, listener);
 
     }
+    
+    //修改名称
+sites.forEach(site => {
+    site.name = site.name
+    .replace(/优汐|哥哥|影院|弹幕/g, '')
+    .replace(/金牌/g, '金牌[优]')
+    .replace(/荐片/g, '荐片[优]')
+    .replace(/皮皮虾/g, '皮皮')
+    .replace(/奇珍异兽/g, '奇异')
+    .replace(/腾云驾雾/g, '腾讯')
+    .replace(/百忙无果/g, '芒果')  
+    .replace(/特下饭/g, '下饭')
+    .replace(/ikanbot/g, '爱看')
+    .replace(/hdmoli/g, '莫离')
+    .replace(/素白白/g, '素白[优]')
+    .replace(/瓜子H5/g, '瓜子H5[优]')
+    .replace(/^(.*?短剧)(?!.*\[短\])/gm, '$1[短]')
+    .replace(/\b动漫/g, '动漫[漫]')
+    .replace(/小米盘搜[\[盘\]]/g, '小米盘搜[搜]')
+    ;
+});
+    
+    //排序
+function customSort(a, b) {
+    // 定义排序顺序
+    let order = ['[优]', '💿', '中心', '交互', '[合]', '直播', '🏠', '官', '[短]', '📻', '[听]', '[书]', '[漫]', '[儿]', '[磁]', '[搜]'];
+    let js_order = ['🏆瓜子APP[优]', '🏆瓜子H5[优]', '🏆皮皮[优]'];
+
+    // 先按照 js_order 排序
+    let i = js_order.indexOf(a.name.split('(')[0]);
+    let j = js_order.indexOf(b.name.split('(')[0]);
+
+    if (i!== -1 && j!== -1) {
+        return i - j;
+    } else if (i!== -1) {
+        return -1;
+    } else if (j!== -1) {
+        return 1;
+    }
+
+    function getIndex(name, order) {
+        for (let i = 0; i < order.length; i++) {
+            if (name.includes(order[i])) {
+                return i;
+            }
+        }
+        return order.length;
+    }
+
+    let indexA = getIndex(a.name, order);
+    let indexB = getIndex(b.name, order);
+    if (indexA!== indexB) {
+        return indexA - indexB;
+    }
+
+    // 放最后
+    const hasPushA = a.name.includes('推送');
+    const hasPushB = b.name.includes('推送');
+    if (hasPushA &&!hasPushB) {
+        return 1;
+    } else if (!hasPushA && hasPushB) {
+        return -1;
+    }
+
+    if (indexA === indexB) {
+        if (a.name.length!== b.name.length) {
+            return a.name.length - b.name.length;
+        }
+        return a.name.localeCompare(b.name);
+    }
+    return 0;
+}
+//过滤
+
+function shouldExclude(site) {
+    const excludeKeywords = ['KKK', '奥秘', '玩偶','擦', '多多', '团长', '豆瓣', 'ACG', 'Omo', '人人', '好乐', '央视'];
+    const order = ['中心', '交互', '推', '爱看'];
+    const regex = /\[[^]]*\]/;
+
+    // 检查是否包含需要排除的关键词，排除包含 order 数组中关键词的情况
+    const hasExcludeKeyword = excludeKeywords.some(keyword => {
+        return site.name.includes(keyword) &&!order.some(orderWord => site.name.includes(orderWord));
+    });
+
+    // 检查是否不包含 [字符串] 形式，排除包含 order 数组中关键词的情况
+    const hasNoBrackets =!regex.test(site.name) &&!order.some(orderWord => site.name.includes(orderWord));
+
+    return hasExcludeKeyword || hasNoBrackets;
+}
+ sites = sites.filter(site =>!shouldExclude(site));
+
+
+let emojiMap = {
+    "[儿]": "👶",
+    "[优]": "🏆",
+    "[合]": "🎁",
+    "短": "📲",
+  //  "[影视]": "📺",
+    "[戏]": "🎭",
+    "博": "📻",
+    "相声": "📻",
+    "[磁]": "🧲",
+    "[慢]": "🐢",
+    "[画]": "🖼️",
+    "密": "🚫",
+    "直播": "▶️",
+    "哔哩": "🅱️",
+    "[搜]": "🔎",
+    "[播]": "🖥️",
+    "[V2]": "🔱",
+    "[资]": "♻️",
+    "[自动]": "🤖",
+    "[虫]": "🐞",
+    "[球]": "⚽",
+    "[盘]": "💿",
+    "[书]": "📚",
+    "[官]": "🏠",
+    "[漫]": "💮",
+    "[音乐]": "🎻",
+    "[听]": "🎧️",
+    "[飞]": "✈️",
+    "[央]": "🌎",
+    "[弹幕]": "😎",
+    "置": "⚙️",
+    "交互": "⚙️",
+    "推": "🛴",
+    "": "📺"
+
+}
+
+   
+// 查找并添加图标
+    // 遍历 sites 数组
+sites.forEach(site => {
+let addedEmoji = '';
+    for (let key in emojiMap) {
+        if (site.name.includes(key)) {
+            addedEmoji = emojiMap[key];
+            break;
+        }
+    }
+    if (addedEmoji) {
+        site.name = addedEmoji + site.name;
+    }
+});
+
+//console.log(sites);
+
 
     // 订阅再次处理别名的情况
     if (sub) {
@@ -202,6 +350,15 @@ async function generateSiteJSON(jsDir, dr2Dir, configDir, requestHost, sub, subF
         sites = sites.filter(it => !(new RegExp('\\[[密]\\]|密+')).test(it.name));
     }
     sites = naturalSort(sites, 'name', sort_list);
+    
+    
+    
+
+
+
+// 使用数组的 sort 方法调用 customSort 函数进行排序
+sites.sort(customSort);
+
     return {sites};
 }
 
@@ -283,6 +440,50 @@ async function generateParseJSON(jxDir, requestHost) {
     return {parses};
 }
 
+
+function generateLivesJSON(requestHost) {
+    const live_urls = [
+        process.env.LIVE_URL1,
+        process.env.LIVE_URL2,
+        process.env.LIVE_URL3,
+        process.env.LIVE_URL4
+    ];
+    const epg_url = process.env.EPG_URL || '';
+    const logo_url = process.env.LOGO_URL || '';
+    const names = ["yuanzl77", "范明明V6", "直播", "一起看"];
+
+    function processUrl(url) {
+        if (url &&!url.startsWith('http')) {
+            const public_url = urljoin(requestHost, 'public/');
+            return urljoin(public_url, url);
+        }
+        return url;
+    }
+
+    function createLiveObject(url, name) {
+        return {
+            name,
+            type: 0,
+            url,
+            playerType: 1,
+            ua: "okhttp/3.12.13",
+            epg: epg_url,
+            logo: logo_url
+        };
+    }
+
+    const lives = live_urls.map((url, index) => {
+        const processedUrl = processUrl(url);
+        if (processedUrl) {
+            return createLiveObject(processedUrl, names[index]);
+        }
+        return null;
+    }).filter(Boolean);
+
+    return { lives };
+}
+
+/*
 function generateLivesJSON(requestHost) {
     let lives = [];
     let live_url = process.env.LIVE_URL || '';
@@ -309,6 +510,7 @@ function generateLivesJSON(requestHost) {
     return {lives}
 }
 
+*/
 function generatePlayerJSON(configDir, requestHost) {
     let playerConfig = {};
     let playerConfigPath = path.join(configDir, './player.json');

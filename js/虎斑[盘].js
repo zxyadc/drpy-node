@@ -4,29 +4,42 @@ const {
 } = misc;
 var rule = {
     title: '虎斑[盘]',
-    // host: 'https://wp.huban.xyz',
+    //host: 'http://wp.huban.xyz',
     host: 'http://45.207.212.215:12121',
-    url: '/index.php/vod/show/id/fyfilter.html',
+    url: '/index.php/vod/show/id/fyclass/page/fypage.html',
     filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
     searchUrl: '/index.php/vod/search/page/fypage/wd/**.html',
-    filter: 'H4sIAAAAAAAAA+2a2U4jRxSGr2eeIvI1kWlgmOVu9n3fJ5oLz8hKRiFEAhIJjZAAY49hwDaIwePYbBn24IUlxJgYv4yr236LtF3l09V/W6JJUJRIdenv/32q+lS5+px2vz99yqN5Lnzz3vO9v99zwfO2y9fb62nxdPt+8Jsf2eiqHgian3/2df3kr/u6azi4Vg2s1bD5wTPQIuhMyvQL6q1H8grWsBjhLRHPsgjWsOhDMX1wxm4RjAYaWysXUzAQZzTQ6iTbP4CBOKModG1SFM5oLuHP5cIozIWzhqWSXmHjG3aLYDSXsaxRBItg0hUZ0weOK6oxsix/cFyRYDTd9Er5cAGmyxlFCU1VE+sQhTOKMrdhXiNE4ewYa6QPbxozk2DhjCyBMX34F7BwRqk7iLJgHlLHWcNSnZ3SPy/bLYLRQDMfKqMFGIgzysthxpj+nRW3IDWEyRhdqnzBXcMZWSIhFt0GC2e0a0oxc3lh13BmrVRKn53ElaozsoyUjN/g0gWjBBYnjYNUs0uzKQOva1/gR4Cvx++TToBUjo0X3J4AS6vVRKgxTi2Qt5xPs2RRCLRmKwk9n23iE4KV7Jy+f9gsHhdogePLemrT5hOIRpxfN79mcwhEmTqMoEMgGmXnEzoEomX9uIUOgax99gc6BLJGyTlHydliTORYYcUegyOKMRI1M87C6/YwRGm+yyUjmjZGE/YpE7WOpwX9Y8n8sn1QouQL7pUPZuwmjuQN1uXr/tbaYJVsurI26HaDJYumvzFALZBXIGkJ0CEQLfT2EjoEos0SL7KJOJosKm0qh4kjaWOiQyBpUzkcHElbxnHNHElpZ5mA3cGRnPZ+v6/HSrse36vGd12mva217UwjfC2Mtw4ktQPVDlltR7VdVttQbZNVDVVNVltRbZVU7TyoJpDUc6iek9WzqJ6V1U5UO2UVc6XJudIwV5qcKw1zpcm50jBXmpwrDXOlybnSMFcmsP0q/X19fmmDsHRcz0643CAXafPVo3gvknIJlEukXAblMilXQLlCylVQrpJyDZRrpFwH5TopN0C5QcpNUG6ScguUW6TcBuU2KXdAuUPKXVDuknIPlHuk3AflPikPQHlAykNQHpLyCJRHpDwG5TEpT0B5QspTUJ6S8gyUZ6Q8B+U5KS9AeUHKS1BekvIKlFektH59HrQakX8Cb/ql8zEyxQpRx/a3js1anDf93r53pr0xRLlQ0HPTkvrdu75e69aUHWHhkKT2vv2xx1+bweuW01952k6qDTu6QnXR1/ASmg3tsUC0WXEtlGP0fiyzxwppsHB2vE7pqN7PRafkovdzUcW76E7K+4uOKl4wqw0K6oksLAZnNJdPIUdLJphU6DsWQLDm1ZmI4izPVP2v6n9V//9b9b+q3VXtrmp3Vbur2v3/W7uf8rSfUO1eHRw1Vgeh3uZMLhdH5p3loslosplSJRe2WwSjKFNpfQweHQtm3buCeh6qW8GsG+BOeT8G0+VMKquqX2C6gpGlsMEyc2DhjOaS3HY+weeMokzP67v4jw9nFCWf18PRcmHK8ezdplAad381q3lII2cUcWu4MjQOsThTJbUqqa0pq5JaldSqpFYltSqpVUmtSmo3JXXHCZXULuplFy8LGYF0ZREKc8FooMiaEQvBQJyRJTZnbOJLMZzRzevoF3QqsdlKBJ7eC0YDLSyyJDxrF8wqQI58kK6nCs43gTijuRz9IouLPxtYzkz2LsyFM9myvOO0mIzWaOmw/Ce8TyQYRYnMs3ASonBmbdptloaeRjAaKDmmJ6AbEczK7hYrxTG7dda8slOP41XvoHoH1Tuo3kH1Dqp3UL2D6h3+Qe9wRuod1Fmtzmp1VquzWp3V/82zuvPEzmp1GqvTWJ3G6jRWp/HfO40H/gLJWe9DDTwAAA==',
-    filter_def: {
-        1: {cateId: '1'},
-        2: {cateId: '2'},
-        3: {cateId: '3'},
-        4: {cateId: '4'},
-        5: {cateId: '5'},
-        6: {cateId: '6'},
-    },
+    filter: 'H4sIAAAAAAAAA+3Wy0sCURTH8bXzZ9y1MXPHR+bOrLRS81lWtNAYKHpBToGIqx60qSAC/4U2UYto4d+TUv9Fd7JOh1+blrM4yzmf4SqH6xd7VkRpld7sqT2vq9Kq67WOVVQdtg488zQevH4MXszzaWv/xPt67dCMRxcPH2cPwdg8qH50MnUdN/E9s4Nj7K8B0zhqnGsMNcbVRXW5alTN1UF1mOoZUDNgmkJNcZ1GneaaRE1yxV1pviuNu9J8Vxp3pfmuNO5K811p3JXmu9K4KzPobwU+uR77nu977IKMHgfjp+t/XpDMz9mTU+wMySzILEkWJEsyBzJHMg8yT7IAskCSA8mR5EHyJIsgiyRLIEskyyDLJAWQAkkRpEhSAimRrICskJRByiQVkApJFaRKUgOpkdRB6iQNkAbJKsgqyRrIGkkTpEmyDrJOsgGyQeJMzYAFE/4TaHdZH2/uRsPbP9f/N5vBOe2u7e+a138+4m04HD/fM93Z9Tuk70/no6tLpp3to2Mv+AZbUcvE2pVYS6wl1hJriXXIYx2xVExiLbGWWEusJdbhj3VcYi2xllhLrCXWIY+1FVEJibXEWmItsZZYhz7W5r91UnItuZZcS64l16HOtdX/BFhCsT0RIgAA',
     cate_exclude: '网址|专题|全部影片',
-    tab_rename: {'KUAKE1': '夸克1', 'KUAKE11': '夸克2', 'YOUSEE1': 'UC1', 'YOUSEE11': 'UC2',},
+    tab_order:['阿里#1','KUAKE11','YOUSEE1','YOUSEE11'],
     play_parse: true,
     searchable: 1,
     filterable: 1,
     quickSearch: 0,
-    class_name: '电影&剧集&动漫&综艺&短剧&4K',
-    class_url: '1&2&4&3&6&5',
     class_parse: async () => {
+        let classes = [{
+            type_id: '1',
+            type_name: '电影',
+        }, {
+            type_id: '2',
+            type_name: '剧集',
+        }, {
+            type_id: '3',
+            type_name: '综艺',
+        }, {
+            type_id: '4',
+            type_name: '动漫',
+        }, {
+            type_id: '6',
+            type_name: '短剧',
+        }, {
+            type_id: '5',
+            type_name: '虎斑臻彩',
+        }
+        ];
+        return {
+            class: classes,
+        }
     },
     预处理: async () => {
         // await Quark.initQuark()
@@ -43,7 +56,7 @@ var rule = {
         $('.module-items .module-item').each((index, item) => {
             const a = $(item).find('a:first')[0];
             const img = $(item).find('img:first')[0];
-            const content = $(item).find('.module-item-text:first').text();
+            const content = $(item).find('.video-text:first').text();
             videos.push({
                 "vod_name": a.attribs.title,
                 "vod_id": a.attribs.href,
@@ -57,6 +70,7 @@ var rule = {
         let {input} = this;
         let html = (await getHtml(input)).data
         const $ = pq(html)
+        /*
         let vod = {
             "vod_name": $('h1.page-title').text(),
             "vod_id": input,
@@ -64,6 +78,17 @@ var rule = {
             "vod_pic": $('.lazyload').attr('data-src'),
             "vod_content": $('p.sqjj_a').text(),
         }
+        */
+        let VOD = {};
+        VOD.vod_name = pdfh(html, 'h1&&Text');
+        VOD.type_name = pdfh(html, '.tag-link&&Text');
+        VOD.vod_pic = pd(html, '.lazyload&&data-original||data-src||src');
+        VOD.vod_content = pdfh(html, '.sqjj_a--span&&Text');
+        VOD.vod_remarks = pdfh(html, '.video-info-items:eq(3)&&Text');
+        VOD.vod_year = pdfh(html, '.tag-link:eq(2)&&Text');
+        VOD.vod_area = pdfh(html, '.tag-link:eq(3)&&Text');
+        VOD.vod_actor = pdfh(html, '.video-info-actor:eq(1)&&Text');
+        VOD.vod_director = pdfh(html, '.video-info-actor:eq(0)&&Text');
         let playform = []
         let playurls = []
         for (const item of $('.module-row-title')) {
@@ -84,7 +109,8 @@ var rule = {
                         playurls.push("资源已经失效，请访问其他资源")
                     }
                 }
-            } else if (/drive.uc.cn/.test(link)) {
+            } 
+             if (/drive.uc.cn/.test(link)) {
                 const shareData = UC.getShareData(link);
                 if (shareData) {
                     const videos = await UC.getFilesByShareUrl(shareData);
@@ -100,48 +126,80 @@ var rule = {
                     }
                 }
             }
+       if (/www.alipan.com/.test(link)) {
+                const shareData = Ali.getShareData(link);
+                if (shareData) {
+                    const videos = await Ali.getFilesByShareUrl(shareData);
+                    log(videos)
+                    if (videos.length > 0) {
+                        playform.push('Ali-' + shareData.shareId);
+                        playurls.push(videos.map((v) => {
+                            const ids = [v.share_id, v.file_id, v.subtitle ? v.subtitle.file_id : ''];
+                            return formatPlayUrl('', v.name) + '$' + ids.join('*');
+                        }).join('#'))
+                    } else {
+                        playform.push('Ali-' + shareData.shareId);
+                        playurls.push("资源已经失效，请访问其他资源")
+                        
+                    }
+                }
+            }
         }
-        vod.vod_play_from = playform.join("$$$")
-        vod.vod_play_url = playurls.join("$$$")
-        return vod
+    // 去除后缀
+    let processedArray = playform.map(str => str.replace(/-[\w]+$/, "").replace(/UC/, "优汐").replace(/Quark/, "夸克").replace(/Ali/, "阿里"));
+
+// 处理重复元素
+    let uniqueArray = [];
+    let count = {};
+    processedArray.forEach((item) => {
+    if (!count[item]) {
+        count[item] = 1;
+      //  uniqueArray.push(item);
+        uniqueArray.push(item + '#' + count[item]);
+    } else {
+        count[item]++;
+        uniqueArray.push(item + '#' + count[item]);
+    }
+});
+
+// 连接成字符串
+        VOD.vod_play_from = uniqueArray.join("$$$");
+       // vod.vod_play_from = playform.map(str => str.replace(/-[\w]+$/, "")).join("$$$");
+        VOD.vod_play_url = playurls.join("$$$");
+        return VOD
     },
     搜索: async function (wd, quick, pg) {
-        let {input, pdfa, pdfh, pd} = this;
-        let html = await request(input);
-        let d = [];
-        let data = pdfa(html, '.module-items .module-search-item');
-        data.forEach((it) => {
-            d.push({
-                title: pdfh(it, 'a&&title'),
-                pic_url: pd(it, 'img&&data-src'),
-                desc: pdfh(it, '.video-text&&Text'),
-                url: pd(it, 'a:eq(-1)&&href'),
-                content: pdfh(it, '.video-info-items:eq(-1)&&Text'),
+        let {input} = this
+        let html = (await getHtml(input)).data
+        const $ = pq(html)
+        let videos = []
+        $('.module-items .module-search-item').each((index, item) => {
+            const a = $(item).find('a:first')[0];
+            const img = $(item).find('img:first')[0];
+            const content = $(item).find('.video-text:first').text();
+            videos.push({
+                "vod_name": a.attribs.title,
+                "vod_id": a.attribs.href,
+                "vod_remarks": content,
+                "vod_pic": img.attribs['data-src']
             })
-        });
-        return setResult(d);
-
-
+        })
+        return videos
     },
-    lazy: async function (flag, id, flags) {
-        let {input, mediaProxyUrl} = this;
+lazy: async function (flag, id, flags) {
+        let {getProxyUrl, input} = this;
         const ids = input.split('*');
         const urls = [];
+        const headers = []
+        let names = []
         let UCDownloadingCache = {};
         let UCTranscodingCache = {};
-        if (flag.startsWith('Quark-')) {
-            console.log("夸克网盘解析开始");
+        let downUrl = ''
+        if (flag.startsWith('夸克')) {
+            console.log("夸克网盘解析开始")
             const down = await Quark.getDownload(ids[0], ids[1], ids[2], ids[3], true);
-            const headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-                'origin': 'https://pan.quark.cn',
-                'referer': 'https://pan.quark.cn/',
-                'Cookie': Quark.cookie
-            };
+            // urls.push("go原画代理",'http://127.0.0.1:7777/?thread=20&url='+down.download_url)
             urls.push("原画", down.download_url + '#fastPlayMode##threads=10#')
-            // http://ip:port/?thread=线程数&form=url与header编码格式&url=链接&header=所需header
-            urls.push("原代服", mediaProxyUrl + `?thread=${ENV.get('thread') || 6}&form=urlcode&randUa=1&url=` + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)))
-            urls.push("原代本", `http://127.0.0.1:7777/?thread=${ENV.get('thread') || 6}&form=urlcode&randUa=1&url=` + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)))
             const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
             transcoding.forEach((t) => {
                 urls.push(t.resolution === 'low' ? "流畅" : t.resolution === 'high' ? "高清" : t.resolution === 'super' ? "超清" : t.resolution, t.video_info.url)
@@ -149,9 +207,15 @@ var rule = {
             return {
                 parse: 0,
                 url: urls,
-                header: headers
+                header: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+                    'origin': 'https://pan.quark.cn',
+                    'referer': 'https://pan.quark.cn/',
+                    'Cookie': Quark.cookie
+                }
             }
-        } else if (flag.startsWith('UC-')) {
+        }
+        if (flag.startsWith('优汐')) {
             console.log("UC网盘解析开始")
             if (!UCDownloadingCache[ids[1]]) {
                 const down = await UC.getDownload(ids[0], ids[1], ids[2], ids[3], true);
@@ -164,10 +228,39 @@ var rule = {
                 url: urls,
                 header: {
                     "Referer": "https://drive.uc.cn/",
-                    "cookie": UC.cookie,
+                    "cookie": ENV.get("uc_cookie"),
                     "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch'
                 },
             }
+        }
+        if (flag.startsWith('阿里')) {
+            const transcoding_flag = {
+                UHD: "4K 超清",
+                QHD: "2K 超清",
+                FHD: "1080 全高清",
+                HD: "720 高清",
+                SD: "540 标清",
+                LD: "360 流畅"
+            };
+            console.log("网盘解析开始")
+            const down = await Ali.getDownload(ids[0], ids[1], flag === 'down');
+            urls.push("原画", down.url + "#isVideo=true##ignoreMusic=true#")
+            urls.push("极速原画", down.url + "#fastPlayMode##threads=10#")
+            const transcoding = (await Ali.getLiveTranscoding(ids[0], ids[1])).sort((a, b) => b.template_width - a.template_width);
+            transcoding.forEach((t) => {
+                if (t.url !== '') {
+                    urls.push(transcoding_flag[t.template_id], t.url);
+                }
+            });
+            return {
+                parse: 0,
+                url: urls,
+                header: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+                    'Referer': 'https://www.aliyundrive.com/',
+                },
+            }
+
         }
     },
 }

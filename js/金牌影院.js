@@ -63,7 +63,8 @@ var rule = {
         list.forEach((it)=>{
             d.push({
                 title: it.vodName,
-                url: '/detail/'+it.vodId,
+            //    url: '/detail/'+it.vodId,
+                url: `/detail/${it.vodId}##${it.vodPic}##${it.vodName}##${it.vodBlurb}##${it.vodVersion}##${it.vodActor}`,
                 desc: it.vodRemarks || it.vodVersion,
                 pic_url: it.vodPic,
             })
@@ -72,27 +73,53 @@ var rule = {
     },
     二级: async function (ids) {
         let {input} = this;
+        let jminput = decodeURIComponent(input);
+        let jmurl = jminput.split('##')[0];
+        let jmpic = jminput.split('##')[1];
+        let jmname = jminput.split('##')[2];
+        let jmdesc = jminput.split('##')[3];
+    //    let type = jminput.split('##')[2];
+        let jmactor = jminput.split('##')[5];
+        let jmversion = jminput.split('##')[4];
+        console.log('input的结果:', jminput);
         const html = (await req(`${input}`)).content;
+        
         const $ = pq(html)
         const vod = {
-            vod_id: input,
-            vod_name: $('h1').text().trim(),
+            //vod_id: input,
+            vod_id: jminput,
+            vod_name: jmname,
+            vod_pic: jmpic,
+            vod_content: jmdesc,
+            vod_director: jmactor,
+            
+          //  vod_name: $('h1').text().trim(),
         };
+
+        console.log('vod的结果:', vod)
         let playFroms = [];
         let playUrls = [];
         const temp = [];
         let playlist=$('div.main-list-sections__BodyArea-sc-8bb7334b-2 .listitem')
         for (const it of playlist) {
             const a = $(it).find('a')[0]
-            temp.push(a.children[0].data+'$'+a.attribs.href)
+            const title = a.children[0].data;
+            const purl = a.attribs.href;
+            const name = input.split('##')[2];
+           // const version = input.split('##')[4];
+           // temp.push(a.children[0].data+'$'+a.attribs.href)
+            temp.push( title + '$' + purl )
         }
+        console.log('temp的结果:', temp);
         playFroms.push('不知道倾情打造');
         playUrls.push(temp.join('#'));
         vod.vod_play_from = playFroms.join('$$$');
         vod.vod_play_url = playUrls.join('$$$');
-
+        console.log('vod.vod_play_url的结果:', vod.vod_play_url);
+console.log('input的结果:', input);
         return vod
     },
+  
     搜索: async function (wd, quick, pg) {
         let {input} = this
         const t = new Date().getTime()
@@ -122,7 +149,10 @@ var rule = {
         return setResult(d)
     },
     lazy: async function (flag, id, flags) {
-        let {input} = this;
+           let {input} = this;
+   //let {input, pdfa, pdfh, pd} = this;
+        console.log('input的结果:', input);
+       // console.log('name的结果:', name);
         const pid = input.split('/')[3]
         const nid = input.split('/')[5]
         const t = new Date().getTime()

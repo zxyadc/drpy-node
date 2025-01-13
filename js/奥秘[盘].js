@@ -2,52 +2,39 @@ const {getHtml} = $.require('./_lib.request.js')
 const {
     formatPlayUrl,
 } = misc;
-const aliTranscodingCache = {};
-const aliDownloadingCache = {};
 var rule = {
-    title: '多多[盘]',
-    host: 'https://tv.yydsys.top',
-    // url: '/index.php/vod/show/id/fyclassfyfilter.html',
-    url: '/index.php/vod/show/id/fyfilter.html',
+    title: '奥秘[盘]',
+    host: 'https://vip.omii.top',
+  //  url: '/index.php/vod/show/id/fyclass/page/fypage.html',
+    url: '/index.php/vod/show/id/fyclassfyfilter.html',
+    filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
     searchUrl: '/index.php/vod/search/page/fypage/wd/**.html',
-    filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by or "/by/time"}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
-    // filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
-    filter: 'H4sIAAAAAAAAA+2bW08iSRTHn+Vj8OwGW53r29zv9/tM5oGZkN3Jum6i7ibGmKgIg44KGkeGBW873lcUL+siLPJlqG74FtNQxenqf5vYJu7G3dQjv/+fU9Wniq5zaOjxNHg178U3noYe74+Bbu9F7/s2f2ent9Hb7v8pYL5kQ8t6MGS+/tXf9osJ3vR426s4tFIJrlSx+cLb2yjoVMr0C+qrRfIJVrcYkS0Rz7IIVrfo/TG9b8puEYwGGl4pFVIwEGc00PI428/DQJxRFLo2KQpnNJfIl1JuCObCWd1STi+xkTW7RTCay/CmUQCLYNIVGZN5xxVVGVkWPzquSDCabnqpdDAH0+WMooQnKolViMIZRZlZM68RonB2jDXSB9aNqXGwcEaW4LA+8BtYOKPU5aMslIXUcVa3VKYn9C+LdotgNNDUx/JQDgbijPJysGFM/skKW5AawmSMLpS/4q7hjCxjYRbdBgtntGuKMXN5YddwZq1USp8ex5WqMbIMFo0/4NIFowQWxo186rBLsym9b6tv4LcAf0fAL90BUhk2knN7B1hYriTC9XGqgXylbJolC0KgNVtK6NnNQ3xCsJKd0fcPDovHBVrg+KKeWrf5BKIRZ1fNt9kcAlGmDsbQIRCNsvMZHQLRsn7aQodA1j77Cx0CWaNknKNkbDFGMyy3ZI/BEcUYjJoZZ5FVexiiNN/FohFNG0MJ+5SJWrenOf1T0XyzfVCi5AvtlfJTdhNH8gZr87d/b22w8ma6vNLndoMlC6a/PkA1kE8gaQnQIRAt9PYCOgSizRIvsNE4miwqbSqHiSNpY6JDIGlTORwcSVvGcc0cSWlnG0G7gyM57d0Bf4eVdj2+V4nvukx7c1PzmXr4ahhfDUhqK6qtstqCaousNqPaLKsaqpqsNqHaJKnaBVBNIKnnUT0vq+dQPSerZ1E9K6uYK03OlYa50uRcaZgrTc6VhrnS5FxpmCtNzpWGuTKB7VMZ6OoKSBuEpeP65qjLDXKJNl8tiu8SKZdBuUzKFVCukHIVlKukXAPlGinXQblOyg1QbpByE5SbpNwC5RYpt0G5TcodUO6QcheUu6TcA+UeKfdBuU/KA1AekPIQlIekPALlESmPQXlMyhNQnpDyFJSnpDwD5Rkpz0F5TsoLUF6Q8hKUl6S8AuUVKa9BeU1K03cXQKsS+SPwrlu6P45NsFzUsf2t22Y1zrtuX9cH014fopTL6ZlJSf3hQ1endTRtDrJIWFI73//cEajO4G2jx9t8cn3Y0SWqi8aG19Csf48Fo4dV10I5RvPHNvZYLg0Wzo7XKh3V/LlolVw0fy7KeBftSWl/3lHGC2b1QSE9sQmLwRnN5XPY0ZMJJlX6jgUQ7PDyTERx1meqAVANgGoA/q0GQBXvqnhXxbsq3lXx/h8u3ltPrHivFn6Ds85i0GR0fh39bMMIpsvzfWDhjAYaWzFiYRiIM7LEZox1/A6fMzq9jn6eUI5Nl8eg1xCMBpqbZ0noDAQ7Rtmvp3LOBxec0VyO/t7dRWvEMmayd2EunMmWxR2nxWS0RgsHpb/h8YdgVgsyyyJJbEFqzNq12ywdg/6CMxooOawn4PGHYFZ2t1gxjtmtMdU8qOZBNQ+qeVDNg2oeVPMgKap5UM3DiTQPLSfWPFT6hoxlKPsFO0Z/Ud4oljMRKJI5oygTaX0YfnkimHV4hfQsfDcumHUC7pT2oXYVTKqrKl9huoKRJbfGNmbAwhnNJbnt/AEQZxRlclbfxaaKM4qSzeqRaCk34WghbAqlcfd3Iw+PTgSjiFsD5f4RiMWZqqlVTW1NWdXUqqZWNbWqqVVNrWpqVVO7qKnPVGvq0/OnBje/Gv///alB/WPhn/zHwmn4l4H5cfeoikhVRKoiUhWRqohOdUVk3rqkkkh1/K47fnXAqQNOHXDqgFMH3Ck+4Dyeht5vUgPagc5AAAA=',
-
-    filter_def: {
-        1: {cateId: '1',lang:'/lang/国语'},
-        2: {cateId: '2',lang:'/lang/国语'},
-        3: {cateId: '3',lang:'/lang/国语'},
-        4: {cateId: '4',lang:'/lang/国语'},
-        5: {cateId: '5',lang:'/lang/国语'},
-        20: {cateId: '20',lang:'/lang/国语'}
-    },
+    filter: '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',
     cate_exclude: '网址|专题|全部影片',
-    tab_rename: {'KUAKE1': '夸克1', 'KUAKE11': '夸克2', 'YOUSEE1': 'UC1', 'YOUSEE11': 'UC2',},
+    tab_order:['阿里#1','KUAKE11','YOUSEE1','YOUSEE11'],
     play_parse: true,
     searchable: 1,
     filterable: 1,
     quickSearch: 0,
     class_parse: async () => {
         let classes = [{
-            type_id: '1',
-            type_name: '多多电影',
+            type_id: '30',
+            type_name: '电影',
         }, {
-            type_id: '2',
-            type_name: '多多剧集',
+            type_id: '31',
+            type_name: '剧集',
         }, {
-            type_id: '4',
-            type_name: '多多动漫',
+            type_id: '32',
+            type_name: '动漫',
         }, {
-            type_id: '3',
-            type_name: '多多综艺',
+            type_id: '33',
+            type_name: '综艺',
         }, {
-            type_id: '5',
-            type_name: '多多短剧',
-        },
-        {
-            type_id: '20',
-            type_name: '多多记录',
+            type_id: '34',
+            type_name: '短剧',
+        }, {
+            type_id: '35',
+            type_name: '音乐',
         }
         ];
         return {
@@ -83,15 +70,6 @@ var rule = {
         let {input} = this;
         let html = (await getHtml(input)).data
         const $ = pq(html)
-        /*
-        let vod = {
-            "vod_name": $('h1.page-title').text(),
-            "vod_id": input,
-            "vod_remarks": $(' div.video-info-main div:nth-child(4) div.video-info-item').text(),
-            "vod_pic": $('.lazyload').attr('data-src'),
-            "vod_content": $('p.sqjj_a').text(),
-        }
-        */
         let VOD = {};
         VOD.vod_name = pdfh(html, 'h1&&Text');
         VOD.type_name = pdfh(html, '.tag-link&&Text');
@@ -102,6 +80,15 @@ var rule = {
         VOD.vod_area = pdfh(html, '.tag-link:eq(3)&&Text');
         VOD.vod_actor = pdfh(html, '.video-info-actor:eq(1)&&Text');
         VOD.vod_director = pdfh(html, '.video-info-actor:eq(0)&&Text');
+        /*
+        let vod = {
+            "vod_name": $('h1.page-title').text(),
+            "vod_id": input,
+            "vod_remarks": $(' div.video-info-main div:nth-child(4) div.video-info-item').text(),
+            "vod_pic": $('.lazyload').attr('data-src'),
+            "vod_content": $('p.sqjj_a').text(),
+        }
+        */
         let playform = []
         let playurls = []
         for (const item of $('.module-row-title')) {
@@ -122,7 +109,8 @@ var rule = {
                         playurls.push("资源已经失效，请访问其他资源")
                     }
                 }
-            } if (/drive.uc.cn/.test(link)) {
+            } 
+             if (/drive.uc.cn/.test(link)) {
                 const shareData = UC.getShareData(link);
                 if (shareData) {
                     const videos = await UC.getFilesByShareUrl(shareData);
@@ -175,7 +163,7 @@ var rule = {
 });
 
 // 连接成字符串
-        VOD.vod_play_from = uniqueArray.join("$$$");
+        VODvod_play_from = uniqueArray.join("$$$");
        // vod.vod_play_from = playform.map(str => str.replace(/-[\w]+$/, "")).join("$$$");
         VOD.vod_play_url = playurls.join("$$$");
         return VOD

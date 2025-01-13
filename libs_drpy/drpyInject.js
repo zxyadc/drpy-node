@@ -74,6 +74,65 @@ function generateCurlCommand(config) {
 
 const confs = {};
 
+/**
+ * 初始化本地存储（仅读取）
+ * @param {string} storage - 存储的名称
+ */
+function initLocalStorage(storage) {
+    // 构建存储路径
+    const storagePath = 'local/' + storage;
+
+    // 如果存储路径存在
+    if (fs.existsSync(storagePath)) {
+        // 读取并解析文件内容
+        confs[storage] = JSON.parse(fs.readFileSync(storagePath).toString());
+    }
+}
+
+/**
+ * 从本地存储中获取值
+ * @param {string} storage - 存储的名称
+ * @param {string} key - 键
+ * @returns {any} - 获取的值，如果不存在则返回空字符串
+ */
+function localGet(storage, key) {
+    // 初始化本地存储
+    initLocalStorage(storage);
+    // 使用 _.get 方法获取指定键的值，如果不存在则返回空字符串
+    return _.get(confs[storage], key, '');
+}
+
+/**
+ * 在本地存储中设置值（如果不存在存储文件则不进行设置）
+ * @param {string} storage - 存储的名称
+ * @param {string} key - 键
+ * @param {any} value - 值
+ */
+function localSet(storage, key, value) {
+    // 初始化本地存储（仅检查是否存在）
+    initLocalStorage(storage);
+    // 如果存在存储文件，则设置键值对
+    if (_.has(confs, storage)) {
+        confs[storage][key] = value;
+        fs.writeFileSync('local/' + storage, JSON.stringify(confs[storage]));
+    }
+}
+
+/**
+ * 从本地存储中删除指定键的值（如果不存在存储文件则不进行删除）
+ * @param {string} storage - 存储的名称
+ * @param {string} key - 键
+ */
+function localDelete(storage, key) {
+    // 初始化本地存储（仅检查是否存在）
+    initLocalStorage(storage);
+    // 如果存在存储文件，则删除指定键的值
+    if (_.has(confs, storage)) {
+        delete confs[storage][key];
+        fs.writeFileSync('local/' + storage, JSON.stringify(confs[storage]));
+    }
+}
+/*
 function initLocalStorage(storage) {
     if (!_.has(confs, storage)) {
         if (!fs.existsSync('local')) {
@@ -107,7 +166,7 @@ function localDelete(storage, key) {
     delete confs[storage][key];
     fs.writeFileSync('local/js_' + storage, JSON.stringify(confs[storage]));
 }
-
+*/
 async function request(url, opt = {}) {
     // console.log('进入了req...');
     // 解构参数并设置默认值
