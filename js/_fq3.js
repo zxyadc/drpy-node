@@ -91,8 +91,13 @@ const rule = {
     homeUrl: 'https://fanqienovel.com/api/author/book/category_list/v0/',
     url: '/api/author/library/book_list/v0/?page_count=18&page_index=(fypage-1)&gender=-1&category_id=fyclass&creation_status=-1&word_count=-1&sort=0#fyfilter',
     class_parse: async function () {
-        let html = (await req('https://self-signed.badssl.com/')).content;
-        log(html);
+        // let html = (await req('https://self-signed.badssl.com/')).content;
+        // log(html);
+        let a = `{"res_code": 0, "res_message": "成功","expireTime":0,"expireType":0,"fileListAO":{"count":1,"fileList":[],"fileListSize":0,"folderList":[{"createDate":"2024-10-04 15:13:39","filata":1,"fileListSize":0,"id":623111159176591217,"lastOpTime":"2025-01-14 10:43:18","name":"Season 1","parentId":624131159175862127,"rev":"20250114104318","starLabel":2}]},"lastRev":20250114232239}`;
+        // log(a);
+        // log(JSON.parse(a));
+        // log(JSON.parse(a).fileListAO.folderList);
+        // log(JsonBig.parse(a).fileListAO.folderList);
     },
     class_parse2: async function () {
         let {proxyUrl, getRule} = this;

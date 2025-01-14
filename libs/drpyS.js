@@ -7,6 +7,7 @@ import path from "path";
 import vm from 'vm';
 import WebSocket, {WebSocketServer} from 'ws';
 import zlib from 'zlib';
+import JSONbig from 'json-bigint';
 import * as minizlib from 'minizlib';
 import '../libs_drpy/es6-extend.js'
 import {getSitesMap} from "../utils/sites-map.js";
@@ -18,6 +19,7 @@ import {Quark} from "../utils/quark.js";
 import {UC} from "../utils/uc.js";
 import {Ali} from "../utils/ali.js";
 import {Cloud} from "../utils/cloud.js";
+import {Yun} from "../utils/yun.js";
 import AIS from '../utils/ais.js';
 // const { req } = await import('../utils/req.js');
 import {gbkTool} from '../libs_drpy/gbk.js'
@@ -54,12 +56,15 @@ globalThis.Quark = Quark;
 globalThis.UC = UC;
 globalThis.Ali = Ali;
 globalThis.Cloud = Cloud;
+globalThis.Yun = Yun;
 globalThis.require = createRequire(import.meta.url);
 globalThis._fetch = fetch;
 globalThis.XMLHttpRequest = XMLHttpRequest;
 globalThis.WebSocket = WebSocket;
 globalThis.WebSocketServer = WebSocketServer;
 globalThis.zlib = zlib;
+globalThis.JSONbig = JSONbig;
+globalThis.JsonBig = JSONbig({storeAsString: true});
 globalThis.minizlib = minizlib;
 globalThis.AIS = AIS;
 globalThis.pathLib = {
@@ -273,10 +278,13 @@ export async function getSandbox(env = {}) {
         UC,
         Ali,
         Cloud,
+        Yun,
         require,
         WebSocket,
         WebSocketServer,
         zlib,
+        JSONbig,
+        JsonBig,
         minizlib,
     };
 

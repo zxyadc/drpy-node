@@ -1,7 +1,8 @@
-import '../libs_drpy/jsencrypt.js';
+import '../libs_drpy/jsencrypt.js'
 import {ENV} from "./env.js";
 import axios from "axios";
 import qs from "qs"
+
 
 class CloudDrive {
     constructor() {
@@ -112,7 +113,7 @@ class CloudDrive {
         }
     }
 
-    async getShareData(url) {
+    async getShareID(url) {
         const matches = this.regex.exec(url);
         if (matches && matches[1]) {
             this.shareCode = matches[1];
@@ -124,11 +125,40 @@ class CloudDrive {
             const accessCodeMatch = this.shareCode.match(/访问码：([a-zA-Z0-9]+)/);
             this.accessCode = accessCodeMatch ? accessCodeMatch[1] : '';
         }
+    }
 
+    async getShareData(shareUrl) {
+        let file = {}
+        let fileData = []
+        let fileId = await this.getShareInfo(shareUrl)
+        if (fileId) {
+            let fileList = await this.getShareList(fileId);
+            if (fileList && Array.isArray(fileList)) {
+                for (const item of fileList) {
+                    if (!(item.name in file)) {
+                        file[item.name] = [];
+                    }
+                    fileData = await this.getShareFile(item.id);
+                    if (fileData && fileData.length > 0) {
+                        file[item.name].push(...fileData);
+                    }
+                }
+            } else {
+                file['root'] = await this.getShareFile(fileId)
+            }
+        }
+        if (Object.keys(file).length === 0) {
+            file['root'] = await this.getShareFile(fileId)
+        }
+        return file;
     }
 
     async getShareInfo(shareUrl) {
-        await this.getShareData(shareUrl);
+        if (shareUrl.startsWith('http')) {
+            await this.getShareID(shareUrl);
+        } else {
+            this.shareCode = shareUrl;
+        }
         try {
             let resp = await axios.get(`${this.api}/open/share/getShareInfoByCodeV2.action?key=noCache&shareCode=${this.shareCode}`,
                 {
@@ -149,73 +179,74 @@ class CloudDrive {
         }
     }
 
-    async getShareList(shareUrl, code) {
-        let file = {}
-        let videos = []
-        if (code) {
-            this.accessCode = code
-        }
-        let fileId = await this.getShareInfo(shareUrl)
-        let resp = await axios.get(`${this.api}/open/share/listShareDir.action?key=noCache&pageNum=1&pageSize=60&fileId=${fileId}&shareDirFileId=${fileId}&isFolder=${this.isFolder}&shareId=${this.shareId}&shareMode=${this.shareMode}&iconOption=5&orderBy=lastOpTime&descending=true&accessCode=${this.accessCode}`,
-            {
-                headers: {
-                    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-                }
-            }
-        )
-        let data = resp.data
-        let count = data.match(/<count>\d+<\/count>/g)[0].replace(/<count>|<\/count>/g, '');
-        let fileList = data.match(/<id>(.*?)<\/id>/g);
-        let filename = data.match(/<name>(.*?)<\/name>/g);
-        let mediaType = data.match(/<mediaType>\d+<\/mediaType>/g)
-        if (count >= 0 && mediaType) {
-            for (let i = 0; i < fileList.length; i++) {
-                if (!filename[i].replace(/<name>|<\/name>/g, '').endsWith('.txt')) {
+    async getShareList(fileId) {
+        try {
+            let videos = []
+            const headers = new Headers();
+            headers.append('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36');
+            headers.append('Accept', 'application/json;charset=UTF-8');
+            headers.append('Accept-Encoding', 'gzip, deflate, br, zstd');
+            const options = {
+                method: 'GET',
+                headers: headers
+            };
+            let resp = await _fetch(`${this.api}/open/share/listShareDir.action?key=noCache&pageNum=1&pageSize=60&fileId=${fileId}&shareDirFileId=${fileId}&isFolder=${this.isFolder}&shareId=${this.shareId}&shareMode=${this.shareMode}&iconOption=5&orderBy=lastOpTime&descending=true&accessCode=${this.accessCode}&noCache=${Math.random()}`, options)
+            let json = JsonBig.parse(await resp.text());
+            const data = json?.fileListAO;
+            let folderList = data?.folderList
+            let names = folderList.map(item => item.name)
+            let ids = folderList.map(item => item.id);
+            if (folderList && folderList.length > 0) {
+                names.forEach((name, index) => {
                     videos.push({
-                        name: filename[i].replace(/<name>|<\/name>/g, ''),
-                        fileId: fileList[i].replace(/<id>|<\/id>/g, ''),
-                        shareId: this.shareId,
+                        name: name,
+                        id: ids[index],
+                        type: 'folder'
                     })
-                }
+                });
+                let result = await Promise.all(ids.map(async (id) => this.getShareList(id)))
+                result = result.filter(item => item !== undefined);
+                return [...videos, ...result.flat()];
             }
-            return videos;
-        } else {
-            for (let i = 0; i < fileList.length; i++) {
-                let form = filename[i].replace(/<name>|<\/name>/g, '')
-                if (!file.hasOwnProperty(form)) {
-                    file[form] = []
-                }
-                file[form].push(await this.getShareFile(fileList[i].replace(/<id>|<\/id>/g, '')))
-            }
-            return file
+        } catch (e) {
+            console.log(e)
         }
     }
 
     async getShareFile(fileId) {
-        let resp = await axios.get(`${this.api}/open/share/listShareDir.action?key=noCache&pageNum=1&pageSize=60&fileId=${fileId}&shareDirFileId=${fileId}&isFolder=${this.isFolder}&shareId=${this.shareId}&shareMode=${this.shareMode}&iconOption=5&orderBy=lastOpTime&descending=true&accessCode=${this.accessCode}`,
-            {
-                headers: {
-                    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        try {
+            const headers = new Headers();
+            headers.append('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36');
+            headers.append('Accept', 'application/json;charset=UTF-8');
+            headers.append('Accept-Encoding', 'gzip, deflate, br, zstd');
+            const options = {
+                method: 'GET',
+                headers: headers
+            };
+            let resp = await _fetch(`${this.api}/open/share/listShareDir.action?key=noCache&pageNum=1&pageSize=60&fileId=${fileId}&shareDirFileId=${fileId}&isFolder=${this.isFolder}&shareId=${this.shareId}&shareMode=${this.shareMode}&iconOption=5&orderBy=lastOpTime&descending=true&accessCode=${this.accessCode}&noCache=${Math.random()}`, options)
+            let json = JsonBig.parse(await resp.text());
+            let videos = []
+            const data = json?.fileListAO;
+            let fileList = data.fileList
+            let filename = fileList.map(item => item.name)
+            let ids = fileList.map(item => item.id);
+            let count = data.fileListSize
+            if (count >= 0) {
+                for (let i = 0; i < count; i++) {
+                    if (fileList[i].mediaType === 3) {
+                        videos.push({
+                            name: filename[i],
+                            fileId: ids[i],
+                            shareId: this.shareId,
+                        })
+                    }
                 }
             }
-        )
-        let data = resp.data
-        let count = data.match(/<count>\d+<\/count>/g)[0].replace(/<count>|<\/count>/g, '');
-        let fileList = data.match(/<id>(.*?)<\/id>/g);
-        let filename = data.match(/<name>(.*?)<\/name>/g);
-        let videos = []
-        if (count >= 0) {
-            for (let i = 0; i < fileList.length; i++) {
-                if (!filename[i].replace(/<name>|<\/name>/g, '').endsWith('.txt')) {
-                    videos.push({
-                        name: filename[i].replace(/<name>|<\/name>/g, ''),
-                        fileId: fileList[i].replace(/<id>|<\/id>/g, ''),
-                        shareId: this.shareId,
-                    })
-                }
-            }
+            return videos
+        } catch (e) {
+            console.log(e)
         }
-        return videos
+
     }
 
     async getShareUrl(fileId, shareId) {
@@ -223,47 +254,47 @@ class CloudDrive {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
             'Accept': 'application/json;charset=UTF-8',
             'Accept-Encoding': 'gzip, deflate, br, zstd',
-        }
+        };
         if (!this.cookie && this.account && this.password && this.index < 2) {
+            console.log("正在登录，请稍等....")
             await this.login(this.account, this.password);
-            headers['Cookie'] = this.cookie;
-        } else {
-            headers['Cookie'] = this.cookie;
+            console.log("登录成功,获取cookie成功")
         }
+        headers['Cookie'] = this.cookie;
         try {
-            let resp = await axios.get(`${this.api}/portal/getNewVlcVideoPlayUrl.action?shareId=${shareId}&dt=1&fileId=${fileId}&type=4&key=noCache`,
-                {
-                    headers: headers
-                }
-            );
+            let resp = await axios.get(`${this.api}/portal/getNewVlcVideoPlayUrl.action?shareId=${shareId}&dt=1&fileId=${fileId}&type=4&key=noCache`, {
+                headers: headers
+            });
+
             let location = await axios.get(resp.data.normal.url, {
                 maxRedirects: 0, // 禁用自动重定向
                 validateStatus: function (status) {
                     return status >= 200 && status < 400; // 只处理 2xx 和 3xx 状态码
                 }
-            })
-            let link = ''
+            });
+            let link = '';
             if (location.status >= 300 && location.status < 400 && location.headers.location) {
-                link = location.headers.location
+                link = location.headers.location;
             } else {
-                link = resp.data.normal.url
+                link = resp.data.normal.url;
             }
             return link;
         } catch (error) {
-            if (error.status === 400 && this.index < 2) {
-                ENV.set('cloud_cookie', '')
+            if (error.response && error.response.status === 400 && this.index < 2) {
+                console.log("获取播放地址失败，错误信息为：" + error.response.data)
+                console.log('cookie失效，正在重新获取cookie')
+                ENV.set('cloud_cookie', '');
                 this.index += 1;
-                return await this.getShareUrl(fileId, shareId)
+                return await this.getShareUrl(fileId, shareId);
             } else {
-                console.error('Error during getShareUrl:', error);
+                console.error('Error during getShareUrl:', error.message, error.response ? error.response.status : 'N/A');
             }
-
         } finally {
-            this.index = 0;
+            if (this.index >= 2) {
+                this.index = 0; // 仅在达到最大重试次数后重置
+            }
         }
     }
-
-
 }
 
 export const Cloud = new CloudDrive();

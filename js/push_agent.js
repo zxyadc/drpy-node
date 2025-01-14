@@ -55,7 +55,7 @@ var rule = {
             let list = input.split('#');
             // log(list);
             for (let i = 0; i < list.length; i++) {
-                if (/pan.quark.cn|drive.uc.cn|www.alipan.com|www.aliyundrive.com|cloud.189.cn/.test(list[i])) {
+                if (/pan.quark.cn|drive.uc.cn|www.alipan.com|www.aliyundrive.com|cloud.189.cn|yun.139.com/.test(list[i])) {
                     if (/pan.quark.cn/.test(list[i])) {
                         const shareData = Quark.getShareData(list[i]);
                         if (shareData) {
@@ -106,31 +106,30 @@ var rule = {
                         }
                     }
                     if (/cloud.189.cn/.test(list[i])) {
-                        let data = await Cloud.getShareList(list[i])
-                        if (Array.isArray(data)) {
-                            playform.push('Cloud-球球啦')
-                            playurls.push(data.map((it) => {
-                                const urls = [it.fileId, it.shareId]
-                                return it.name + "$" + urls.join('*')
-                            }).join('#'))
-                        } else {
-                            Object.keys(data).forEach(it => {
-                                playform.push('Cloud-' + it)
-                                data[it].forEach(item => {
-                                    playurls.push(item.map((it) => {
-                                        const urls = [it.fileId, it.shareId]
-                                        return it.name + "$" + urls.join('*')
-                                    }).join('#'))
-                                })
-                            })
-                        }
+                        let data = await Cloud.getShareData(list[i])
+                        Object.keys(data).forEach(it => {
+                            playform.push('Cloud-' + it)
+                            const urls = data[it].map(item => item.name + "$" + [item.fileId, item.shareId].join('*')).join('#');
+                            playurls.push(urls);
+                        })
+                    }
+                    if (/yun.139.com/.test(list[i])) {
+                        let data = await Yun.getShareData(list[i])
+                        playform = data.map(it => {
+                            return 'Yun-' + it.name
+                        })
+                        let json = await Promise.all(data.map(it => Yun.getShareUrl(it.path)))
+                        json.forEach(it => {
+                            const urls = it.map(item => item.name + "$" + [item.contentId, item.linkID].join('*'))
+                            playurls.push(urls.join('#'))
+                        })
                     }
                 } else {
                     playform.push('推送');
                     playurls.push("推送" + '$' + list[i])
                 }
             }
-        } else if (/pan.quark.cn|drive.uc.cn|www.alipan.com|www.aliyundrive.com|cloud.189.cn/.test(input)) {
+        } else if (/pan.quark.cn|drive.uc.cn|www.alipan.com|www.aliyundrive.com|cloud.189.cn|yun.139.com/.test(input)) {
             if (/pan.quark.cn/.test(input)) {
                 const shareData = Quark.getShareData(input);
                 if (shareData) {
@@ -181,24 +180,23 @@ var rule = {
                 }
             }
             if (/cloud.189.cn/.test(input)) {
-                let data = await Cloud.getShareList(input)
-                if (Array.isArray(data)) {
-                    playform.push('Cloud-球球啦')
-                    playurls.push(data.map((it) => {
-                        const urls = [it.fileId, it.shareId]
-                        return it.name + "$" + urls.join('*')
-                    }).join('#'))
-                } else {
-                    Object.keys(data).forEach(it => {
-                        playform.push('Cloud-' + it)
-                        data[it].forEach(item => {
-                            playurls.push(item.map((it) => {
-                                const urls = [it.fileId, it.shareId]
-                                return it.name + "$" + urls.join('*')
-                            }).join('#'))
-                        })
-                    })
-                }
+                let data = await Cloud.getShareData(input)
+                Object.keys(data).forEach(it => {
+                    playform.push('Cloud-' + it)
+                    const urls = data[it].map(item => item.name + "$" + [item.fileId, item.shareId].join('*')).join('#');
+                    playurls.push(urls);
+                })
+            }
+            if (/yun.139.com/.test(input)) {
+                let data = await Yun.getShareData(input)
+                playform = data.map(it => {
+                    return 'Yun-' + it.name
+                })
+                let json = await Promise.all(data.map(it => Yun.getShareUrl(it.path)))
+                json.forEach(it => {
+                    const urls = it.map(item => item.name + "$" + [item.contentId, item.linkID].join('*'))
+                    playurls.push(urls.join('#'))
+                })
             }
         } else {
             playform.push('推送');
@@ -218,7 +216,7 @@ var rule = {
             } else {
                 return {parse: 1, url: input}
             }
-        } else if (/Quark-|UC-|Ali-|Cloud-/.test(flag)) {
+        } else if (/Quark-|UC-|Ali-|Cloud-|Yun-/.test(flag)) {
             const ids = input.split('*');
             const urls = [];
             let UCDownloadingCache = {};
@@ -296,11 +294,13 @@ var rule = {
                 const url = await Cloud.getShareUrl(ids[0], ids[1]);
                 return {
                     url: url + "#isVideo=true#",
-                    header: {
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-                        'Accept-Encoding': 'identity;q=1, *;q=0',
-                        'referer': 'https://cloud.189.cn/'
-                    }
+                }
+            }
+            if (flag.startsWith('Yun-')) {
+                log('移动云盘解析开始')
+                const url = await Yun.getSharePlay(ids[0], ids[1])
+                return {
+                    url: url
                 }
             }
         } else {
