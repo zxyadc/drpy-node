@@ -325,6 +325,11 @@ var rule = {
                 d.push(getInput('get_deepseek_apiKey', '查看deepseek AI鉴权', images.settings));
                 d.push(genMultiInput('sparkBotObject', '设置讯飞星火智能体 AI鉴权', '设置对象形式，如:{"appId":"6fafca", "uid":"道长", "assistantId":"tke24zrzq3f1"}\n 在这个页面的http鉴权信息:\nhttps://xinghuo.xfyun.cn/botcenter/createbot', images.settings));
                 d.push(getInput('get_sparkBotObject', '查看讯飞星火智能体 AI鉴权', images.settings));
+
+                d.push(genMultiInput('show_curl', '设置打印curl开关', '设置为1可启用此功能(默认关闭)', images.settings));
+                d.push(getInput('get_show_curl', '查看打印curl开关', images.settings));
+                d.push(genMultiInput('show_req', '设置打印req开关', '设置为1可启用此功能(默认关闭)', images.settings));
+                d.push(getInput('get_req', '查看打印req开关', images.settings));
                 break;
             case 'test':
                 d.push({
@@ -970,6 +975,8 @@ var rule = {
             'sparkBotObject',
             'now_ai',
             'allow_forward',
+            'show_curl',
+            'show_req',
         ];
         let get_cookie_sets = [
             'get_quark_cookie',
@@ -987,6 +994,8 @@ var rule = {
             'get_sparkBotObject',
             'get_now_ai',
             'get_allow_forward',
+            'get_show_curl',
+            'get_show_req',
         ];
         if (cookie_sets.includes(action) && value) {
             try {

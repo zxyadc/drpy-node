@@ -1,5 +1,6 @@
 我的哔哩[官]@?render=1&type=url&params=../json/哔哩教育.json@哔哩教育[官]
 我的哔哩[官]@?render=1&type=url&params=../json/哔哩大全.json@哔哩大全[官]
+我的哔哩[官]@?render=1&type=url&params=../json/哔哩大杂烩.json@哔哩大杂烩[官]
 直播转点播[合]@?type=url&params=../json/live2cms.json
 采集之王[合]@?type=url&params=../json/采集静态.json$1@采王道长[合]
 采集之王[合]@?type=url&params=../json/采集[zy]静态.json$1@采王zy[密]

@@ -113,7 +113,7 @@ class CloudDrive {
         }
     }
 
-    async getShareID(url) {
+    async getShareID(url, accessCode) {
         const matches = this.regex.exec(url);
         if (matches && matches[1]) {
             this.shareCode = matches[1];
@@ -125,55 +125,96 @@ class CloudDrive {
             const accessCodeMatch = this.shareCode.match(/访问码：([a-zA-Z0-9]+)/);
             this.accessCode = accessCodeMatch ? accessCodeMatch[1] : '';
         }
+        if (accessCode) {
+            this.accessCode = accessCode
+        }
     }
 
-    async getShareData(shareUrl) {
+    async getShareData(shareUrl, accessCode) {
         let file = {}
         let fileData = []
-        let fileId = await this.getShareInfo(shareUrl)
+        let fileId = await this.getShareInfo(shareUrl, accessCode)
         if (fileId) {
             let fileList = await this.getShareList(fileId);
             if (fileList && Array.isArray(fileList)) {
-                for (const item of fileList) {
+                await Promise.all(fileList.map(async (item) => {
                     if (!(item.name in file)) {
                         file[item.name] = [];
                     }
-                    fileData = await this.getShareFile(item.id);
+                    const fileData = await this.getShareFile(item.id);
                     if (fileData && fileData.length > 0) {
                         file[item.name].push(...fileData);
                     }
-                }
+                }));
             } else {
                 file['root'] = await this.getShareFile(fileId)
             }
         }
+        // 过滤掉空数组
+        for (let key in file) {
+            if (file[key].length === 0) {
+                delete file[key];
+            }
+        }
+        // 如果 file 对象为空，重新获取 root 数据并过滤空数组
         if (Object.keys(file).length === 0) {
-            file['root'] = await this.getShareFile(fileId)
+            file['root'] = await this.getShareFile(fileId);
+            if (file['root'] && Array.isArray(file['root'])) {
+                file['root'] = file['root'].filter(item => item && Object.keys(item).length > 0);
+            }
         }
         return file;
     }
 
-    async getShareInfo(shareUrl) {
+    async getShareInfo(shareUrl, accessCode) {
         if (shareUrl.startsWith('http')) {
-            await this.getShareID(shareUrl);
+            await this.getShareID(shareUrl, accessCode);
         } else {
             this.shareCode = shareUrl;
         }
         try {
-            let resp = await axios.get(`${this.api}/open/share/getShareInfoByCodeV2.action?key=noCache&shareCode=${this.shareCode}`,
-                {
+            if (accessCode) {
+                let check = await axios.get(`${this.api}/open/share/checkAccessCode.action?shareCode=${this.shareCode}&accessCode=${this.accessCode}`, {
                     headers: {
                         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
                         'accept': 'application/json;charset=UTF-8',
                         'accept-encoding': 'gzip, deflate, br, zstd',
                         'accept-language': 'zh-CN,zh;q=0.9',
                     }
-                });
-            let fileId = resp.data.fileId;
-            this.shareId = resp.data.shareId;
-            this.shareMode = resp.data.shareMode;
-            this.isFolder = resp.data.isFolder;
-            return fileId;
+                })
+                if (check.status === 200) {
+                    this.shareId = check.data.shareId;
+                }
+                let resp = await axios.get(`${this.api}/open/share/getShareInfoByCodeV2.action?key=noCache&shareCode=${this.shareCode}`,
+                    {
+                        headers: {
+                            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+                            'accept': 'application/json;charset=UTF-8',
+                            'accept-encoding': 'gzip, deflate, br, zstd',
+                            'accept-language': 'zh-CN,zh;q=0.9',
+                        }
+                    });
+                let fileId = resp.data.fileId;
+                this.shareMode = resp.data.shareMode;
+                this.isFolder = resp.data.isFolder;
+                return fileId;
+            } else {
+                let resp = await axios.get(`${this.api}/open/share/getShareInfoByCodeV2.action?key=noCache&shareCode=${this.shareCode}`,
+                    {
+                        headers: {
+                            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+                            'accept': 'application/json;charset=UTF-8',
+                            'accept-encoding': 'gzip, deflate, br, zstd',
+                            'accept-language': 'zh-CN,zh;q=0.9',
+                        }
+                    });
+                let fileId = resp.data.fileId;
+                this.shareId = resp.data.shareId;
+                this.shareMode = resp.data.shareMode;
+                this.isFolder = resp.data.isFolder;
+                return fileId;
+            }
+
         } catch (error) {
             console.error('Error during getShareInfo:', error);
         }
@@ -194,6 +235,9 @@ class CloudDrive {
             let json = JsonBig.parse(await resp.text());
             const data = json?.fileListAO;
             let folderList = data?.folderList
+            if (!folderList) {
+                return null
+            }
             let names = folderList.map(item => item.name)
             let ids = folderList.map(item => item.id);
             if (folderList && folderList.length > 0) {
@@ -205,7 +249,7 @@ class CloudDrive {
                     })
                 });
                 let result = await Promise.all(ids.map(async (id) => this.getShareList(id)))
-                result = result.filter(item => item !== undefined);
+                result = result.filter(item => item !== undefined && item !== null);
                 return [...videos, ...result.flat()];
             }
         } catch (e) {
@@ -228,6 +272,9 @@ class CloudDrive {
             let videos = []
             const data = json?.fileListAO;
             let fileList = data.fileList
+            if (!fileList) {
+                return null
+            }
             let filename = fileList.map(item => item.name)
             let ids = fileList.map(item => item.id);
             let count = data.fileListSize

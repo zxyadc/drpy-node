@@ -87,16 +87,49 @@ class YunDrive {
     }
 
 
-    async getShareData(url, depth = 0, maxDepth = 3) {
-        if (!url || depth > maxDepth) {
+    async getShareData(url) {
+        if (!url) {
+            return;
+        }
+        const isValidUrl = url.startsWith('http');
+        let pCaID = isValidUrl ? 'root' : url;
+        if (isValidUrl) {
+            await this.getShareID(url);
+        }
+        let file = {}
+        let fileInfo = await this.getShareFile(pCaID)
+        if (fileInfo && Array.isArray(fileInfo)) {
+            await Promise.all(fileInfo.map(async (item) => {
+                if (!(item.name in file)) {
+                    file[item.name] = [];
+                }
+                let filelist = await this.getShareUrl(item.path);
+                if (filelist && filelist.length > 0) {
+                    file[item.name].push(...filelist);
+                }
+            }));
+        }
+        for (let key in file) {
+            if (file[key].length === 0) {
+                delete file[key];
+            }
+        }
+        if (Object.keys(file).length === 0) {
+            file['root'] = await this.getShareFile(url)
+            if (file['root'] && Array.isArray(file['root'])) {
+                file['root'] = file['root'].filter(item => item && Object.keys(item).length > 0);
+            }
+        }
+        return file
+    }
+
+    async getShareFile(pCaID) {
+        if (!pCaID) {
             return;
         }
         try {
-            const isValidUrl = url.startsWith('http');
-            let pCaID = isValidUrl ? 'root' : url;
-            if (isValidUrl) {
-                await this.getShareID(url);
-            }
+            const isValidUrl = pCaID.startsWith('http');
+            pCaID = isValidUrl ? 'root' : pCaID;
             const resp = await this.getShareInfo(pCaID);
             if (resp.status !== 200) {
                 return null;
@@ -105,32 +138,31 @@ class YunDrive {
             if (!json || !json.caLst) {
                 return null;
             }
-            const caLst = json.caLst;
+            const caLst = json?.caLst;
             const names = caLst.map(it => it.caName);
             const rootPaths = caLst.map(it => it.path);
             const filterRegex = /App|活动中心|免费|1T空间|免流/;
-            const filteredItems = [];
-            if (pCaID !== 'root') {
+            const videos = [];
+            if (caLst && caLst.length > 0) {
                 names.forEach((name, index) => {
                     if (!filterRegex.test(name)) {
-                        filteredItems.push({name, path: rootPaths[index]});
+                        videos.push({
+                            name: name,
+                            path: rootPaths[index]
+                        });
                     }
                 });
-                return filteredItems;
+                let result = await Promise.all(rootPaths.map(async (path) => this.getShareFile(path)));
+                result = result.filter(item => item !== undefined && item !== null);
+                return [...videos, ...result.flat()];
             }
-            let result = await Promise.all(rootPaths.map(async (path) => this.getShareData(path, depth + 1, maxDepth)));
-            result = result.flat();
-            return result;
         } catch (error) {
             console.error('Error processing share data:', error);
             return null;
         }
     }
 
-    async getShareUrl(pCaID, depth = 0, maxDepth = 2) {
-        if (depth > maxDepth) {
-            return null;
-        }
+    async getShareUrl(pCaID) {
         try {
             let resp = await this.getShareInfo(pCaID);
             if (resp.status !== 200) {
@@ -153,7 +185,7 @@ class YunDrive {
                 }));
             } else if (caLst !== null) {
                 const rootPaths = caLst.map(it => it.path);
-                let result = await Promise.all(rootPaths.map(path => this.getShareUrl(path, depth + 1, maxDepth)));
+                let result = await Promise.all(rootPaths.map(path => this.getShareUrl(path)));
                 result = result.filter(item => item && item.length > 0);
                 return result.flat();
             }
@@ -162,7 +194,6 @@ class YunDrive {
             return null;
         }
     }
-
 
     async getSharePlay(contentId, linkID) {
         let data = {

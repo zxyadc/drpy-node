@@ -87,34 +87,12 @@ var rule = {
         let playform = []
         let playurls = []
         if (/cloud.189.cn/.test(link)) {
-            log("云盘解析开始")
-            let data = await Cloud.getShareList(link)
-            if (Array.isArray(data)) {
-                playform.push('Cloud-球球啦')
-                playurls.push(data.map((it) => {
-                    const urls = [it.fileId, it.shareId]
-                    return it.name + "$" + urls.join('*')
-                }).join('#'))
-            } else {
-                Object.keys(data).forEach(it => {
-                    playform.push('Cloud-' + it)
-                    data[it].forEach(item => {
-                        playurls.push(item.map((it) => {
-                            const urls = [it.fileId, it.shareId]
-                            return it.name + "$" + urls.join('*')
-                        }).join('#'))
-                    })
-                })
-            }
-        }
-        if (link && link.match(/shareCode/g)) {
-            log("天翼云盘解析开始")
-            let data = await Cloud.getShareList('' + link.split('shareCode=')[1])
-            playform.push('Cloud-球球啦')
-            playurls.push(data.map((it) => {
-                const urls = [it.fileId, it.shareId]
-                return it.name + "$" + urls.join('*')
-            }).join('#'))
+            let data = await Cloud.getShareData(link)
+            Object.keys(data).forEach(it => {
+                playform.push('Cloud-' + it)
+                const urls = data[it].map(item => item.name + "$" + [item.fileId, item.shareId].join('*')).join('#');
+                playurls.push(urls);
+            })
         }
         vod.vod_play_from = playform.join("$$$")
         vod.vod_play_url = playurls.join("$$$")
@@ -141,17 +119,11 @@ var rule = {
     lazy: async function (flag, id, flags) {
         let {getProxyUrl, input} = this;
         const ids = input.split('*');
-        const urls = [];
         if (flag.startsWith('Cloud-')) {
-            console.log("天翼云盘解析开始")
+            log("天翼云盘解析开始")
             const url = await Cloud.getShareUrl(ids[0], ids[1]);
             return {
                 url: url + "#isVideo=true#",
-                header: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-                    'Accept-Encoding': 'identity;q=1, *;q=0',
-                    'referer': 'https://cloud.189.cn/'
-                }
             }
         }
     },

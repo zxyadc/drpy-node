@@ -1,5 +1,5 @@
 {
-  "sites_count": 92,
+  "sites_count": 93,
   "sites": [
     {
       "key": "drpyS_设置中心",
@@ -284,16 +284,6 @@
       "ext": ""
     },
     {
-      "key": "drpyS_哔哩直播[官]",
-      "name": "哔哩直播[官](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/哔哩直播[官]",
-      "searchable": 2,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
       "key": "drpyS_哔哩影视[官]",
       "name": "哔哩影视[官](DS)",
       "type": 4,
@@ -304,11 +294,31 @@
       "ext": ""
     },
     {
+      "key": "drpyS_哔哩直播[官]",
+      "name": "哔哩直播[官](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/哔哩直播[官]",
+      "searchable": 2,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
       "key": "drpyS_奇珍异兽[官]",
       "name": "奇珍异兽[官](DS)",
       "type": 4,
       "api": "http://localhost:5757/api/奇珍异兽[官]",
       "searchable": 2,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_抖音直播弹幕[官]",
+      "name": "抖音直播弹幕[官](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/抖音直播弹幕[官]",
+      "searchable": 1,
       "filterable": 1,
       "quickSearch": 0,
       "ext": ""
@@ -334,14 +344,14 @@
       "ext": "H4sIAAAAAAAAA9PT088qzs/Tfzp5ytPJK58uWf60dYUeSAQAZ2A+OBkAAAA="
     },
     {
-      "key": "drpyS_抖音直播弹幕[官]",
-      "name": "抖音直播弹幕[官](DS)",
+      "key": "drpyS_哔哩大杂烩[官]",
+      "name": "哔哩大杂烩[官](DS)",
       "type": 4,
-      "api": "http://localhost:5757/api/抖音直播弹幕[官]",
-      "searchable": 1,
+      "api": "http://localhost:5757/api/我的哔哩[官]",
+      "searchable": 2,
       "filterable": 1,
       "quickSearch": 0,
-      "ext": ""
+      "ext": "H4sIAAAAAAAAA9PT088qzs/Tfzp5ytPJK58uWf5sbtPz5pV6IEEAolZcGBwAAAA="
     },
     {
       "key": "drpyS_百忙无果[官]",

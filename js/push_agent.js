@@ -51,8 +51,8 @@ var rule = {
             }
         }
         log('[push_agent] decode input:', input);
-        if (input.indexOf('#') > -1) {
-            let list = input.split('#');
+        if (input.indexOf('@') > -1) {
+            let list = input.split('@');
             // log(list);
             for (let i = 0; i < list.length; i++) {
                 if (/pan.quark.cn|drive.uc.cn|www.alipan.com|www.aliyundrive.com|cloud.189.cn|yun.139.com/.test(list[i])) {

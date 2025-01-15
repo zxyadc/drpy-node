@@ -13,6 +13,7 @@ import iconv from 'iconv-lite';
 import {jsonpath, jsoup} from './htmlParser.js';
 import hlsParser from './hls-parser.js'
 import {keysToLowerCase} from '../utils/utils.js'
+import {ENV} from '../utils/env.js';
 
 // import {batchFetch1, batchFetch2, batchFetch3} from './drpyBatchFetch.js';
 import {batchFetch3} from './hikerBatchFetch.js';
@@ -37,7 +38,9 @@ const _axios = axios.create({
 _axios.interceptors.request.use((config) => {
     // 生成 curl 命令
     const curlCommand = generateCurlCommand(config);
-    console.log(`Generated cURL command:\n${curlCommand}`);
+    if (ENV.get('show_curl', '0') === '1') {
+        console.log(`Generated cURL command:\n${curlCommand}`);
+    }
     return config;
 }, (error) => {
     return Promise.reject(error);
@@ -159,7 +162,9 @@ async function request(url, opt = {}) {
     // 设置响应类型为 arraybuffer，确保能正确处理编码
     const respType = returnBuffer ? 'arraybuffer' : 'arraybuffer';
 
-    console.log(`req: ${url} headers: ${JSON.stringify(headers)} data: ${JSON.stringify(data)}`);
+    if (ENV.get('show_req', '0') === '1') {
+        console.log(`req: ${url} headers: ${JSON.stringify(headers)} data: ${JSON.stringify(data)}`);
+    }
     try {
         // 发送请求
         const resp = await _axios({
