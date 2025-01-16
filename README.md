@@ -13,15 +13,15 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 * [cookie管理插件](/apps/cookie-butler/index.html)
 * [本站防止爬虫协议](/robots.txt)
 * [本项目主页-免翻](https://git-proxy.playdreamer.cn/hjdhnx/drpy-node)
+* [DS源适配猫影视](https://github.com/hjdhnx/CatPawOpen/tree/ds-cat)
 
 ## 更新记录
 
-### 20250116
+### 20250117
 
-更新至V1.1.11
+本次未更新版本
 
-1. 优化天翼和移动
-2. 新增哔哩大杂烩
+1. 新开项目，使ds源适用于新版猫影视 [猫爪catpwd](https://github.com/CatPawApp/CatPawOpen)
 
 [点此查看完整更新记录](docs/updateRecord.md)
 

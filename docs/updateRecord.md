@@ -1,5 +1,11 @@
 # drpyS更新记录
 
+### 20250117
+
+本次未更新版本
+
+1. 新开项目，使ds源适用于新版猫影视 [猫爪catpwd](https://github.com/CatPawApp/CatPawOpen)
+
 ### 20250116
 
 更新至V1.1.11

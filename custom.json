@@ -314,16 +314,6 @@
       "ext": ""
     },
     {
-      "key": "drpyS_抖音直播弹幕[官]",
-      "name": "抖音直播弹幕[官](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/抖音直播弹幕[官]",
-      "searchable": 1,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
       "key": "drpyS_哔哩教育[官]",
       "name": "哔哩教育[官](DS)",
       "type": 4,
@@ -352,6 +342,16 @@
       "filterable": 1,
       "quickSearch": 0,
       "ext": "H4sIAAAAAAAAA9PT088qzs/Tfzp5ytPJK58uWf5sbtPz5pV6IEEAolZcGBwAAAA="
+    },
+    {
+      "key": "drpyS_抖音直播弹幕[官]",
+      "name": "抖音直播弹幕[官](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/抖音直播弹幕[官]",
+      "searchable": 1,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
     },
     {
       "key": "drpyS_百忙无果[官]",
