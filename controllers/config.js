@@ -1,7 +1,9 @@
 import {readdirSync, readFileSync, writeFileSync, existsSync} from 'fs';
 import path from 'path';
 import * as drpy from '../libs/drpyS.js';
+import '../libs_drpy/jinja.js'
 import {naturalSort, urljoin, updateQueryString} from '../utils/utils.js'
+import {md5} from "../libs_drpy/crypto-util.js";
 import {ENV} from "../utils/env.js";
 import {validatePwd} from "../utils/api_validate.js";
 import {getSitesMap} from "../utils/sites-map.js";
@@ -358,7 +360,33 @@ export default (fastify, options, done) => {
             const hostname = request.hostname;  // 主机名，不包含端口
             const port = request.socket.localPort;  // 获取当前服务的端口
             console.log(`cfg_path:${cfg_path},port:${port}`);
-            let requestHost = cfg_path === '/1' ? `${protocol}://${hostname}` : `http://127.0.0.1:${options.PORT}`; // 动态生成根地址
+            let requestHost = (cfg_path.startsWith('/1') || cfg_path.startsWith('/index')) ? `${protocol}://${hostname}` : `http://127.0.0.1:${options.PORT}`; // 动态生成根地址
+            let requestUrl = (cfg_path.startsWith('/1') || cfg_path.startsWith('/index')) ? `${protocol}://${hostname}${request.url}` : `http://127.0.0.1:${options.PORT}${request.url}`; // 动态生成请求链接
+            // console.log('requestUrl:', requestUrl);
+            if (cfg_path.endsWith('.js')) {
+                if (cfg_path.includes('index.js')) {
+                    return reply.sendFile('index.js', path.join(options.rootDir, 'data/cat'));
+                } else if (cfg_path.includes('index.config.js')) {
+                    let content = readFileSync(path.join(options.rootDir, 'data/cat/index.config.js'), 'utf-8');
+                    // console.log(content);
+                    content = jinja.render(content, {config_url: requestUrl.replace(cfg_path, '/1')});
+                    return reply.type('application/javascript;charset=utf-8').send(content);
+                }
+            }
+            if (cfg_path.endsWith('.js.md5')) {
+                if (cfg_path.includes('index.js')) {
+                    let content = readFileSync(path.join(options.rootDir, 'data/cat/index.js.md5'), 'utf-8');
+                    return reply.type('text/plain;charset=utf-8').send(content);
+                    // return reply.sendFile('index.js.md5', path.join(options.rootDir, 'data/cat'));
+                } else if (cfg_path.includes('index.config.js')) {
+                    let content = readFileSync(path.join(options.rootDir, 'data/cat/index.config.js'), 'utf-8');
+                    // console.log(content);
+                    content = jinja.render(content, {config_url: requestUrl.replace(cfg_path, '/1')});
+                    let contentHash = md5(content);
+                    console.log('contentHash:', contentHash);
+                    return reply.type('text/plain;charset=utf-8').send(contentHash);
+                }
+            }
             let sub = null;
             if (sub_code) {
                 let subs = getSubs(options.subFilePath);
