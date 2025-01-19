@@ -5,7 +5,7 @@ import '../libs_drpy/jinja.js'
 import {naturalSort, urljoin, updateQueryString} from '../utils/utils.js'
 import {md5} from "../libs_drpy/crypto-util.js";
 import {ENV} from "../utils/env.js";
-import {validatePwd} from "../utils/api_validate.js";
+import {validateBasicAuth, validatePwd} from "../utils/api_validate.js";
 import {getSitesMap} from "../utils/sites-map.js";
 import {getParsesDict} from "../utils/file.js";
 import batchExecute from '../libs_drpy/batchExecute.js';
@@ -348,7 +348,7 @@ export default (fastify, options, done) => {
     });
 
     // 接口：返回配置 JSON，同时写入 index.json
-    fastify.get('/config*', {preHandler: validatePwd}, async (request, reply) => {
+    fastify.get('/config*', {preHandler: [validatePwd, validateBasicAuth]}, async (request, reply) => {
         let t1 = (new Date()).getTime();
         const query = request.query; // 获取 query 参数
         const pwd = query.pwd || '';
