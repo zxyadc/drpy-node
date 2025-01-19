@@ -360,32 +360,84 @@ export default (fastify, options, done) => {
             const hostname = request.hostname;  // 主机名，不包含端口
             const port = request.socket.localPort;  // 获取当前服务的端口
             console.log(`cfg_path:${cfg_path},port:${port}`);
-            let requestHost = (cfg_path.startsWith('/1') || cfg_path.startsWith('/index')) ? `${protocol}://${hostname}` : `http://127.0.0.1:${options.PORT}`; // 动态生成根地址
-            let requestUrl = (cfg_path.startsWith('/1') || cfg_path.startsWith('/index')) ? `${protocol}://${hostname}${request.url}` : `http://127.0.0.1:${options.PORT}${request.url}`; // 动态生成请求链接
+            let not_local = cfg_path.startsWith('/1') || cfg_path.startsWith('/index');
+            let requestHost = not_local ? `${protocol}://${hostname}` : `http://127.0.0.1:${options.PORT}`; // 动态生成根地址
+            let requestUrl = not_local ? `${protocol}://${hostname}${request.url}` : `http://127.0.0.1:${options.PORT}${request.url}`; // 动态生成请求链接
             // console.log('requestUrl:', requestUrl);
+            // if (cfg_path.endsWith('.js')) {
+            //     if (cfg_path.includes('index.js')) {
+            //         // return reply.sendFile('index.js', path.join(options.rootDir, 'data/cat'));
+            //         let content = readFileSync(path.join(options.rootDir, 'data/cat/index.js'), 'utf-8');
+            //         // content = jinja.render(content, {config_url: requestUrl.replace(cfg_path, `/1?sub=all&pwd=${process.env.API_PWD || ''}`)});
+            //         content = content.replace('$config_url', requestUrl.replace(cfg_path, `/1?sub=all&pwd=${process.env.API_PWD || ''}`));
+            //         return reply.type('application/javascript;charset=utf-8').send(content);
+            //     } else if (cfg_path.includes('index.config.js')) {
+            //         let content = readFileSync(path.join(options.rootDir, 'data/cat/index.config.js'), 'utf-8');
+            //         // content = jinja.render(content, {config_url: requestUrl.replace(cfg_path, `/1?sub=all&pwd=${process.env.API_PWD || ''}`)});
+            //         content = content.replace('$config_url', requestUrl.replace(cfg_path, `/1?sub=all&pwd=${process.env.API_PWD || ''}`));
+            //         return reply.type('application/javascript;charset=utf-8').send(content);
+            //     }
+            // }
+            // if (cfg_path.endsWith('.js.md5')) {
+            //     if (cfg_path.includes('index.js')) {
+            //         let content = readFileSync(path.join(options.rootDir, 'data/cat/index.js'), 'utf-8');
+            //         // content = jinja.render(content, {config_url: requestUrl.replace(cfg_path, `/1?sub=all&pwd=${process.env.API_PWD || ''}`)});
+            //         content = content.replace('$config_url', requestUrl.replace(cfg_path, `/1?sub=all&pwd=${process.env.API_PWD || ''}`));
+            //         let contentHash = md5(content);
+            //         console.log('index.js contentHash:', contentHash);
+            //         return reply.type('text/plain;charset=utf-8').send(contentHash);
+            //     } else if (cfg_path.includes('index.config.js')) {
+            //         let content = readFileSync(path.join(options.rootDir, 'data/cat/index.config.js'), 'utf-8');
+            //         // content = jinja.render(content, {config_url: requestUrl.replace(cfg_path, `/1?sub=all&pwd=${process.env.API_PWD || ''}`)});
+            //         content = content.replace('$config_url', requestUrl.replace(cfg_path, `/1?sub=all&pwd=${process.env.API_PWD || ''}`));
+            //         let contentHash = md5(content);
+            //         console.log('index.config.js contentHash:', contentHash);
+            //         return reply.type('text/plain;charset=utf-8').send(contentHash);
+            //     }
+            // }
+            const getFilePath = (cfgPath, rootDir, fileName) => path.join(rootDir, `data/cat/${fileName}`);
+            const processContent = (content, cfgPath, requestUrl) =>
+                content.replace('$config_url', requestUrl.replace(cfgPath, `/1?sub=all&pwd=${process.env.API_PWD || ''}`));
+
+            const handleJavaScript = (cfgPath, requestUrl, options, reply) => {
+                const fileMap = {
+                    'index.js': 'index.js',
+                    'index.config.js': 'index.config.js'
+                };
+
+                for (const [key, fileName] of Object.entries(fileMap)) {
+                    if (cfgPath.includes(key)) {
+                        const filePath = getFilePath(cfgPath, options.rootDir, fileName);
+                        let content = readFileSync(filePath, 'utf-8');
+                        content = processContent(content, cfgPath, requestUrl);
+                        return reply.type('application/javascript;charset=utf-8').send(content);
+                    }
+                }
+            };
+
+            const handleJsMd5 = (cfgPath, requestUrl, options, reply) => {
+                const fileMap = {
+                    'index.js': 'index.js',
+                    'index.config.js': 'index.config.js'
+                };
+
+                for (const [key, fileName] of Object.entries(fileMap)) {
+                    if (cfgPath.includes(key)) {
+                        const filePath = getFilePath(cfgPath, options.rootDir, fileName);
+                        let content = readFileSync(filePath, 'utf-8');
+                        content = processContent(content, cfgPath, requestUrl);
+                        const contentHash = md5(content);
+                        console.log(`${fileName} contentHash:`, contentHash);
+                        return reply.type('text/plain;charset=utf-8').send(contentHash);
+                    }
+                }
+            };
             if (cfg_path.endsWith('.js')) {
-                if (cfg_path.includes('index.js')) {
-                    return reply.sendFile('index.js', path.join(options.rootDir, 'data/cat'));
-                } else if (cfg_path.includes('index.config.js')) {
-                    let content = readFileSync(path.join(options.rootDir, 'data/cat/index.config.js'), 'utf-8');
-                    // console.log(content);
-                    content = jinja.render(content, {config_url: requestUrl.replace(cfg_path, '/1')});
-                    return reply.type('application/javascript;charset=utf-8').send(content);
-                }
+                return handleJavaScript(cfg_path, requestUrl, options, reply);
             }
+
             if (cfg_path.endsWith('.js.md5')) {
-                if (cfg_path.includes('index.js')) {
-                    let content = readFileSync(path.join(options.rootDir, 'data/cat/index.js.md5'), 'utf-8');
-                    return reply.type('text/plain;charset=utf-8').send(content);
-                    // return reply.sendFile('index.js.md5', path.join(options.rootDir, 'data/cat'));
-                } else if (cfg_path.includes('index.config.js')) {
-                    let content = readFileSync(path.join(options.rootDir, 'data/cat/index.config.js'), 'utf-8');
-                    // console.log(content);
-                    content = jinja.render(content, {config_url: requestUrl.replace(cfg_path, '/1')});
-                    let contentHash = md5(content);
-                    console.log('contentHash:', contentHash);
-                    return reply.type('text/plain;charset=utf-8').send(contentHash);
-                }
+                return handleJsMd5(cfg_path, requestUrl, options, reply);
             }
             let sub = null;
             if (sub_code) {

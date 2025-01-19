@@ -284,21 +284,21 @@
       "ext": ""
     },
     {
-      "key": "drpyS_哔哩影视[官]",
-      "name": "哔哩影视[官](DS)",
-      "type": 4,
-      "api": "http://localhost:5757/api/哔哩影视[官]",
-      "searchable": 1,
-      "filterable": 1,
-      "quickSearch": 0,
-      "ext": ""
-    },
-    {
       "key": "drpyS_哔哩直播[官]",
       "name": "哔哩直播[官](DS)",
       "type": 4,
       "api": "http://localhost:5757/api/哔哩直播[官]",
       "searchable": 2,
+      "filterable": 1,
+      "quickSearch": 0,
+      "ext": ""
+    },
+    {
+      "key": "drpyS_哔哩影视[官]",
+      "name": "哔哩影视[官](DS)",
+      "type": 4,
+      "api": "http://localhost:5757/api/哔哩影视[官]",
+      "searchable": 1,
       "filterable": 1,
       "quickSearch": 0,
       "ext": ""

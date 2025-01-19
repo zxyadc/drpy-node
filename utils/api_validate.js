@@ -11,6 +11,7 @@ export const validateBasicAuth = (request, reply, done) => {
             done();
             return
         }
+        console.log(`[validateBasicAuth] 猫配置文件 ${cf_path} 进入鉴权`);
     }
     // console.log('进入了basic验证');
     const authHeader = request.headers.authorization;

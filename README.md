@@ -14,15 +14,15 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 * [本站防止爬虫协议](/robots.txt)
 * [本项目主页-免翻](https://git-proxy.playdreamer.cn/hjdhnx/drpy-node)
 * [DS源适配猫影视](https://github.com/hjdhnx/CatPawOpen/tree/ds-cat)
-* [在线猫ds源-复制链接后手动改地址加授权](/config/index.js.md5)
+* [在线猫ds源主页](/cat/index.html)
 
 ## 更新记录
 
-### 20250119
+### 20250120
 
-更新至V1.1.12
+更新至V1.1.13
 
-1. 支持猫源在线配置
+1. 完善猫在线配置
 
 ### 20250117
 

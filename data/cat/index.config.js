@@ -24,8 +24,7 @@ __export(index_config_exports, {
 module.exports = __toCommonJS(index_config_exports);
 var index_config_default = {
   drpyS: {
-    // config_url: "http://localhost:5757/config/1?sub=all&pwd=",
-    config_url: "{{config_url}}",
+    config_url: "$config_url",
     // 本地ds 支持
     // config_url: 'http://localhost:5707/config/0?sub=dzyyds', // 本地hipy-t4 支持
     home_site: "http://localhost:5757/api/设置中心",
