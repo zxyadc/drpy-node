@@ -42,6 +42,14 @@ export const validatePwd = async (request, reply) => {
     if (!apiPwd) {
         return; // 如果未配置 API_PWD，直接通过
     }
+    if (request.url.startsWith('/config/')) {
+        let cf_path = request.url.slice(8).split('?')[0];
+        // console.log(cf_path);
+        if (['index.js', 'index.js.md5', 'index.config.js', 'index.config.js.md5'].includes(cf_path)) {
+            return
+        }
+        console.log(`[validatePwd] 猫配置文件 ${cf_path} 进入鉴权`);
+    }
 
     // 从查询参数或请求体中获取 pwd
     const pwd = request.query.pwd || request.body?.pwd;
