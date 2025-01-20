@@ -183,8 +183,8 @@ var rule = {
     aliScanCheck: null,
     biliScanCheck: null,
     host: 'http://empty',
-    class_name: '推送&夸克&UC&阿里&天翼&哔哩&系统配置&测试',
-    class_url: 'push&quark&uc&ali&cloud&bili&system&test',
+    class_name: '推送&夸克&UC&阿里&天翼&哔哩&系统配置&测试&接口挂载',
+    class_url: 'push&quark&uc&ali&cloud&bili&system&test&apiLink',
     url: '/fyclass',
 
     预处理: async function (env) {
@@ -313,6 +313,8 @@ var rule = {
                 d.push(getInput('get_hide_adult', '查看青少年模式', images.settings));
                 d.push(genMultiInput('thread', '设置播放代理线程数', '默认为1，可自行配置成其他值如:10', images.settings));
                 d.push(getInput('get_thread', '查看播放代理线程数', images.settings));
+                d.push(genMultiInput('play_proxy_mode', '设置播放代理模式', '默认为1，可自行配置成其他值如:2 (1 内存加速,2 磁盘加速 其他:内存加速)', images.settings));
+                d.push(getInput('get_play_proxy_mode', '查看播放代理模式', images.settings));
                 d.push(genMultiInput('enable_dr2', '设置drpy2源启用状态', '设置为1可启用此功能(默认没设置也属于启动，设置其他值关闭)', images.settings));
                 d.push(getInput('get_enable_dr2', '查看drpy2源启用状态', images.settings));
                 d.push(genMultiInput('now_ai', '设置当前AI', '1: 讯飞星火 2:deepseek 3.讯飞智能体 4.Kimi \n如果不填，连续对话默认使用讯飞星火', images.settings));
@@ -338,6 +340,17 @@ var rule = {
                     vod_pic: images.lives,
                     vod_desc: "流式代理mp4等视频"
                 });
+                break;
+            case 'apiLink':
+                d.push(genMultiInput('link_url', '设置挂载地址', '可以挂载t4配置链接如 hipy-t4、不夜t4', images.settings));
+                d.push(getInput('get_link_url', '查看挂载地址', images.settings));
+                d.push(getInput('link_data', '更新挂载数据', images.settings, '将挂载的配置数据获取到系统内方便武魂融合，远程有更新也需要执行此内容'));
+                d.push(getInput('get_link_data', '查看挂载数据', images.settings));
+                d.push(genMultiInput('enable_link_data', '设置启用挂载数据', '设置为1可以启用。默认即启用。设置其他值禁用', images.settings));
+                d.push(getInput('get_enable_link_data', '查看启用挂载数据', images.settings));
+                d.push(genMultiInput('enable_link_push', '设置启用挂载推送', '设置为1可以启用。默认即关闭。设置其他值禁用', images.settings));
+                d.push(getInput('get_enable_link_push', '查看启用挂载推送', images.settings));
+
                 break;
         }
         return d
@@ -969,6 +982,7 @@ var rule = {
             'bili_cookie',
             'hide_adult',
             'thread',
+            'play_proxy_mode',
             'enable_dr2',
             'spark_ai_authKey',
             'deepseek_apiKey',
@@ -977,6 +991,9 @@ var rule = {
             'allow_forward',
             'show_curl',
             'show_req',
+            'link_url',
+            'enable_link_data',
+            'enable_link_push',
         ];
         let get_cookie_sets = [
             'get_quark_cookie',
@@ -988,6 +1005,7 @@ var rule = {
             'get_bili_cookie',
             'get_hide_adult',
             'get_thread',
+            'get_play_proxy_mode',
             'get_enable_dr2',
             'get_spark_ai_authKey',
             'get_deepseek_apiKey',
@@ -996,6 +1014,9 @@ var rule = {
             'get_allow_forward',
             'get_show_curl',
             'get_show_req',
+            'get_link_url',
+            'get_enable_link_data',
+            'get_enable_link_push',
         ];
         if (cookie_sets.includes(action) && value) {
             try {
@@ -1052,6 +1073,62 @@ var rule = {
                 return '发生错误：' + e.message;
             }
         }
+        if (action === 'link_data' && value) {
+            try {
+                const obj = JSON.parse(value);
+                const auth_code = obj.auth_code;
+                if (!auth_code) {
+                    return '入库授权码不允许为空!'
+                }
+                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'drpys';
+                if (auth_code !== COOKIE_AUTH_CODE) {
+                    return `您输入的入库授权码【${auth_code}】不正确`
+                }
+                const link_url = ENV.get('link_url');
+                let data = await request(link_url);
+                pathLib.writeFile('./settings/link_data.json', data);
+                return '挂载数据已更新，请前往查看确保无问题';
+            } catch (e) {
+                return '发生错误：' + e.message;
+            }
+        }
+        if (action === 'get_link_data' && value) {
+            try {
+                const obj = JSON.parse(value);
+                const auth_code = obj.auth_code;
+                if (!auth_code) {
+                    return '入库授权码不允许为空!'
+                }
+                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'drpys';
+                if (auth_code !== COOKIE_AUTH_CODE) {
+                    return `您输入的入库授权码【${auth_code}】不正确`
+                }
+                let data = pathLib.readFile('./settings/link_data.json');
+                let sites = [];
+                try {
+                    sites = JSON.parse(data).sites.filter(site => site.type = 4);
+                } catch (e) {
+                }
+                sites = JSON.stringify(sites);
+                // log(sites);
+                return JSON.stringify({
+                    action: {
+                        actionId: action + '_value',
+                        id: 'link_data',
+                        type: 'input',
+                        title: '已挂载的数据',
+                        tip: `你想查看的挂载数据`,
+                        value: 'link_data.json',
+                        width: 680,
+                        height: 800,
+                        msgType: 'long_text',
+                        msg: sites
+                    }
+                });
+            } catch (e) {
+                return '发生错误：' + e.message;
+            }
+        }
         if (action === '查看夸克cookie') {
             return {action: getInput('get_quark_cookie', '查看夸克 cookie', urljoin(publicUrl, './images/icon_cookie/夸克.webp')).vod_id};
         }
@@ -1094,7 +1171,7 @@ function genMultiInput(actionId, title, desc, img) {
     }
 }
 
-function getInput(actionId, title, img) {
+function getInput(actionId, title, img, desc) {
     return {
         vod_id: JSON.stringify({
             actionId: actionId,
@@ -1103,7 +1180,7 @@ function getInput(actionId, title, img) {
             title: '入库授权码',
             tip: '请输入.env中配置的入库授权码',
             value: '',
-            msg: '查看已设置的cookie需要授权码',
+            msg: desc || '查看已设置的cookie需要授权码',
             // imageUrl: img || 'https://pic.imgdb.cn/item/667ce9f4d9c307b7e9f9d052.webp',
             imageUrl: img || 'https://pic.qisuidc.cn/s/2024/10/23/6718c212f1fdd.webp',
             imageHeight: 200,

@@ -1,5 +1,5 @@
 import {readFile} from 'fs/promises';
-import {existsSync, readFileSync} from 'fs';
+import {existsSync, readFileSync, writeFileSync, mkdirSync} from 'fs';
 import {fileURLToPath} from "url";
 import {createRequire} from 'module';
 import {XMLHttpRequest} from 'xmlhttprequest';
@@ -83,6 +83,26 @@ globalThis.pathLib = {
             return '';
         }
         return readFileSync(resolvedPath, 'utf8')
+    },
+    writeFile: function (filename, text) {
+        let _file_path = path.join(_data_path, filename);
+        const resolvedPath = path.resolve(_data_path, _file_path); // 将路径解析为绝对路径
+        if (!resolvedPath.startsWith(_data_path)) {
+            log(`no access for read ${_file_path}`)
+            return '';
+        }
+        try {
+            const dirPath = path.dirname(resolvedPath);
+            // 检查目录是否存在，不存在则创建
+            if (!existsSync(dirPath)) {
+                mkdirSync(dirPath, {recursive: true});
+            }
+            writeFileSync(resolvedPath, text, 'utf8');
+            return true
+        } catch (e) {
+            log(`failed for saveFile ${_file_path}　error:${e.message}`);
+            return false
+        }
     },
 };
 const {sleep, sleepSync, computeHash, deepCopy, urljoin, urljoin2, joinUrl, naturalSort, $js} = utils;

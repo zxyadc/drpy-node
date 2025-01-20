@@ -115,13 +115,10 @@ var rule = {
                     }
                     if (/yun.139.com/.test(list[i])) {
                         let data = await Yun.getShareData(list[i])
-                        playform = data.map(it => {
-                            return 'Yun-' + it.name
-                        })
-                        let json = await Promise.all(data.map(it => Yun.getShareUrl(it.path)))
-                        json.forEach(it => {
-                            const urls = it.map(item => item.name + "$" + [item.contentId, item.linkID].join('*'))
-                            playurls.push(urls.join('#'))
+                        Object.keys(data).forEach(it => {
+                            playform.push('Yun-' + it)
+                            const urls = data[it].map(item => item.name + "$" + [item.contentId, item.linkID].join('*')).join('#');
+                            playurls.push(urls);
                         })
                     }
                 } else {
@@ -189,13 +186,10 @@ var rule = {
             }
             if (/yun.139.com/.test(input)) {
                 let data = await Yun.getShareData(input)
-                playform = data.map(it => {
-                    return 'Yun-' + it.name
-                })
-                let json = await Promise.all(data.map(it => Yun.getShareUrl(it.path)))
-                json.forEach(it => {
-                    const urls = it.map(item => item.name + "$" + [item.contentId, item.linkID].join('*'))
-                    playurls.push(urls.join('#'))
+                Object.keys(data).forEach(it => {
+                    playform.push('Yun-' + it)
+                    const urls = data[it].map(item => item.name + "$" + [item.contentId, item.linkID].join('*')).join('#');
+                    playurls.push(urls);
                 })
             }
         } else {

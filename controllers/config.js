@@ -13,7 +13,13 @@ import batchExecute from '../libs_drpy/batchExecute.js';
 const {jsEncoder} = drpy;
 
 // 工具函数：生成 JSON 数据
-async function generateSiteJSON(jsDir, dr2Dir, configDir, requestHost, sub, subFilePath, pwd) {
+async function generateSiteJSON(options, requestHost, sub, pwd) {
+    const jsDir = options.jsDir;
+    const dr2Dir = options.dr2Dir;
+    const configDir = options.configDir;
+    const subFilePath = options.subFilePath;
+    const rootDir = options.rootDir;
+
     const files = readdirSync(jsDir);
     let valid_files = files.filter((file) => file.endsWith('.js') && !file.startsWith('_')); // 筛选出不是 "_" 开头的 .js 文件
     let sort_list = [];
@@ -189,6 +195,40 @@ async function generateSiteJSON(jsDir, dr2Dir, configDir, requestHost, sub, subF
 
         await batchExecute(dr2_tasks, listener);
 
+    }
+
+    // 根据用户是否启用挂载数据源去生成对应配置
+    if (ENV.get('enable_link_data', '1') === '1') {
+        log(`开始挂载外部T4数据`);
+        let link_sites = [];
+        let link_url = ENV.get('link_url');
+        let enable_link_push = ENV.get('enable_link_push');
+        try {
+            let link_data = readFileSync(path.join(rootDir, './data/settings/link_data.json'), 'utf-8');
+            link_sites = JSON.parse(link_data).sites.filter(site => site.type = 4);
+            link_sites.forEach((site) => {
+                if (site.key === 'push_agent' && !enable_link_push) {
+                    return
+                }
+                if (site.api && !site.api.startsWith('http')) {
+                    site.api = urljoin(link_url, site.api)
+                }
+                if (site.ext && site.ext.startsWith('.')) {
+                    site.ext = urljoin(link_url, site.ext)
+                }
+                if (site.key === 'push_agent' && enable_link_push) { // 推送覆盖
+                    let pushIndex = sites.findIndex(s => s.key === 'push_agent');
+                    if (pushIndex > -1) {
+                        sites[pushIndex] = site;
+                    } else {
+                        sites.push(site);
+                    }
+                } else {
+                    sites.push(site);
+                }
+            });
+        } catch (e) {
+        }
     }
 
     // 订阅再次处理别名的情况
@@ -449,7 +489,7 @@ export default (fastify, options, done) => {
                 }
             }
 
-            const siteJSON = await generateSiteJSON(options.jsDir, options.dr2Dir, options.configDir, requestHost, sub, options.subFilePath, pwd);
+            const siteJSON = await generateSiteJSON(options, requestHost, sub, pwd);
             const parseJSON = await generateParseJSON(options.jxDir, requestHost);
             const livesJSON = generateLivesJSON(requestHost);
             const playerJSON = generatePlayerJSON(options.configDir, requestHost);

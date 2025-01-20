@@ -257,7 +257,7 @@ export default (fastify, options, done) => {
                 }
                 // return proxyStreamMediaMulti(content, new_headers, request, reply); // 走  流式代理
                 // 将查询参数构建为目标 URL
-                const redirectUrl = `/mediaProxy?url=${encodeURIComponent(content)}&headers=${encodeURIComponent(new_headers)}&thread=${ENV.get('thread') || 1}`;
+                const redirectUrl = `/mediaProxy?url=${encodeURIComponent(content)}&headers=${encodeURIComponent(JSON.stringify(new_headers))}&thread=${ENV.get('thread') || 1}`;
                 // 执行重定向
                 return reply.redirect(redirectUrl);
             }

@@ -1,6 +1,8 @@
 import {base64Decode} from '../libs_drpy/crypto-util.js';
 import '../utils/random-http-ua.js'
 import {keysToLowerCase} from '../utils/utils.js';
+import {ENV} from "../utils/env.js";
+import chunkStream, {testSupport} from '../utils/chunk.js';
 import http from 'http';
 import https from 'https';
 import axios from 'axios';
@@ -36,79 +38,29 @@ export default (fastify, options, done) => {
                 : {};
 
             // Call the proxy function, passing the decoded URL and headers
-            // return await proxyStreamMedia(decodedUrl, decodedHeader, reply);
-            return await proxyStreamMediaMulti(decodedUrl, decodedHeader, request, reply, thread, size, randUa);
+            // return await proxyStreamMediaMulti(decodedUrl, decodedHeader, request, reply, thread, size, randUa);
+            // return await chunkStream(request, reply, decodedUrl, ids[1], Object.assign({Cookie: cookie}, baseHeader));
+            if (ENV.get('play_proxy_mode', '1') !== '2') { // 2磁盘加速 其他都是内存加速
+                console.log('[mediaProxy] proxyStreamMediaMulti 内存加速:chunkSize:', sizeToBytes(size));
+                return await proxyStreamMediaMulti(decodedUrl, decodedHeader, request, reply, thread, size, randUa);
+            } else {
+                console.log('[mediaProxy] chunkStream 磁盘加速 chunkSize:', sizeToBytes('256K'));
+                return await chunkStream(request, reply, decodedUrl, null, decodedHeader,
+                    Object.assign({chunkSize: 1024 * 256, poolSize: 5, timeout: 1000 * 10}, {
+                        // chunkSize: sizeToBytes(size),
+                        poolSize: thread
+                    })
+                );
+            }
         } catch (error) {
-            fastify.log.error(error);
+            // fastify.log.error(error);
+            fastify.log.error(error.message);
             reply.code(500).send({error: error.message});
         }
     });
 
     done();
 };
-
-// 媒体文件 流式代理，单线程管道方式发送数据，且存在bug，暂不使用
-function proxyStreamMedia(videoUrl, headers, reply) {
-    console.log(`进入了流式代理: ${videoUrl} | headers: ${JSON.stringify(headers)}`);
-
-    const protocol = videoUrl.startsWith('https') ? https : http;
-    const agent = videoUrl.startsWith('https') ? httpsAgent : httpAgent;
-
-    // 发起请求
-    const proxyRequest = protocol.request(videoUrl, {headers, agent}, (videoResponse) => {
-        console.log('videoResponse.statusCode:', videoResponse.statusCode);
-        console.log('videoResponse.headers:', videoResponse.headers);
-
-        if (videoResponse.statusCode === 200 || videoResponse.statusCode === 206) {
-            const resp_headers = {
-                'Content-Type': videoResponse.headers['content-type'] || 'application/octet-stream',
-                'Content-Length': videoResponse.headers['content-length'],
-                ...(videoResponse.headers['content-range'] ? {'Content-Range': videoResponse.headers['content-range']} : {}),
-            };
-            console.log('Response headers:', resp_headers);
-            reply.headers(resp_headers).status(videoResponse.statusCode);
-
-            // 将响应流直接管道传输给客户端
-            videoResponse.pipe(reply.raw);
-
-            videoResponse.on('data', (chunk) => {
-                console.log('Data chunk received, size:', chunk.length);
-            });
-
-            videoResponse.on('end', () => {
-                console.log('Video data transmission complete.');
-            });
-
-            videoResponse.on('error', (err) => {
-                console.error('Error during video response:', err.message);
-                reply.code(500).send({error: 'Error streaming video', details: err.message});
-            });
-
-            reply.raw.on('finish', () => {
-                console.log('Data fully sent to client');
-            });
-
-            // 监听关闭事件，销毁视频响应流
-            reply.raw.on('close', () => {
-                console.log('Response stream closed.');
-                videoResponse.destroy();
-            });
-        } else {
-            console.error(`Unexpected status code: ${videoResponse.statusCode}`);
-            reply.code(videoResponse.statusCode).send({error: 'Failed to fetch video'});
-        }
-    });
-
-    // 监听错误事件
-    proxyRequest.on('error', (err) => {
-        console.error('Proxy request error:', err.message);
-        reply.code(500).send({error: 'Error fetching video', details: err.message});
-    });
-
-    // 必须调用 .end() 才能发送请求
-    proxyRequest.end();
-}
-
 
 // Helper function for range-based chunk downloading
 async function fetchStream(url, userHeaders, start, end, randUa) {
@@ -314,7 +266,6 @@ async function proxyStreamMediaMulti(mediaUrl, reqHeaders, request, reply, threa
         }
     }
 }
-
 
 // Helper function to convert size string (e.g., '128K', '1M') to bytes
 function sizeToBytes(size) {

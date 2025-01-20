@@ -156,10 +156,11 @@ class UCHandler {
 
 
     async api(url, data, headers, method, retry) {
+        let cookie = this.cookie || '';
         headers = headers || {};
         Object.assign(headers, this.baseHeader);
         Object.assign(headers, {
-            Cookie: this.cookie || '',
+            Cookie: cookie,
         });
         method = method || 'post';
         const resp =
@@ -175,6 +176,16 @@ class UCHandler {
                 return err.response || {status: 500, data: {}};
             });
         const leftRetry = retry || 3;
+        if (resp.headers['set-cookie']) {
+            const puus = resp.headers['set-cookie'].join(';;;').match(/__puus=([^;]+)/);
+            if (puus) {
+                if (cookie.match(/__puus=([^;]+)/)[1] !== puus[1]) {
+                    cookie = cookie.replace(/__puus=[^;]+/, `__puus=${puus[1]}`);
+                    console.log('[uc] api:更新cookie:', cookie);
+                    ENV.set('uc_cookie', cookie);
+                }
+            }
+        }
         if (resp.status === 429 && leftRetry > 0) {
             await this.delay(1000);
             return await this.api(url, data, headers, method, leftRetry - 1);
