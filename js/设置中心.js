@@ -949,7 +949,8 @@ var rule = {
                     action: {
                         actionId: '__detail__',
                         skey: 'push_agent',
-                        ids: encodeURIComponent(obj.push),
+                        // ids: encodeURIComponent(obj.push),
+                        ids: obj.push,
                     },
                     toast: `开始解析视频:${obj.push}`
                 });
