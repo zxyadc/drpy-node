@@ -86,7 +86,9 @@ var rule = {
         }
         let playform = []
         let playurls = []
+        let playPans = [];
         if (/cloud.189.cn/.test(link)) {
+            playPans.push(link);
             let data = await Cloud.getShareData(link)
             Object.keys(data).forEach(it => {
                 playform.push('Cloud-' + it)
@@ -96,6 +98,7 @@ var rule = {
         }
         vod.vod_play_from = playform.join("$$$")
         vod.vod_play_url = playurls.join("$$$")
+        vod.vod_play_pan = playPans.join("$$$")
         return vod
     },
     搜索: async function (wd, quick, pg) {

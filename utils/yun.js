@@ -46,8 +46,13 @@ class YunDrive {
     }
 
     async getShareInfo(pCaID) {
-        if (this.cache[pCaID]) {
-            return this.cache[pCaID];
+        if (!this.linkID) {
+            console.error('linkID is not set. Please call getShareID first.');
+            return null;
+        }
+        const cacheKey = `${this.linkID}-${pCaID}`;
+        if (this.cache[cacheKey]) {
+            return this.cache[cacheKey];
         }
         let data = JSON.stringify(this.encrypt(JSON.stringify({
             "getOutLinkInfoReq": {
@@ -69,7 +74,7 @@ class YunDrive {
                 return null;
             }
             const json = JSON.parse(this.decrypt(resp.data)).data;
-            this.cache[pCaID] = json; // 缓存结果
+            this.cache[cacheKey] = json; // 缓存结果
             return json;
         } catch (error) {
             console.error('Error processing share info:', error);
@@ -191,9 +196,8 @@ class YunDrive {
                 'Content-Type': 'application/json'
             }
         })
-        if (resp.status === 200) {
+        if (resp.status === 200 && resp.data.data !== null) {
             let data = resp.data
-            console.log(data)
             return data.data.contentInfo.presentURL
         }
 

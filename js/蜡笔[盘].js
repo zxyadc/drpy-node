@@ -105,10 +105,12 @@ var rule = {
         }
         let playform = []
         let playurls = []
+        let playPans = [];
         for (const item of $('.module-row-title')) {
             const a = $(item).find('p:first')[0];
             let link = a.children[0].data.trim()
             if (/pan.quark.cn/.test(link)) {
+                playPans.push(link);
                 const shareData = Quark.getShareData(link);
                 if (shareData) {
                     const videos = await Quark.getFilesByShareUrl(shareData);
@@ -124,6 +126,7 @@ var rule = {
                     }
                 }
             } else if (/drive.uc.cn/.test(link)) {
+                playPans.push(link);
                 const shareData = UC.getShareData(link);
                 if (shareData) {
                     const videos = await UC.getFilesByShareUrl(shareData);
@@ -142,6 +145,7 @@ var rule = {
         }
         vod.vod_play_from = playform.join("$$$")
         vod.vod_play_url = playurls.join("$$$")
+        vod.vod_play_pan = playPans.join("$$$")
         return vod
     },
     搜索: async function (wd, quick, pg) {

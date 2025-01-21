@@ -104,6 +104,7 @@ async function generateSiteJSON(options, requestHost, sub, pwd) {
                         filterable: ruleObject.filterable,
                         quickSearch: ruleObject.quickSearch,
                         more: ruleObject.more,
+                        logo: ruleObject.logo,
                         ext: fileSite.ext || "", // 固定为空字符串
                     };
                     sites.push(site);
@@ -183,6 +184,7 @@ async function generateSiteJSON(options, requestHost, sub, pwd) {
                             filterable: ruleObject.filterable,
                             quickSearch: ruleObject.quickSearch,
                             more: ruleObject.more,
+                            logo: ruleObject.logo,
                             ext: fileSite.ext || "", // 固定为空字符串
                         };
                         sites.push(site);
@@ -198,16 +200,16 @@ async function generateSiteJSON(options, requestHost, sub, pwd) {
     }
 
     // 根据用户是否启用挂载数据源去生成对应配置
-    if (ENV.get('enable_link_data', '1') === '1') {
+    if (ENV.get('enable_link_data', '0') === '1') {
         log(`开始挂载外部T4数据`);
         let link_sites = [];
         let link_url = ENV.get('link_url');
-        let enable_link_push = ENV.get('enable_link_push');
+        let enable_link_push = ENV.get('enable_link_push', '0');
         try {
             let link_data = readFileSync(path.join(rootDir, './data/settings/link_data.json'), 'utf-8');
             link_sites = JSON.parse(link_data).sites.filter(site => site.type = 4);
             link_sites.forEach((site) => {
-                if (site.key === 'push_agent' && !enable_link_push) {
+                if (site.key === 'push_agent' && enable_link_push !== '1') {
                     return
                 }
                 if (site.api && !site.api.startsWith('http')) {
@@ -216,7 +218,7 @@ async function generateSiteJSON(options, requestHost, sub, pwd) {
                 if (site.ext && site.ext.startsWith('.')) {
                     site.ext = urljoin(link_url, site.ext)
                 }
-                if (site.key === 'push_agent' && enable_link_push) { // 推送覆盖
+                if (site.key === 'push_agent' && enable_link_push === '1') { // 推送覆盖
                     let pushIndex = sites.findIndex(s => s.key === 'push_agent');
                     if (pushIndex > -1) {
                         sites[pushIndex] = site;

@@ -346,7 +346,7 @@ var rule = {
                 d.push(getInput('get_link_url', '查看挂载地址', images.settings));
                 d.push(getInput('link_data', '更新挂载数据', images.settings, '将挂载的配置数据获取到系统内方便武魂融合，远程有更新也需要执行此内容'));
                 d.push(getInput('get_link_data', '查看挂载数据', images.settings));
-                d.push(genMultiInput('enable_link_data', '设置启用挂载数据', '设置为1可以启用。默认即启用。设置其他值禁用', images.settings));
+                d.push(genMultiInput('enable_link_data', '设置启用挂载数据', '设置为1可以启用。默认不启用。设置其他值禁用', images.settings));
                 d.push(getInput('get_enable_link_data', '查看启用挂载数据', images.settings));
                 d.push(genMultiInput('enable_link_push', '设置启用挂载推送', '设置为1可以启用。默认即关闭。设置其他值禁用', images.settings));
                 d.push(getInput('get_enable_link_push', '查看启用挂载推送', images.settings));
