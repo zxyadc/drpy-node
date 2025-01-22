@@ -10,13 +10,19 @@ var rule = {
   timeout: 5000,
   play_parse: true,
   filterable: 0,
-  class_name: '热门新番&日本动漫&国产动漫&欧美动漫&动漫电影',
-  class_url: '23&21&22&25&24',
   预处理: async () => {
     return []
   },
-  class_parse: async () => {
-    const html = await request('https://duanjuzy.com/label/tabs.html');
+  class_parse: async function () {
+    const { sign, timestamp } = this.decodeCk();
+    const html = await request(`${this.host}/label/tabs.html`, {
+      headers: {
+        Ck: { user_check:"", time: timestamp, sign, "Version": "1.0.0" },
+        "Content-Type": "application/x-www-form-urlencoded",
+        Origin: "https://modupan.com",
+        Referer: "https://modupan.com/",
+      }
+    });
     const response = JSON.parse(html);
     const lists = response.list;
     const classes = [];
@@ -33,7 +39,15 @@ var rule = {
   },
   推荐: async function (tid, pg, filter, extend) {
     const { input, pdfa, pdfh, pd } = this;
-    const html = await request("https://duanjuzy.com/vod/index.html?page=1&type=recommend");
+    const { sign, timestamp } = this.decodeCk();
+    const html = await request(`${this.host}/vod/index.html?page=1&type=recommend`, {
+      headers: {
+        Ck: { user_check:"", time: timestamp, sign, "Version": "1.0.0" },
+        "Content-Type": "application/x-www-form-urlencoded",
+        Origin: "https://modupan.com",
+        Referer: "https://modupan.com/",
+      }
+    });
     const response = JSON.parse(html);
     const lists = response.data;
     const vod = [];
@@ -51,7 +65,15 @@ var rule = {
   },
   一级: async function (tid, pg, filter, extend) {
     const { input, pdfa, pdfh, pd } = this;
-    const html = await request(input);
+    const { sign, timestamp } = this.decodeCk();
+    const html = await request(input, {
+      headers: {
+        Ck: { user_check:"", time: timestamp, sign, "Version": "1.0.0" },
+        "Content-Type": "application/x-www-form-urlencoded",
+        Origin: "https://modupan.com",
+        Referer: "https://modupan.com/",
+      }
+    });
     const response = JSON.parse(html);
     const lists = response.data;
     const vod = [];
@@ -69,8 +91,16 @@ var rule = {
   },
   二级: async function (ids) {
     const { input, pdfa, pdfh, pd } = this;
-    const url = `${this.host}/vod/detail/id/${ids[0]}.html`
-    const html = await request(url);
+    const url = `${this.host}/vod/detail/id/${ids[0]}.html`;
+    const { sign, timestamp } = this.decodeCk();
+    const html = await request(url, {
+      headers: {
+        Ck: { user_check:"", time: timestamp, sign, "Version": "1.0.0" },
+        "Content-Type": "application/x-www-form-urlencoded",
+        Origin: "https://modupan.com",
+        Referer: "https://modupan.com/",
+      }
+    });
     const response = JSON.parse(html);
     const vod = {
       vod_id: response.id,
@@ -99,7 +129,15 @@ var rule = {
   },
   搜索: async function (wd, quick, pg) {
     const { input, pdfa, pdfh, pd } = this;
-    const html = await request(input);
+    const { sign, timestamp } = this.decodeCk();
+    const html = await request(input, {
+      headers: {
+        Ck: { user_check:"", time: timestamp, sign, "Version": "1.0.0" },
+        "Content-Type": "application/x-www-form-urlencoded",
+        Origin: "https://modupan.com",
+        Referer: "https://modupan.com/",
+      }
+    });
     const response = JSON.parse(html);
     const lists = response.data;
     const vod = [];
@@ -117,11 +155,20 @@ var rule = {
   },
   lazy: async function (flag, id, flags) {
     const { input, pdfa, pdfh, pd } = this;
-  console.log(input)
+
     if (/m3u8|mp4|flv/.test(input)) {
       return { parse: 0, url: input };
     } else {
       return { parse: 1, url: input };
     }
+  },
+  decodeCk: function () {
+    const prefix = 'e3e2e10r058g6';
+    const suffix = 'e3e2e10r058g6';
+    const version = 'Version=1.0.0';
+    const timestamp = Math.ceil(new Date().getTime() / 1000); 
+    const plainText = `${prefix}${encodeURIComponent(version)}${timestamp}${suffix}`;
+    const sign = md5(plainText);
+    return { sign, timestamp };
   }
 }

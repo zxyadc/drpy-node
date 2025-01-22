@@ -48,6 +48,7 @@ async function generateSiteJSON(options, requestHost, sub, pwd) {
         }
     }
     let sites = [];
+    let link_jar = '';
     // console.log('hide_adult:', ENV.get('hide_adult'));
     if (ENV.get('hide_adult') === '1') {
         valid_files = valid_files.filter(it => !(new RegExp('\\[[密]\\]|密+')).test(it));
@@ -205,9 +206,19 @@ async function generateSiteJSON(options, requestHost, sub, pwd) {
         let link_sites = [];
         let link_url = ENV.get('link_url');
         let enable_link_push = ENV.get('enable_link_push', '0');
+        let enable_link_jar = ENV.get('enable_link_jar', '0');
         try {
             let link_data = readFileSync(path.join(rootDir, './data/settings/link_data.json'), 'utf-8');
-            link_sites = JSON.parse(link_data).sites.filter(site => site.type = 4);
+            let link_config = JSON.parse(link_data);
+            link_sites = link_config.sites.filter(site => site.type = 4);
+            if (link_config.spider && enable_link_jar === '1') {
+                let link_spider_arr = link_config.spider.split(';');
+                link_jar = urljoin(link_url, link_spider_arr[0]);
+                if (link_spider_arr.length > 1) {
+                    link_jar = [link_jar].concat(link_spider_arr.slice(1)).join(';')
+                }
+                log(`开始挂载外部T4 Jar: ${link_jar}`);
+            }
             link_sites.forEach((site) => {
                 if (site.key === 'push_agent' && enable_link_push !== '1') {
                     return
@@ -246,7 +257,7 @@ async function generateSiteJSON(options, requestHost, sub, pwd) {
         sites = sites.filter(it => !(new RegExp('\\[[密]\\]|密+')).test(it.name));
     }
     sites = naturalSort(sites, 'name', sort_list);
-    return {sites};
+    return {sites, spider: link_jar};
 }
 
 async function generateParseJSON(jxDir, requestHost) {
@@ -495,7 +506,7 @@ export default (fastify, options, done) => {
             const parseJSON = await generateParseJSON(options.jxDir, requestHost);
             const livesJSON = generateLivesJSON(requestHost);
             const playerJSON = generatePlayerJSON(options.configDir, requestHost);
-            const configObj = {sites_count: siteJSON.sites.length, ...siteJSON, ...parseJSON, ...livesJSON, ...playerJSON};
+            const configObj = {sites_count: siteJSON.sites.length, ...playerJSON, ...siteJSON, ...parseJSON, ...livesJSON};
             // console.log(configObj);
             const configStr = JSON.stringify(configObj, null, 2);
             if (!process.env.VERCEL) { // Vercel 环境不支持写文件，关闭此功能

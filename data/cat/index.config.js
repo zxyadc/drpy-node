@@ -35,14 +35,35 @@ var index_config_default = {
     hipy_sniffer_url: "http://127.0.0.1:5708/sniffer?url=",
     parse_count: 6,
     // 最多显示多少条解析
-    parse_timeout: 5e3
+    parse_timeout: 5e3,
     // 解析超时毫秒数
+    test_thread_proxy: "http://127.0.0.1:5759/proxy?thread=8&chunkSize=256&url=https://vdse.bdstatic.com//628ca08719cef5987ea2ae3c6f0d2386.mp4"
   },
   ffm3u8: {
     url: "https://cj.ffzyapi.com/api.php/provide/vod/from/ffm3u8",
     categories: ["国产剧", "香港剧", "韩国剧", "欧美剧", "台湾剧", "日本剧", "海外剧", "泰国剧", "短剧", "动作片", "喜剧片", "爱情片", "科幻片", "恐怖片", "剧情片", "战争片", "动漫片", "大陆综艺", "港台综艺", "日韩综艺", "欧美综艺", "国产动漫", "日韩动漫", "欧美动漫", "港台动漫", "海外动漫", "记录片"]
   },
   alist: [
+    {
+      "name": "丫仙女",
+      "server": "http://localhost:5244",
+      "startPage": "/",
+      "showAll": false,
+      "search": true,
+      "login": {
+        "username": "admin",
+        "password": "admin",
+        "otp_code": ""
+      },
+      "params": {
+        "/abc": {
+          "password": "123"
+        },
+        "/abc/abc": {
+          "password": "123"
+        }
+      }
+    },
     {
       name: "🐉神族九帝",
       server: "https://alist.shenzjd.com"

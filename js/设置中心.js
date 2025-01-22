@@ -313,6 +313,9 @@ var rule = {
                 d.push(getInput('get_hide_adult', '查看青少年模式', images.settings));
                 d.push(genMultiInput('thread', '设置播放代理线程数', '默认为1，可自行配置成其他值如:10', images.settings));
                 d.push(getInput('get_thread', '查看播放代理线程数', images.settings));
+                d.push(genMultiInput('play_local_proxy_type', '设置原代本类型', '默认为1，可自行配置成其他值如:2 (1 不夜5575,2 mediaGo 7777 其他:5575)', images.settings));
+                d.push(getInput('get_play_local_proxy_type', '查看原代本类型', images.settings));
+
                 d.push(genMultiInput('play_proxy_mode', '设置播放代理模式', '默认为1，可自行配置成其他值如:2 (1 内存加速,2 磁盘加速 其他:内存加速)', images.settings));
                 d.push(getInput('get_play_proxy_mode', '查看播放代理模式', images.settings));
                 d.push(genMultiInput('enable_dr2', '设置drpy2源启用状态', '设置为1可启用此功能(默认没设置也属于启动，设置其他值关闭)', images.settings));
@@ -350,6 +353,8 @@ var rule = {
                 d.push(getInput('get_enable_link_data', '查看启用挂载数据', images.settings));
                 d.push(genMultiInput('enable_link_push', '设置启用挂载推送', '设置为1可以启用。默认即关闭。设置其他值禁用', images.settings));
                 d.push(getInput('get_enable_link_push', '查看启用挂载推送', images.settings));
+                d.push(genMultiInput('enable_link_jar', '设置允许挂载Jar', '设置为1可以启用。默认即关闭。设置其他值禁用', images.settings));
+                d.push(getInput('get_enable_link_jar', '查看允许挂载Jar', images.settings));
 
                 break;
         }
@@ -983,6 +988,7 @@ var rule = {
             'bili_cookie',
             'hide_adult',
             'thread',
+            'play_local_proxy_type',
             'play_proxy_mode',
             'enable_dr2',
             'spark_ai_authKey',
@@ -995,6 +1001,7 @@ var rule = {
             'link_url',
             'enable_link_data',
             'enable_link_push',
+            'enable_link_jar',
         ];
         let get_cookie_sets = [
             'get_quark_cookie',
@@ -1006,6 +1013,7 @@ var rule = {
             'get_bili_cookie',
             'get_hide_adult',
             'get_thread',
+            'play_local_proxy_type',
             'get_play_proxy_mode',
             'get_enable_dr2',
             'get_spark_ai_authKey',
@@ -1018,6 +1026,7 @@ var rule = {
             'get_link_url',
             'get_enable_link_data',
             'get_enable_link_push',
+            'get_enable_link_jar',
         ];
         if (cookie_sets.includes(action) && value) {
             try {

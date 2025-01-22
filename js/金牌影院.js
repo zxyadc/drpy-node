@@ -2,20 +2,23 @@
 // http://localhost:5757/api/金牌影院?ac=detail&ids=/detail/131374
 // http://localhost:5757/api/金牌影院?wd=我的&pg=1
 // http://localhost:5757/api/金牌影院?play=/vod/play/131374/sid/1125278&flag=金牌影院
+const {req_} = $.require('./_lib.request.js')
 var rule = {
     类型: '影视',
     title: '金牌影院',
     desc: '金牌影院纯js版本',
-    host: 'https://www.cfkj86.com',
+    host: 'https://m.cfkj86.com',
     homeUrl:'',
     url: 'https://m.cfkj86.com/api/mw-movie/anonymous/video/list?pageNum=fypage&pageSize=30&sort=1&sortBy=1&type1=fyclass',
     searchUrl: '/api/mw-movie/anonymous/video/searchByWordPageable?keyword=**&pageNum=fypage&pageSize=12&type=false',
-    searchable: 2,
-    quickSearch: 0,
+    searchable: 1,
+    quickSearch: 1,
     timeout: 5000,
     play_parse: true,
     headers: {
-        'User-Agent': 'MOBILE_UA',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+        'accept-language': 'zh-CN,zh;q=0.9'
     },
     class_parse: async () => {
          let classes = [{
@@ -59,7 +62,6 @@ var rule = {
         })).content);
         let d = [];
         const list = html.data.list
-        log(list)
         list.forEach((it)=>{
             d.push({
                 title: it.vodName,
@@ -72,19 +74,31 @@ var rule = {
     },
     二级: async function (ids) {
         let {input} = this;
-        const html = (await req(`${input}`)).content;
-        const $ = pq(html)
+        let id = ids[0]
+        let id_ = id.split('/')[2]
+        const t = new Date().getTime()
+        const signkey = `id=${id_}&key=cb808529bae6b6be45ecfab29a4889bc&t=`+t
+        const key = CryptoJS.SHA1(CryptoJS.MD5(signkey).toString()).toString()
+        const html = await req_(`https://www.cfkj86.com/api/mw-movie/anonymous/video/detail?id=${id_}`,'get',{
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
+            'Accept': 'application/json, text/plain, */*',
+            'authorization':'',
+            'deviceId': '58a80c52-138c-48fd-8edb-138fd74d12c8',
+            'sign': key,
+            't': t.toString()
+        });
         const vod = {
-            vod_id: input,
-            vod_name: $('h1').text().trim(),
+            vod_id: id,
+            vod_name: html.data.vodName,
         };
         let playFroms = [];
         let playUrls = [];
         const temp = [];
-        let playlist=$('div.main-list-sections__BodyArea-sc-8bb7334b-2 .listitem')
+        let playlist = html.data.episodeList;
+        // let list = html.match(/\"episodeList\\":\s*(\[[\s\S]*?\])/g)[0].replace('"episodeList\\":', '').replace(/\\/g, '');
+        // let playlist = JSON.parse(list)
         for (const it of playlist) {
-            const a = $(it).find('a')[0]
-            temp.push(a.children[0].data+'$'+a.attribs.href)
+            temp.push(it.name+'$'+`/vod/play/${id_}/sid/${it.nid}`)
         }
         playFroms.push('不知道倾情打造');
         playUrls.push(temp.join('#'));
@@ -104,9 +118,10 @@ var rule = {
                 headers:{
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
                     'Accept': 'application/json, text/plain, */*',
+                    'authorization':'',
                     'deviceId': '58a80c52-138c-48fd-8edb-138fd74d12c8',
                     'sign': key,
-                    't': t
+                    't': t.toString()
                 }
         })).content);
         let d = [];
@@ -122,52 +137,22 @@ var rule = {
         return setResult(d)
     },
     lazy: async function (flag, id, flags) {
-        let {input} = this;
+        let {getProxyUrl,input} = this;
         const pid = input.split('/')[3]
         const nid = input.split('/')[5]
         const t = new Date().getTime()
-        const signkey = 'id='+pid+'&nid='+nid+'&key=cb808529bae6b6be45ecfab29a4889bc&t='+t
+        const signkey = `clientType=1&id=${pid}&nid=${nid}&key=cb808529bae6b6be45ecfab29a4889bc&t=`+t
         const key = CryptoJS.SHA1(CryptoJS.MD5(signkey).toString()).toString()
-        const relurl = rule.host+'/api/mw-movie/anonymous/v1/video/episode/url?id='+pid+'&nid='+nid
-        const html = JSON.parse((await req(relurl,
-            {
-                headers:{
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        const relurl = 'https://www.cfkj86.com/api/mw-movie/anonymous/v1/video/episode/url?clientType=1&id='+pid+'&nid='+nid
+        const html = await req_(relurl,'get', {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
                     'Accept': 'application/json, text/plain, */*',
-                    'Accept-Encoding': 'gzip, deflate, br, zstd',
-                    'sec-ch-ua-platform': '"Windows"',
+                    'authorization':'',
                     'deviceId': '58a80c52-138c-48fd-8edb-138fd74d12c8',
                     'sign': key,
-                    't': t,
-                    'referer': `${rule.host}${input}`,
-                    'authorization': '',
-                }
-        })).content)
-        return {parse: 0, url: getProxyUrl()+'&url='+encodeURIComponent(html.data.playUrl), js: ''}
-    },
-    proxy_rule: async function()  {
-        let {input} = this
-        if (input) {
-            input = decodeURIComponent(input);
-            log(`${rule.title}代理播放:${input}`);
-            let m3u8 = (await req(input,{headers:rule.headers})).content;
-            const lines = m3u8.split('\n');
-            const tsUrls = [];
-            let link_start = ''
-            lines.forEach(line => {
-                if (line.trim().startsWith('http') && line.endsWith('.ts')) {
-                    tsUrls.push(/line/,link_start + line.trim())
-                }
-                if (line.indexOf('.ts') > 0) { // 确保只匹配 TS 片段的 URL
-                    link_start = input.split('?')[0].replace(/([^/]+)(?=\.m3u8(?:$|[\?#]))/, '').replace('.m3u8', '')
-                    tsUrls.push(link_start + line.trim())
-                }else {
-                    tsUrls.push(line)
-                }
-            })
-            let m3u8_text = tsUrls.join('\n')
-            return [200,'application/vnd.apple.mpegurl', m3u8_text];
-        }
+                    't': t.toString()
+                })
+        return {parse: 0, url: html.data.playUrl}
     },
 };
 
