@@ -1,4 +1,4 @@
-import {base64Decode} from '../libs_drpy/crypto-util.js';
+import {base64Decode, md5} from '../libs_drpy/crypto-util.js';
 import '../utils/random-http-ua.js'
 import {keysToLowerCase} from '../utils/utils.js';
 import {ENV} from "../utils/env.js";
@@ -25,6 +25,9 @@ export default (fastify, options, done) => {
     fastify.all('/mediaProxy', async (request, reply) => {
         const {thread = 1, form = 'urlcode', url, header, size = '128K', randUa = 0} = request.query;
 
+        // console.log('url:', url)
+        // console.log('header:', header)
+
         // Check if the URL parameter is missing
         if (!url) {
             return reply.code(400).send({error: 'Missing required parameter: url'});
@@ -32,9 +35,9 @@ export default (fastify, options, done) => {
 
         try {
             // Decode URL and headers based on the form type
-            const decodedUrl = form === 'base64' ? base64Decode(url) : decodeURIComponent(url);
+            const decodedUrl = form === 'base64' ? base64Decode(url) : url;
             const decodedHeader = header
-                ? JSON.parse(form === 'base64' ? base64Decode(header) : decodeURIComponent(header))
+                ? JSON.parse(form === 'base64' ? base64Decode(header) : header)
                 : {};
 
             // Call the proxy function, passing the decoded URL and headers
@@ -45,7 +48,7 @@ export default (fastify, options, done) => {
                 return await proxyStreamMediaMulti(decodedUrl, decodedHeader, request, reply, thread, size, randUa);
             } else {
                 console.log('[mediaProxy] chunkStream 磁盘加速 chunkSize:', sizeToBytes('256K'));
-                return await chunkStream(request, reply, decodedUrl, null, decodedHeader,
+                return await chunkStream(request, reply, decodedUrl, md5(decodedUrl), decodedHeader,
                     Object.assign({chunkSize: 1024 * 256, poolSize: 5, timeout: 1000 * 10}, {
                         // chunkSize: sizeToBytes(size),
                         poolSize: thread

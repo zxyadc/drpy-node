@@ -140,3 +140,4 @@ dist
 /yarn.lock
 /custom.json
 /index.json
+/vod_cache/
