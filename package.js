@@ -7,7 +7,7 @@ import url from 'url';
 const EXCLUDE_DIRS = ['.git', '.idea', 'soft', 'pyTools', 'drop_code', 'jstest', 'local', 'logs', '对话1.txt'];
 
 // 要排除的文件列表
-const EXCLUDE_FILES = ['config/env.json', '.env', 'js/UC分享.js', 'js/百忙无果[官].js', 'json/UC分享.json', 'jx/奇奇.js', 'data/settings/link_data.json'];
+const EXCLUDE_FILES = ['config/env.json', '.env', 'js/UC分享.js', 'js/百忙无果[官].js', 'json/UC分享.json', 'jx/奇奇.js', 'data/settings/link_data.json', 'index.json', 'custom.json'];
 
 // 获取脚本所在目录
 const getScriptDir = () => dirname(resolve(url.fileURLToPath(import.meta.url)));

@@ -507,6 +507,9 @@ export default (fastify, options, done) => {
             const livesJSON = generateLivesJSON(requestHost);
             const playerJSON = generatePlayerJSON(options.configDir, requestHost);
             const configObj = {sites_count: siteJSON.sites.length, ...playerJSON, ...siteJSON, ...parseJSON, ...livesJSON};
+            if (!configObj.spider) {
+                configObj.spider = playerJSON.spider
+            }
             // console.log(configObj);
             const configStr = JSON.stringify(configObj, null, 2);
             if (!process.env.VERCEL) { // Vercel 环境不支持写文件，关闭此功能
