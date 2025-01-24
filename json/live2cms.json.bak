@@ -1,16 +1,9 @@
 [
 {
-    "name": "开源IPTV",
-    "url": "../proxy/iptv/live",
-    "img": "",
-    "headers": {"user-agent":"com.stub.StubApp/1.5.1 (Linux;Android 13) AndroidXMedia3/1.4.1"}
+    "name": "live",
+    "url": "https://zhxy.eu.org/live",
+    "img": "https://mpimg.cn/view.php/b7e3e1a74bb92c82ce71247fe95e5dbd.jpg"
   },
-{
-    "name": "咪咕M3U",
-    "url": "https://www.freetv.top/migu.m3u",
-    "img": ""
-  },
-  
   {
     "name": "天微",
     "url": "https://mpimg.cn/down.php/80327eb496e349425e7fbd73ef47fb36.txt",

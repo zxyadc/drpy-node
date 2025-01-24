@@ -266,7 +266,7 @@ sites.forEach(site => {
 function customSort(a, b) {
     // 定义排序顺序
     let order = ['[APP]','[优]', '💿', '中心', '交互', '[合]', '直播', '🏠', '[短]', '📻', '[听]', '[书]', '[漫]', '[儿]', '🅱️', '[磁]', '[搜]'];
-    let js_order = ['🏆瓜子[APP]', '🏆瓜子[优]', '🏆金牌[优]'];
+    let js_order = ['🏆瓜子[APP]', '🏆瓜子[优]', '🏆皮皮[优]'];
 
     // 先按照 js_order 排序
     let i = js_order.indexOf(a.name.split('(')[0]);
@@ -375,7 +375,7 @@ let addedEmoji = '';
 //console.log(sites);
 function shouldExclude(site) {
     const excludeKeywords = ['6587','PTT', '密', '低端', 
-    '金牌[优](DR)', '📺', '虎牙直播[官](DR)', '擦', '皮皮',
+    'kgv', '📺', '虎牙直播[官](DR)', '擦', 
   '豆瓣', 'ACG', 'Omo', '人人', '好乐','非凡','PTT',
    '木偶','玩偶','多多','欧哥','六趣',
   '团长', '奥秘' , '六趣'
