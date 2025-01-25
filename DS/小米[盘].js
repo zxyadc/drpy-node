@@ -5,7 +5,7 @@ const {
 var rule = {
     title: '小米[盘]',
     author: '道长',
-    host: 'http://ucmi.fun',
+    host: 'http://www.mucpan.cc/',
     url: '/index.php/vod/show/id/fyfilter.html',
     filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
     searchUrl: '/index.php/vod/search/page/fypage/wd/**.html',

@@ -4,7 +4,7 @@ const {
 } = misc;
 var rule = {
     title: '蜡笔[盘]',
-    host: 'https://feimaoai.site',
+    host: 'https://feimaoai.site/',
     url: '/index.php/vod/show/id/fyfilter.html',
     filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
     searchUrl: '/index.php/vod/search/page/fypage/wd/**.html',
@@ -23,6 +23,9 @@ filter_def: {
     searchable: 1,
     filterable: 1,
     quickSearch: 0,
+    headers: {
+    'User-Agent': 'okhttp/3.12.11',
+    },
     class_parse: async () => {
         let classes = [{
             type_id: '1',

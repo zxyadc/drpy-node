@@ -114,9 +114,9 @@ var rule = {
         let data = pdfa(html, '.module-items .module-search-item');
         data.forEach((it) => {
             d.push({
-                title: pdfh(it, 'a&&title'),
+                title: pdfh(it, 'img&&alt'),
                 pic_url: pd(it, 'img&&data-src'),
-                desc: pdfh(it, '.video-text&&Text'),
+                desc: pdfh(it, '.video-serial&&Text'),
                 url: pd(it, 'a:eq(-1)&&href'),
                 content: pdfh(it, '.video-info-items:eq(-1)&&Text'),
             })
