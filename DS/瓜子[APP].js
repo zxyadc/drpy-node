@@ -1,17 +1,3 @@
-globalThis.getsign = async function (sign) {
-    let key = CryptoJS.enc.Utf8.parse("mvXBSW7ekreItNsT");
-    let iv = CryptoJS.enc.Utf8.parse("2U3IrJL8szAKp0Fj");
-    // 将文本加密为 AES/CBC/PKCS5Padding 格式
-    let encrypted = CryptoJS.AES.encrypt(plainText, key, {
-        iv: iv,
-        mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7
-    });
-
-    // 获取加密结果并转为 Hex 格式
-    let encryptedHex = encrypted.ciphertext.toString(CryptoJS.enc.Hex);
-    return encryptedHex.toUpperCase(); // 返回大写 Hex 格式
-}
 
 
 var rule = {
@@ -29,8 +15,9 @@ var rule = {
     // limit: 6,
     //double: false,
     play_parse: true,
-    /*
-    lazy: $js.toString(() => {
+    
+    lazy: async function () {
+    let { input, MY_CATE, MY_FL, MY_PAGE } = this;
         let d = [];
         //console.log("wangzhi==="+input)
         var vod_id = input.split("/")[0];
@@ -82,7 +69,7 @@ var rule = {
         var signature2 = md5(signature); //log(signature2)
         var body = 'token=1be86e8e18a9fa18b2b8d5432699dad0.ac008ed650fd087bfbecf2fda9d82e9835253ef24843e6b18fcd128b10763497bcf9d53e959f5377cde038c20ccf9d17f604c9b8bb6e61041def86729b2fc7408bd241e23c213ac57f0226ee656e2bb0a583ae0e4f3bf6c6ab6c490c9a6f0d8cdfd366aacf5d83193671a8f77cd1af1ff2e9145de92ec43ec87cf4bdc563f6e919fe32861b0e93b118ec37d8035fbb3c.59dd05c5d9a8ae726528783128218f15fe6f2c0c8145eddab112b374fcfe3d79&token_id=&phone_type=1&time=' + t + '&phone_model=xiaomi-22021211rc&keys=ZH8gpdp9bxjuG2NK97sol3o7Uiz%2B9eVEaVMlE2Fk3j7EResM3YHnECZUH7BONNTjpy7RVNi%2FYimGuNYriC7Cmswv4PNYiFYzw9QhlqZKwNfCM6IUpFZ0T4rZx8G78zkv2tNVbfYC4qNQedGi07nWZ33dlSuVxROVfY5JxOWHMI0%3D&request_key=' + request_key2 + '&signature=' + signature2 + '&app_id=1&ad_version=1'; //log(body)
 
-        var html = fetch('https://api.8utdtcq.com/App/Resource/VurlDetail/showOne', {
+        var html = await fetch('https://api.8utdtcq.com/App/Resource/VurlDetail/showOne', {
             headers: {
                 'Cache-Control': 'no-cache',
                 'Version': '2406025',
@@ -112,14 +99,13 @@ var rule = {
         var iv = CryptoJS.enc.Utf8.parse(bodykeyiv.iv); //log(iv)
         var html2 = Decrypt(response_key, key, iv); //log(html2)
         var url = JSON.parse(html2).url; //log(url)
-        input = {
+       return input = {
             url: url,
             parse: 0,
             header: rule.headers
         }
-        setResult(d)
-    }),
-    */
+        return  setResult(d)
+    },
     //   推荐: $js.toString(() => {
     //     let d = [];
     //     let data = JSON.parse(request(input))
@@ -136,55 +122,75 @@ var rule = {
     //     });
     //     setResult(d)
     //   }),
-    /*
+    
+
+    一级: async function () {
+    let { input, MY_CATE, MY_FL, MY_PAGE } = this;
+    let d = [];
+
+    // 加密函数
+    function Encrypt(plainText) {
+        let key = CryptoJS.enc.Utf8.parse("mvXBSW7ekreItNsT");
+        let iv = CryptoJS.enc.Utf8.parse("2U3IrJL8szAKp0Fj");
+        let encrypted = CryptoJS.AES.encrypt(plainText, key, {
+            iv: iv,
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        });
+        let encryptedHex = encrypted.ciphertext.toString(CryptoJS.enc.Hex);
+        return encryptedHex.toUpperCase();
+    }
+
+    // 解密函数
+    function Decrypt(word, key, iv) {
+        let encryptedHexStr = CryptoJS.enc.Hex.parse(word);
+        let decrypt = CryptoJS.AES.decrypt({ ciphertext: encryptedHexStr }, key, {
+            iv: iv,
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        });
+        let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
+        return decryptedStr;
+    }
+
+    // 获取请求体
+    function getbody3(key, t) {
+        var signature = `token_id=,token=1be86e8e18a9fa18b2b8d5432699dad0.ac008ed650fd087bfbecf2fda9d82e9835253ef24843e6b18fcd128b10763497bcf9d53e959f5377cde038c20ccf9d17f604c9b8bb6e61041def86729b2fc7408bd241e23c213ac57f0226ee656e2bb0a583ae0e4f3bf6c6ab6c490c9a6f0d8cdfd366aacf5d83193671a8f77cd1af1ff2e9145de92ec43ec87cf4bdc563f6e919fe32861b0e93b118ec37d8035fbb3c.59dd05c5d9a8ae726528783128218f15fe6f2c0c8145eddab112b374fcfe3d79,phone_type=1,request_key=${key},app_id=1,time=${t},keys=qDpotE2bedimK3QGqlyV5ieXXC3EhaPLQ+IOJyHnHflCj5w/7ESK7FgywMvrgjxbx0GklEFLI4+JshgySe633OIRstuktwdiCy3CT+fLSpuxBJDIlfXQDaeH3ig1wiB0JsZ601XHiFweGMu4tZfnSpHg3OnoL6nz/uurUif2OK4=*&zvdvdvddbfikkkumtmdwqppp?|4Y!s!2br`;
+        var signature2 = md5(signature).toUpperCase();
+        var body = `token=1be86e8e18a9fa18b2b8d5432699dad0.ac008ed650fd087bfbecf2fda9d82e9835253ef24843e6b18fcd128b10763497bcf9d53e959f5377cde038c20ccf9d17f604c9b8bb6e61041def86729b2fc7408bd241e23c213ac57f0226ee656e2bb0a583ae0e4f3bf6c6ab6c490c9a6f0d8cdfd366aacf5d83193671a8f77cd1af1ff2e9145de92ec43ec87cf4bdc563f6e919fe32861b0e93b118ec37d8035fbb3c.59dd05c5d9a8ae726528783128218f15fe6f2c0c8145eddab112b374fcfe3d79&token_id=&phone_type=1&time=${t}&phone_model=xiaomi-22021211rc&keys=qDpotE2bedimK3QGqlyV5ieXXC3EhaPLQ%2BIOJyHnHflCj5w%2F7ESK7FgywMvrgjxbx0GklEFLI4%2BJshgySe633OIRstuktwdiCy3CT%2BfLSpuxBJDIlfXQDaeH3ig1wiB0JsZ601XHiFweGMu4tZfnSpHg3OnoL6nz%2FuurUif2OK4%3D&request_key=${key}&signature=${signature2}&app_id=1&ad_version=1`;
+        return body;
+    }
+    var bodykey = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGAe6hKrWLi1zQmjTT1ozbE4QdFeJGNxubxld6GrFGximxfMsMB6BpJhpcTouAqywAFppiKetUBBbXwYsYU1wNr648XVmPmCMCy4rY8vdliFnbMUj086DU6Z+/oXBdWU3/b1G0DN3E9wULRSwcKZT3wj/cCI1vsCm3gj2R5SqkA9Y0CAwEAAQKBgAJH+4CxV0/zBVcLiBCHvSANm0l7HetybTh/j2p0Y1sTXro4ALwAaCTUeqdBjWiLSo9lNwDHFyq8zX90+gNxa7c5EqcWV9FmlVXr8VhfBzcZo1nXeNdXFT7tQ2yah/odtdcx+vRMSGJd1t/5k5bDd9wAvYdIDblMAg+wiKKZ5KcdAkEA1cCakEN4NexkF5tHPRrR6XOY/XHfkqXxEhMqmNbB9U34saTJnLWIHC8IXys6Qmzz30TtzCjuOqKRRy+FMM4TdwJBAJQZFPjsGC+RqcG5UvVMiMPhnwe/bXEehShK86yJK/g/UiKrO87h3aEu5gcJqBygTq3BBBoH2md3pr/W+hUMWBsCQQChfhTIrdDinKi6lRxrdBnn0Ohjg2cwuqK5zzU9p/N+S9x7Ck8wUI53DKm8jUJE8WAG7WLj/oCOWEh+ic6NIwTdAkEAj0X8nhx6AXsgCYRql1klbqtVmL8+95KZK7PnLWG/IfjQUy3pPGoSaZ7fdquG8bq8oyf5+dzjE/oTXcByS+6XRQJAP/5ciy1bL3NhUhsaOVy55MHXnPjdcTX0FaLi+ybXZIfIQ2P4rb19mVq1feMbCXhz+L1rG8oat5lYKfpe8k83ZA=="; //log(bodykey)
+
+    // 发送请求并获取 HTML
     async function gethtml(u, body, headers) {
-    return new Promise((resolve, reject) => {
-        fetch(u, {
-            headers: headers,
-            body: body,
-            method: 'POST',
-            rejectCoding: true
-        })
-        .then(response => response.json())
-        .then(data => {
-            const banner = data.data;
-            const response_key = banner.response_key;
-            const keys = banner.keys;
-            const bodykeyiv = JSON.parse(RSA.decode(keys, bodykey));
-            const key = CryptoJS.enc.Utf8.parse(bodykeyiv.key);
-            const iv = CryptoJS.enc.Utf8.parse(bodykeyiv.iv);
-            const html = Decrypt(response_key, key, iv);
-            resolve(html);
-        })
-        .catch(error => reject(error));
-    });
-}
-const config = {
-    token: '1be86e8e18a9fa18b2b8d5432699dad0.ac008ed650fd087bfbecf2fda9d82e9835253ef24843e6b18fcd128b10763497bcf9d53e959f5377cde038c20ccf9d17f604c9b8bb6e61041def86729b2fc7408bd241e23c213ac57f0226ee656e2bb0a583ae0e4f3bf6c6ab6c490c9a6f0d8cdfd366aacf5d83193671a8f77cd1af1ff2e9145de92ec43ec87cf4bdc563f6e919fe32861b0e93b118ec37d8035fbb3c.59dd05c5d9a8ae726528783128218f15fe6f2c0c8145eddab112b374fcfe3d79',
-    phoneType: '1',
-    appId: '1',
-    phoneModel: 'xiaomi-22021211rc',
-    keys: 'qDpotE2bedimK3QGqlyV5ieXXC3EhaPLQ+IOJyHnHflCj5w/7ESK7FgywMvrgjxbx0GklEFLI4+JshgySe633OIRstuktwdiCy3CT+fLSpuxBJDIlfXQDaeH3ig1wiB0JsZ601XHiFweGMu4tZfnSpHg3OnoL6nz/uurUif2OK4=',
-    adVersion: '1'
-};
+            var hd = await fetch(u, {
+                headers: headers,
+                body: body,
+                method: 'POST',
+                rejectCoding: true
+            });
+            var banner = JSON.parse(hd).data;
+            var response_key = banner.response_key; //log()
+            var keys = banner.keys; //log(keys)
+            var bodykeyiv = JSON.parse(RSA.decode(keys, bodykey));
+            var key = CryptoJS.enc.Utf8.parse(bodykeyiv.key);
+            var iv = CryptoJS.enc.Utf8.parse(bodykeyiv.iv);
+            var html = Decrypt(response_key, key, iv);
+            return html
+        }
 
-function generateSignature(key, t) {
-    const signature = `token_id=,token=${config.token},phone_type=${config.phoneType},request_key=${key},app_id=${config.appId},time=${t},keys=${config.keys}*&zvdvdvddbfikkkumtmdwqppp?|4Y!s!2br`;
-    return md5(signature).toUpperCase();
-}
+    
 
-function getbody3(key, t) {
-    const signature2 = generateSignature(key, t);
-    return `token=${config.token}&token_id=&phone_type=${config.phoneType}&time=${t}&phone_model=${config.phoneModel}&keys=${encodeURIComponent(config.keys)}&request_key=${key}&signature=${signature2}&app_id=${config.appId}&ad_version=${config.adVersion}`;
-}
-*/
+    // 获取子分类
+    function hqsub(MY_CATE) {
+        const subs = ["5", "12", "30", "22", ""];
+        const tids = ["1", "2", "4", "3", "64"];
+        const index = tids.indexOf(MY_CATE);
+        return index !== -1 ? subs[index] : "";
+    }
 
-/*
-一级: async function () {
-    let {input, MY_CATE, MY_FL, MY_PAGE} = this;
-    const MY_CATE = '1'; // 示例分类
-    const MY_FL = { area: '0', sub: '', year: '0', sort: 'd_id' }; // 示例过滤条件
-    const MY_PAGE = 1; // 示例页码
+    // 设置请求头
     const headers = {
         'Cache-Control': 'no-cache',
         'Version': '2406025',
@@ -197,10 +203,16 @@ function getbody3(key, t) {
         'Connection': 'Keep-Alive',
         'User-Agent': 'okhttp/3.12.0'
     };
-console.log('headers的结果:', headers);
+
+    // 获取分类和子分类
     const tid = MY_CATE;
     const sub = hqsub(MY_CATE);
+
+    // 获取时间戳
     const timestamp = Math.floor(new Date().getTime() / 1000);
+    const t = timestamp.toString();
+
+    // 构造请求参数
     const request_key = JSON.stringify({
         "area": (MY_FL.area || 0).toString(),
         "sub": (MY_FL.sub || sub).toString(),
@@ -210,139 +222,34 @@ console.log('headers的结果:', headers);
         "page": MY_PAGE,
         "tid": tid
     });
+ // 加密请求参数
     const request_key2 = Encrypt(request_key);
-    const body = getbody3(request_key2, timestamp);
-        const html2 = await gethtml('https://api.8utdtcq.com/App/IndexList/indexList', body, headers);
-        const list = JSON.parse(html2).list;
-        const d = list.map(data => ({
-            title: data.vod_name,
-            desc: data.vod_continu == 0 ? '电影' : '更新至' + data.vod_continu + '集',
-            year: data.vod_scroe,
-            img: data.vod_pic,
-            url: `${data.vod_id}/${data.vod_continu}`
-        }));
-      return  setResult(d);
 
+    // 获取请求体
+    const body = getbody3(request_key2, t);
+        // 发送请求并获取解密后的 HTML 数据
+        const html = await gethtml("https://api.8utdtcq.com/App/IndexList/indexList", body, headers);
+
+        // 解析返回的 HTML 数据
+        const data = JSON.parse(html);
+
+        // 检查返回的数据是否包含列表
+            data.list.forEach(item => {
+                d.push({
+                    title: item.vod_name,
+                    desc: item.vod_continu === 0 ? '电影' : `更新至${item.vod_continu}集`,
+                    year: item.vod_score, // 注意这里应该是 vod_score 而不是 vod_scroe
+                    img: item.vod_pic,
+                    url: `${item.vod_id}/${item.vod_continu}`,
+                });
+            });
+
+    // 返回最终结果
+    return setResult(d);
 },
-*/
-
+   
 /*
-async function Encrypt(plainText) {
-    let key = CryptoJS.enc.Utf8.parse("mvXBSW7ekreItNsT");
-    let iv = CryptoJS.enc.Utf8.parse("2U3IrJL8szAKp0Fj");
-    // 将文本加密为 AES/CBC/PKCS5Padding 格式
-    let encrypted = CryptoJS.AES.encrypt(plainText, key, {
-        iv: iv,
-        mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7
-    });
-
-    // 获取加密结果并转为 Hex 格式
-    let encryptedHex = encrypted.ciphertext.toString(CryptoJS.enc.Hex);
-    return encryptedHex.toUpperCase(); // 返回大写 Hex 格式
-}
-
-async function Decrypt(word, key, iv) {
-    let encryptedHexStr = CryptoJS.enc.Hex.parse(word);
-
-    // 使用AES/CBC/PKCS5Padding模式进行解密
-    let decrypt = CryptoJS.AES.decrypt({
-        ciphertext: encryptedHexStr
-    }, key, {
-        iv: iv,
-        mode: CryptoJS.mode.CBC, // 使用CBC模式
-        padding: CryptoJS.pad.Pkcs7 // 使用PKCS#7填充
-    });
-
-    // 将解密后的数据转换为原始文本
-    let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
-
-    // 返回解密后的文本
-    return decryptedStr;
-}
-*/
-async function getbody3(key, t) {
-    var signature = 'token_id=,token=1be86e8e18a9fa18b2b8d5432699dad0.ac008ed650fd087bfbecf2fda9d82e9835253ef24843e6b18fcd128b10763497bcf9d53e959f5377cde038c20ccf9d17f604c9b8bb6e61041def86729b2fc7408bd241e23c213ac57f0226ee656e2bb0a583ae0e4f3bf6c6ab6c490c9a6f0d8cdfd366aacf5d83193671a8f77cd1af1ff2e9145de92ec43ec87cf4bdc563f6e919fe32861b0e93b118ec37d8035fbb3c.59dd05c5d9a8ae726528783128218f15fe6f2c0c8145eddab112b374fcfe3d79,phone_type=1,request_key=' + key + ',app_id=1,time=' + t + ',keys=qDpotE2bedimK3QGqlyV5ieXXC3EhaPLQ+IOJyHnHflCj5w/7ESK7FgywMvrgjxbx0GklEFLI4+JshgySe633OIRstuktwdiCy3CT+fLSpuxBJDIlfXQDaeH3ig1wiB0JsZ601XHiFweGMu4tZfnSpHg3OnoL6nz/uurUif2OK4=*&zvdvdvddbfikkkumtmdwqppp?|4Y!s!2br'; //log(signature)
-    var signature2 = md5(signature).toUpperCase(); //log(signature2)
-    var body = 'token=1be86e8e18a9fa18b2b8d5432699dad0.ac008ed650fd087bfbecf2fda9d82e9835253ef24843e6b18fcd128b10763497bcf9d53e959f5377cde038c20ccf9d17f604c9b8bb6e61041def86729b2fc7408bd241e23c213ac57f0226ee656e2bb0a583ae0e4f3bf6c6ab6c490c9a6f0d8cdfd366aacf5d83193671a8f77cd1af1ff2e9145de92ec43ec87cf4bdc563f6e919fe32861b0e93b118ec37d8035fbb3c.59dd05c5d9a8ae726528783128218f15fe6f2c0c8145eddab112b374fcfe3d79&token_id=&phone_type=1&time=' + t + '&phone_model=xiaomi-22021211rc&keys=qDpotE2bedimK3QGqlyV5ieXXC3EhaPLQ%2BIOJyHnHflCj5w%2F7ESK7FgywMvrgjxbx0GklEFLI4%2BJshgySe633OIRstuktwdiCy3CT%2BfLSpuxBJDIlfXQDaeH3ig1wiB0JsZ601XHiFweGMu4tZfnSpHg3OnoL6nz%2FuurUif2OK4%3D&request_key=' + key + '&signature=' + signature2 + '&app_id=1&ad_version=1';
-    return body
-}
-
-async function gethtml(u, body, headers) {
-    try {
-        var response = await fetch(u, {
-            headers: headers,
-            body: body,
-            method: 'POST',
-            rejectCoding: true
-        });
-        var banner = await response.json();
-        var response_key = banner.response_key; //log()
-        var keys = banner.keys; //log(keys)
-        var bodykeyiv = JSON.parse(RSA.decode(keys, bodykey));
-        var key = CryptoJS.enc.Utf8.parse(bodykeyiv.key);
-        var iv = CryptoJS.enc.Utf8.parse(bodykeyiv.iv);
-        var html = await Decrypt(response_key, key, iv);
-        return html
-    } catch (error) {
-        console.error('获取 HTML 时出错:', error);
-        return null;
-    }
-}
-
-async function hqsub(MY_CATE) {
-    var subs = ["5", "12", "30", "22", ""]
-    var tids = ["1", "2", "4", "3", "64"]
-    let index = tids.indexOf(MY_CATE);
-    if (index!== -1) {
-        return subs[index];
-    }
-    return ""; // 或者根据需要返回其他值
-}
-
-一级: async function () {
-    try {
-        var headers = {
-            'Cache-Control': 'no-cache',
-            'Version': '2406025',
-            'PackageName': 'com.uf076bf0c246.qe439f0d5e.m8aaf56b725a.ifeb647346f',
-            'Ver': '1.9.2',
-            'Referer': 'https://api.8utdtcq.com',
-            'X-Customer-Client-Ip': '127.0.0.1',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Host': 'api.8utdtcq.com',
-            'Connection': 'Keep-Alive',
-            //'Accept-Encoding': 'gzip',
-            'User-Agent': 'okhttp/3.12.0'
-        };
-        var tid = MY_CATE;
-        var sub = await hqsub(MY_CATE);
-        var timestamp = new Date().getTime() / 1000;
-        var t = timestamp.toString().split('.')[0];
-        var request_key = JSON.stringify({ "area": (MY_FL.area || 0).toString(), "sub": (MY_FL.sub || sub).toString(), "year": (MY_FL.year || 0).toString(), "pageSize": "30", "sort": (MY_FL.sort || "d_id").toString(), "page": MY_PAGE, "tid": tid });
-        var request_key2 = await Encrypt(request_key);
-        var body = await getbody3(request_key2, t);
-        var html2 = await gethtml("https://api.8utdtcq.com/App/IndexList/indexList", body, headers);
-        //console.log("tttttlieb=="+html2)
-        var list = JSON.parse(html2).list; //log(list)
-        let d = [];
-        list.forEach(data => {
-        d.push({
-                title: data.vod_name,
-                desc: data.vod_continu == 0? '电影' : '更新至'+data.vod_continu+'集',
-                year: data.vod_scroe,
-                img: data.vod_pic,
-                url: `${data.vod_id}/${data.vod_continu}`,
-            })
-        })
-        setResult(d);
-    } catch (error) {
-        console.error('主函数执行时出错:', error);
-    }
-},
-                
-                
-二级: async function () {
+    二级: async function () {
 	let {input} = this;
 	let html = await request(input);
 	let VOD = {};
@@ -350,127 +257,51 @@ async function hqsub(MY_CATE) {
     VOD.vod_play_from = "道长在线";
     VOD.vod_play_url = '嗅探播放1$'+ input;
     return VOD;
-}
-/*
-async function getPlayInfo(vod_id) {
-    const headers = {
-        'Cache-Control': 'no-cache',
-        'Version': '2406025',
-        'PackageName': 'com.uf076bf0c246.qe439f0d5e.m8aaf56b725a.ifeb647346f',
-        'Ver': '1.9.2',
-        'Referer': 'https://api.8utdtcq.com',
-        'X-Customer-Client-Ip': '127.0.0.1',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Host': 'api.8utdtcq.com',
-        'Connection': 'Keep-Alive',
-        'User-Agent': 'okhttp/3.12.0'
-    };
-    const timestamp = Math.floor(new Date().getTime() / 1000);
-    const request_key = JSON.stringify({
-        "token_id": "393668",
-        "vod_id": vod_id,
-        "mobile_time": timestamp,
-        "token": "1be86e8e18a9fa18b2b8d5432699dad0.ac008ed650fd087bfbecf2fda9d82e9835253ef24843e6b18fcd128b10763497bcf9d53e959f5377cde038c20ccf9d17f604c9b8bb6e61041def86729b2fc7408bd241e23c213ac57f0226ee656e2bb0a583ae0e4f3bf6c6ab6c490c9a6f0d8cdfd366aacf5d83193671a8f77cd1af1ff2e9145de92ec43ec87cf4bdc563f6e919fe32861b0e93b118ec37d8035fbb3c.59dd05c5d9a8ae726528783128218f15fe6f2c0c8145eddab112b374fcfe3d79"
-    });
-    const request_key2 = Encrypt(request_key);
-    const body = getbody2(request_key2, timestamp);
+},
+    */
+    
+    二级: async function () {
+    let { input, MY_CATE, MY_FL, MY_PAGE } = this;
+    let d = [];
+   let VOD = {};
 
-    try {
-        const html = await gethtml('https://api.8utdtcq.com/App/IndexPlay/playInfo', body, headers);
-        const data2 = JSON.parse(html).vodInfo;
-
-.parse(html).vodInfo;
-
-        const request_key3 = JSON.stringify({
-            "vurl_cloud_id": "2",
-            "vod_d_id": vod_id
+    // 加密函数
+    function Encrypt(plainText) {
+        let key = CryptoJS.enc.Utf8.parse("mvXBSW7ekreItNsT");
+        let iv = CryptoJS.enc.Utf8.parse("2U3IrJL8szAKp0Fj");
+        let encrypted = CryptoJS.AES.encrypt(plainText, key, {
+            iv: iv,
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
         });
-        const request_key4 = Encrypt(request_key3);
-        const body2 = getbody2(request_key4, timestamp);
-
-        const html3 = await gethtml('https://api.8utdtcq.com/App/Resource/Vurl/show', body2, headers);
-        const list = JSON.parse(html3).list;
-
-        const nnnmm = list.map(item => {
-            const playParams = Object.values(item.play);
-            let lastParam = null;
-            for (let i = playParams.length - 1; i >= 0; i--) {
-                if (playParams[i].param) {
-                    lastParam = playParams[i].param;
-                    break;
-                }
-            }
-            const vurlIdMatch = lastParam.match(/vurl_id=(\d+)/);
-            const resolution = lastParam.match(/resolution=(\d+)/);
-            if (vurlIdMatch) {
-                return `${item.title}$${vod_id}/${vurlIdMatch[1]}?${resolution[1]}`;
-            }
-        }).filter(Boolean);
-
-const VOD = {
-            title: data2.vod_name,
-            type: data2.videoTag.toString(),
-            desc: data2.vod_use_content,
-            vod_actor: data2.vod_actor,
-            vod_area: data2.vod_area,
-            vod_director: data2.vod_director,
-            img: data2.vod_pic,
-            content: data2.vod_addtime,
-            vod_play_from: '瓜子',
-            vod_play_url: nnnmm.join('#')
-        };
-
-        console.log(VOD);
-    } catch (error) {
-        console.error('Error fetching play info:', error);
+        let encryptedHex = encrypted.ciphertext.toString(CryptoJS.enc.Hex);
+        return encryptedHex.toUpperCase();
     }
-}
-    */ 
-    
-    /*
-    一级: $js.toString(() => {
-        let d = [];
-        function Encrypt(plainText) {
-            let key = CryptoJS.enc.Utf8.parse("mvXBSW7ekreItNsT");
-            let iv = CryptoJS.enc.Utf8.parse("2U3IrJL8szAKp0Fj");
-            // 将文本加密为 AES/CBC/PKCS5Padding 格式
-            let encrypted = CryptoJS.AES.encrypt(plainText, key, {
-                iv: iv,
-                mode: CryptoJS.mode.CBC,
-                padding: CryptoJS.pad.Pkcs7
-            });
 
-            // 获取加密结果并转为 Hex 格式
-            let encryptedHex = encrypted.ciphertext.toString(CryptoJS.enc.Hex);
-            return encryptedHex.toUpperCase(); // 返回大写 Hex 格式
-        }
-        function Decrypt(word, key, iv) {
-            let encryptedHexStr = CryptoJS.enc.Hex.parse(word);
+    // 解密函数
+    function Decrypt(word, key, iv) {
+        let encryptedHexStr = CryptoJS.enc.Hex.parse(word);
+        let decrypt = CryptoJS.AES.decrypt({ ciphertext: encryptedHexStr }, key, {
+            iv: iv,
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        });
+        let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
+        return decryptedStr;
+    }
 
-            // 使用AES/CBC/PKCS5Padding模式进行解密
-            let decrypt = CryptoJS.AES.decrypt({
-                ciphertext: encryptedHexStr
-            }, key, {
-                iv: iv,
-                mode: CryptoJS.mode.CBC, // 使用CBC模式
-                padding: CryptoJS.pad.Pkcs7 // 使用PKCS#7填充
-            });
+    // 获取请求体
+    function getbody2(key, t) {
+        var signature = `token_id=,token=1be86e8e18a9fa18b2b8d5432699dad0.ac008ed650fd087bfbecf2fda9d82e9835253ef24843e6b18fcd128b10763497bcf9d53e959f5377cde038c20ccf9d17f604c9b8bb6e61041def86729b2fc7408bd241e23c213ac57f0226ee656e2bb0a583ae0e4f3bf6c6ab6c490c9a6f0d8cdfd366aacf5d83193671a8f77cd1af1ff2e9145de92ec43ec87cf4bdc563f6e919fe32861b0e93b118ec37d8035fbb3c.59dd05c5d9a8ae726528783128218f15fe6f2c0c8145eddab112b374fcfe3d79,phone_type=1,request_key=${key},app_id=1,time=${t},keys=qDpotE2bedimK3QGqlyV5ieXXC3EhaPLQ+IOJyHnHflCj5w/7ESK7FgywMvrgjxbx0GklEFLI4+JshgySe633OIRstuktwdiCy3CT+fLSpuxBJDIlfXQDaeH3ig1wiB0JsZ601XHiFweGMu4tZfnSpHg3OnoL6nz/uurUif2OK4=*&zvdvdvddbfikkkumtmdwqppp?|4Y!s!2br`;
+        var signature2 = md5(signature).toUpperCase();
+        var body = `token=1be86e8e18a9fa18b2b8d5432699dad0.ac008ed650fd087bfbecf2fda9d82e9835253ef24843e6b18fcd128b10763497bcf9d53e959f5377cde038c20ccf9d17f604c9b8bb6e61041def86729b2fc7408bd241e23c213ac57f0226ee656e2bb0a583ae0e4f3bf6c6ab6c490c9a6f0d8cdfd366aacf5d83193671a8f77cd1af1ff2e9145de92ec43ec87cf4bdc563f6e919fe32861b0e93b118ec37d8035fbb3c.59dd05c5d9a8ae726528783128218f15fe6f2c0c8145eddab112b374fcfe3d79&token_id=&phone_type=1&time=${t}&phone_model=xiaomi-22021211rc&keys=qDpotE2bedimK3QGqlyV5ieXXC3EhaPLQ%2BIOJyHnHflCj5w%2F7ESK7FgywMvrgjxbx0GklEFLI4%2BJshgySe633OIRstuktwdiCy3CT%2BfLSpuxBJDIlfXQDaeH3ig1wiB0JsZ601XHiFweGMu4tZfnSpHg3OnoL6nz%2FuurUif2OK4%3D&request_key=${key}&signature=${signature2}&app_id=1&ad_version=1`;
+        return body;
+    }
+    var bodykey = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGAe6hKrWLi1zQmjTT1ozbE4QdFeJGNxubxld6GrFGximxfMsMB6BpJhpcTouAqywAFppiKetUBBbXwYsYU1wNr648XVmPmCMCy4rY8vdliFnbMUj086DU6Z+/oXBdWU3/b1G0DN3E9wULRSwcKZT3wj/cCI1vsCm3gj2R5SqkA9Y0CAwEAAQKBgAJH+4CxV0/zBVcLiBCHvSANm0l7HetybTh/j2p0Y1sTXro4ALwAaCTUeqdBjWiLSo9lNwDHFyq8zX90+gNxa7c5EqcWV9FmlVXr8VhfBzcZo1nXeNdXFT7tQ2yah/odtdcx+vRMSGJd1t/5k5bDd9wAvYdIDblMAg+wiKKZ5KcdAkEA1cCakEN4NexkF5tHPRrR6XOY/XHfkqXxEhMqmNbB9U34saTJnLWIHC8IXys6Qmzz30TtzCjuOqKRRy+FMM4TdwJBAJQZFPjsGC+RqcG5UvVMiMPhnwe/bXEehShK86yJK/g/UiKrO87h3aEu5gcJqBygTq3BBBoH2md3pr/W+hUMWBsCQQChfhTIrdDinKi6lRxrdBnn0Ohjg2cwuqK5zzU9p/N+S9x7Ck8wUI53DKm8jUJE8WAG7WLj/oCOWEh+ic6NIwTdAkEAj0X8nhx6AXsgCYRql1klbqtVmL8+95KZK7PnLWG/IfjQUy3pPGoSaZ7fdquG8bq8oyf5+dzjE/oTXcByS+6XRQJAP/5ciy1bL3NhUhsaOVy55MHXnPjdcTX0FaLi+ybXZIfIQ2P4rb19mVq1feMbCXhz+L1rG8oat5lYKfpe8k83ZA=="; //log(bodykey)
 
-            // 将解密后的数据转换为原始文本
-            let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
-
-            // 返回解密后的文本
-            return decryptedStr;
-        }
-        function getbody3(key, t) {
-            var signature = 'token_id=,token=1be86e8e18a9fa18b2b8d5432699dad0.ac008ed650fd087bfbecf2fda9d82e9835253ef24843e6b18fcd128b10763497bcf9d53e959f5377cde038c20ccf9d17f604c9b8bb6e61041def86729b2fc7408bd241e23c213ac57f0226ee656e2bb0a583ae0e4f3bf6c6ab6c490c9a6f0d8cdfd366aacf5d83193671a8f77cd1af1ff2e9145de92ec43ec87cf4bdc563f6e919fe32861b0e93b118ec37d8035fbb3c.59dd05c5d9a8ae726528783128218f15fe6f2c0c8145eddab112b374fcfe3d79,phone_type=1,request_key=' + key + ',app_id=1,time=' + t + ',keys=qDpotE2bedimK3QGqlyV5ieXXC3EhaPLQ+IOJyHnHflCj5w/7ESK7FgywMvrgjxbx0GklEFLI4+JshgySe633OIRstuktwdiCy3CT+fLSpuxBJDIlfXQDaeH3ig1wiB0JsZ601XHiFweGMu4tZfnSpHg3OnoL6nz/uurUif2OK4=*&zvdvdvddbfikkkumtmdwqppp?|4Y!s!2br'; //log(signature)
-            var signature2 = md5(signature).toUpperCase(); //log(signature2)
-            var body = 'token=1be86e8e18a9fa18b2b8d5432699dad0.ac008ed650fd087bfbecf2fda9d82e9835253ef24843e6b18fcd128b10763497bcf9d53e959f5377cde038c20ccf9d17f604c9b8bb6e61041def86729b2fc7408bd241e23c213ac57f0226ee656e2bb0a583ae0e4f3bf6c6ab6c490c9a6f0d8cdfd366aacf5d83193671a8f77cd1af1ff2e9145de92ec43ec87cf4bdc563f6e919fe32861b0e93b118ec37d8035fbb3c.59dd05c5d9a8ae726528783128218f15fe6f2c0c8145eddab112b374fcfe3d79&token_id=&phone_type=1&time=' + t + '&phone_model=xiaomi-22021211rc&keys=qDpotE2bedimK3QGqlyV5ieXXC3EhaPLQ%2BIOJyHnHflCj5w%2F7ESK7FgywMvrgjxbx0GklEFLI4%2BJshgySe633OIRstuktwdiCy3CT%2BfLSpuxBJDIlfXQDaeH3ig1wiB0JsZ601XHiFweGMu4tZfnSpHg3OnoL6nz%2FuurUif2OK4%3D&request_key=' + key + '&signature=' + signature2 + '&app_id=1&ad_version=1';
-            return body
-        }
-        const bodykey = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGAe6hKrWLi1zQmjTT1ozbE4QdFeJGNxubxld6GrFGximxfMsMB6BpJhpcTouAqywAFppiKetUBBbXwYsYU1wNr648XVmPmCMCy4rY8vdliFnbMUj086DU6Z+/oXBdWU3/b1G0DN3E9wULRSwcKZT3wj/cCI1vsCm3gj2R5SqkA9Y0CAwEAAQKBgAJH+4CxV0/zBVcLiBCHvSANm0l7HetybTh/j2p0Y1sTXro4ALwAaCTUeqdBjWiLSo9lNwDHFyq8zX90+gNxa7c5EqcWV9FmlVXr8VhfBzcZo1nXeNdXFT7tQ2yah/odtdcx+vRMSGJd1t/5k5bDd9wAvYdIDblMAg+wiKKZ5KcdAkEA1cCakEN4NexkF5tHPRrR6XOY/XHfkqXxEhMqmNbB9U34saTJnLWIHC8IXys6Qmzz30TtzCjuOqKRRy+FMM4TdwJBAJQZFPjsGC+RqcG5UvVMiMPhnwe/bXEehShK86yJK/g/UiKrO87h3aEu5gcJqBygTq3BBBoH2md3pr/W+hUMWBsCQQChfhTIrdDinKi6lRxrdBnn0Ohjg2cwuqK5zzU9p/N+S9x7Ck8wUI53DKm8jUJE8WAG7WLj/oCOWEh+ic6NIwTdAkEAj0X8nhx6AXsgCYRql1klbqtVmL8+95KZK7PnLWG/IfjQUy3pPGoSaZ7fdquG8bq8oyf5+dzjE/oTXcByS+6XRQJAP/5ciy1bL3NhUhsaOVy55MHXnPjdcTX0FaLi+ybXZIfIQ2P4rb19mVq1feMbCXhz+L1rG8oat5lYKfpe8k83ZA==";
-        function gethtml(u, body, headers) {
-            var hd = fetch(u, {
+    // 发送请求并获取 HTML
+    async function gethtml(u, body, headers) {
+            var hd = await fetch(u, {
                 headers: headers,
                 body: body,
                 method: 'POST',
@@ -485,107 +316,7 @@ const VOD = {
             var html = Decrypt(response_key, key, iv);
             return html
         }
-        function hqsub(MY_CATE) {
-            var subs = ["5", "12", "30", "22", ""]
-            var tids = ["1", "2", "4", "3", "64"]
-            let index = tids.indexOf(MY_CATE);
-            if (index !== -1) {
-                return subs[index];
-            }
-            return ""; // 或者根据需要返回其他值
-        }
-        var headers = {
-            'Cache-Control': 'no-cache',
-            'Version': '2406025',
-            'PackageName': 'com.uf076bf0c246.qe439f0d5e.m8aaf56b725a.ifeb647346f',
-            'Ver': '1.9.2',
-            'Referer': 'https://api.8utdtcq.com',
-            'X-Customer-Client-Ip': '127.0.0.1',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Host': 'api.8utdtcq.com',
-            'Connection': 'Keep-Alive',
-            //'Accept-Encoding': 'gzip',
-            'User-Agent': 'okhttp/3.12.0'
-        }
-        var tid = MY_CATE;
-        var sub = hqsub(MY_CATE)
-        var timestamp = new Date().getTime() / 1000;
-        var t = timestamp.toString().split('.')[0];
-        var request_key = JSON.stringify({ "area": (MY_FL.area || 0).toString(), "sub": (MY_FL.sub || sub).toString(), "year": (MY_FL.year || 0).toString(), "pageSize": "30", "sort": (MY_FL.sort || "d_id").toString(), "page": MY_PAGE, "tid": tid });
-        var request_key2 = Encrypt(request_key);
-        var body = getbody3(request_key2, t)
-        var html2 = gethtml("https://api.8utdtcq.com/App/IndexList/indexList", body, headers)
-        //console.log("tttttlieb=="+html2)
-        var list = JSON.parse(html2).list; //log(list)
-        list.forEach(data => {
-            d.push({
-                title: data.vod_name,
-                desc: data.vod_continu == 0 ? '电影' : '更新至'+data.vod_continu+'集',
-                year: data.vod_scroe,
-                img: data.vod_pic,
-                url: `${data.vod_id}/${data.vod_continu}`,
-            })
-        })
-        setResult(d)
-    }),
-    
-    二级: $js.toString(() => {
-        // var d = [];
-        function Encrypt(plainText) {
-            let key = CryptoJS.enc.Utf8.parse("mvXBSW7ekreItNsT");
-            let iv = CryptoJS.enc.Utf8.parse("2U3IrJL8szAKp0Fj");
-            // 将文本加密为 AES/CBC/PKCS5Padding 格式
-            let encrypted = CryptoJS.AES.encrypt(plainText, key, {
-                iv: iv,
-                mode: CryptoJS.mode.CBC,
-                padding: CryptoJS.pad.Pkcs7
-            });
-
-            // 获取加密结果并转为 Hex 格式
-            let encryptedHex = encrypted.ciphertext.toString(CryptoJS.enc.Hex);
-            return encryptedHex.toUpperCase(); // 返回大写 Hex 格式
-        }
-        function Decrypt(word, key, iv) {
-            let encryptedHexStr = CryptoJS.enc.Hex.parse(word);
-
-            // 使用AES/CBC/PKCS5Padding模式进行解密
-            let decrypt = CryptoJS.AES.decrypt({
-                ciphertext: encryptedHexStr
-            }, key, {
-                iv: iv,
-                mode: CryptoJS.mode.CBC, // 使用CBC模式
-                padding: CryptoJS.pad.Pkcs7 // 使用PKCS#7填充
-            });
-
-            // 将解密后的数据转换为原始文本
-            let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
-
-            // 返回解密后的文本
-            return decryptedStr;
-        }
-        function getbody2(key, t) {
-            var signature = 'token_id=,token=1be86e8e18a9fa18b2b8d5432699dad0.ac008ed650fd087bfbecf2fda9d82e9835253ef24843e6b18fcd128b10763497bcf9d53e959f5377cde038c20ccf9d17f604c9b8bb6e61041def86729b2fc7408bd241e23c213ac57f0226ee656e2bb0a583ae0e4f3bf6c6ab6c490c9a6f0d8cdfd366aacf5d83193671a8f77cd1af1ff2e9145de92ec43ec87cf4bdc563f6e919fe32861b0e93b118ec37d8035fbb3c.59dd05c5d9a8ae726528783128218f15fe6f2c0c8145eddab112b374fcfe3d79,phone_type=1,request_key=' + key + ',app_id=1,time=' + t + ',keys=Qmxi5ciWXbQzkr7o+SUNiUuQxQEf8/AVyUWY4T/BGhcXBIUz4nOyHBGf9A4KbM0iKF3yp9M7WAY0rrs5PzdTAOB45plcS2zZ0wUibcXuGJ29VVGRWKGwE9zu2vLwhfgjTaaDpXo4rby+7GxXTktzJmxvneOUdYeHi+PZsThlvPI=*&zvdvdvddbfikkkumtmdwqppp?|4Y!s!2br'; //log(signature)
-            var signature2 = md5(signature); //log(signature2)
-            var body = 'token=1be86e8e18a9fa18b2b8d5432699dad0.ac008ed650fd087bfbecf2fda9d82e9835253ef24843e6b18fcd128b10763497bcf9d53e959f5377cde038c20ccf9d17f604c9b8bb6e61041def86729b2fc7408bd241e23c213ac57f0226ee656e2bb0a583ae0e4f3bf6c6ab6c490c9a6f0d8cdfd366aacf5d83193671a8f77cd1af1ff2e9145de92ec43ec87cf4bdc563f6e919fe32861b0e93b118ec37d8035fbb3c.59dd05c5d9a8ae726528783128218f15fe6f2c0c8145eddab112b374fcfe3d79&token_id=&phone_type=1&time=' + t + '&phone_model=xiaomi-22021211rc&keys=Qmxi5ciWXbQzkr7o%2BSUNiUuQxQEf8%2FAVyUWY4T%2FBGhcXBIUz4nOyHBGf9A4KbM0iKF3yp9M7WAY0rrs5PzdTAOB45plcS2zZ0wUibcXuGJ29VVGRWKGwE9zu2vLwhfgjTaaDpXo4rby%2B7GxXTktzJmxvneOUdYeHi%2BPZsThlvPI%3D&request_key=' + key + '&signature=' + signature2 + '&app_id=1&ad_version=1'; //log(body)
-            return body
-        }
-        const bodykey = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGAe6hKrWLi1zQmjTT1ozbE4QdFeJGNxubxld6GrFGximxfMsMB6BpJhpcTouAqywAFppiKetUBBbXwYsYU1wNr648XVmPmCMCy4rY8vdliFnbMUj086DU6Z+/oXBdWU3/b1G0DN3E9wULRSwcKZT3wj/cCI1vsCm3gj2R5SqkA9Y0CAwEAAQKBgAJH+4CxV0/zBVcLiBCHvSANm0l7HetybTh/j2p0Y1sTXro4ALwAaCTUeqdBjWiLSo9lNwDHFyq8zX90+gNxa7c5EqcWV9FmlVXr8VhfBzcZo1nXeNdXFT7tQ2yah/odtdcx+vRMSGJd1t/5k5bDd9wAvYdIDblMAg+wiKKZ5KcdAkEA1cCakEN4NexkF5tHPRrR6XOY/XHfkqXxEhMqmNbB9U34saTJnLWIHC8IXys6Qmzz30TtzCjuOqKRRy+FMM4TdwJBAJQZFPjsGC+RqcG5UvVMiMPhnwe/bXEehShK86yJK/g/UiKrO87h3aEu5gcJqBygTq3BBBoH2md3pr/W+hUMWBsCQQChfhTIrdDinKi6lRxrdBnn0Ohjg2cwuqK5zzU9p/N+S9x7Ck8wUI53DKm8jUJE8WAG7WLj/oCOWEh+ic6NIwTdAkEAj0X8nhx6AXsgCYRql1klbqtVmL8+95KZK7PnLWG/IfjQUy3pPGoSaZ7fdquG8bq8oyf5+dzjE/oTXcByS+6XRQJAP/5ciy1bL3NhUhsaOVy55MHXnPjdcTX0FaLi+ybXZIfIQ2P4rb19mVq1feMbCXhz+L1rG8oat5lYKfpe8k83ZA==";
-        function gethtml(u, body, headers) {
-            var hd = fetch(u, {
-                headers: headers,
-                body: body,
-                method: 'POST',
-                rejectCoding: true
-            });
-            var banner = JSON.parse(hd).data;
-            var response_key = banner.response_key; //log()
-            var keys = banner.keys; //log(keys)
-            var bodykeyiv = JSON.parse(RSA.decode(keys, bodykey));
-            var key = CryptoJS.enc.Utf8.parse(bodykeyiv.key);
-            var iv = CryptoJS.enc.Utf8.parse(bodykeyiv.iv);
-            var html = Decrypt(response_key, key, iv);
-            return html
-        }
+        
         const headers = {
             'Cache-Control': 'no-cache',
             'Version': '2406025',
@@ -614,18 +345,23 @@ const VOD = {
             "mobile_time": t,
             "token": "1be86e8e18a9fa18b2b8d5432699dad0.ac008ed650fd087bfbecf2fda9d82e9835253ef24843e6b18fcd128b10763497bcf9d53e959f5377cde038c20ccf9d17f604c9b8bb6e61041def86729b2fc7408bd241e23c213ac57f0226ee656e2bb0a583ae0e4f3bf6c6ab6c490c9a6f0d8cdfd366aacf5d83193671a8f77cd1af1ff2e9145de92ec43ec87cf4bdc563f6e919fe32861b0e93b118ec37d8035fbb3c.59dd05c5d9a8ae726528783128218f15fe6f2c0c8145eddab112b374fcfe3d79"
         });
-        var request_key2 = Encrypt(request_key);
-        var body = getbody2(request_key2, t)
-        var html = gethtml("https://api.8utdtcq.com/App/IndexPlay/playInfo", body, headers)
+        
+        const request_key2 = Encrypt(request_key);
+    // 获取请求体
+     const body = getbody2(request_key2, t);
+        // 发送请求并获取解密后的 HTML 数据
+        var html = await gethtml("https://api.8utdtcq.com/App/IndexPlay/playInfo", body, headers)
+        
         var data2 = JSON.parse(html).vodInfo; //console.log("hwudwudg-===="+JSON.stringify(data2))
         var request_key3 = JSON.stringify({
             "vurl_cloud_id": "2",
             "vod_d_id": vod_id
         }); //log(request_key3)
-        var request_key4 = Encrypt(request_key3); //log(request_key4)
-        var body2 = getbody2(request_key4, t)
+        
+        const request_key4 = Encrypt(request_key3); //log(request_key4)
+        const body2 = getbody2(request_key4, t)
 
-        var html3 = gethtml("https://api.8utdtcq.com/App/Resource/Vurl/show", body2, headers); //log(html3)
+        var html3 = await gethtml("https://api.8utdtcq.com/App/Resource/Vurl/show", body2, headers); //log(html3)
 
         var list = JSON.parse(html3).list;
         let nnnmm = [];
@@ -650,21 +386,37 @@ const VOD = {
                 nnnmm.push(`${item.title}$${vod_id}/${vurlIdMatch[1]}?${resolution[1]}`);
             }
         });
-        VOD = {
+
+        
+        VOD.vod_name = data2.vod_name;
+        VOD.type_name = data2.videoTag.toString();
+        VOD.vod_remarks = data2.vod_addtime;
+        VOD.vod_actor = data2.vod_actor;
+        VOD.vod_area = data2.vod_area;
+        VOD.vod_director = data2.vod_director;
+        VOD.vod_pic = data2.vod_pic;
+        VOD.vod_content = data2.vod_use_content;
+        VOD.vod_play_from = '瓜子';
+        VOD.vod_play_url = nnnmm.join('#');
+        /*
+         VOD = {
             title: data2.vod_name,
             type: data2.videoTag.toString(),
-            desc: data2.vod_use_content,
+            desc: data2.vod_addtime,
             vod_actor: data2.vod_actor,
             vod_area: data2.vod_area,
             vod_director: data2.vod_director,
             img: data2.vod_pic,
-            content: data2.vod_addtime,
+            content: data2.vod_use_content,
             vod_play_from: '瓜子',
             vod_play_url: nnnmm.join('#')
-        }
-    }),
-    /*
-    搜索: $js.toString(() => {
+        }*/
+        //console.log('VOD的结果:', VOD);
+        return VOD;
+    },
+    
+    搜索: async function () {
+    let { input, MY_CATE, MY_FL, MY_PAGE } = this;
         let d = [];
         function Encrypt(plainText) {
             let key = CryptoJS.enc.Utf8.parse("mvXBSW7ekreItNsT");
@@ -705,8 +457,8 @@ const VOD = {
             return body
         }
         const bodykey = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGAe6hKrWLi1zQmjTT1ozbE4QdFeJGNxubxld6GrFGximxfMsMB6BpJhpcTouAqywAFppiKetUBBbXwYsYU1wNr648XVmPmCMCy4rY8vdliFnbMUj086DU6Z+/oXBdWU3/b1G0DN3E9wULRSwcKZT3wj/cCI1vsCm3gj2R5SqkA9Y0CAwEAAQKBgAJH+4CxV0/zBVcLiBCHvSANm0l7HetybTh/j2p0Y1sTXro4ALwAaCTUeqdBjWiLSo9lNwDHFyq8zX90+gNxa7c5EqcWV9FmlVXr8VhfBzcZo1nXeNdXFT7tQ2yah/odtdcx+vRMSGJd1t/5k5bDd9wAvYdIDblMAg+wiKKZ5KcdAkEA1cCakEN4NexkF5tHPRrR6XOY/XHfkqXxEhMqmNbB9U34saTJnLWIHC8IXys6Qmzz30TtzCjuOqKRRy+FMM4TdwJBAJQZFPjsGC+RqcG5UvVMiMPhnwe/bXEehShK86yJK/g/UiKrO87h3aEu5gcJqBygTq3BBBoH2md3pr/W+hUMWBsCQQChfhTIrdDinKi6lRxrdBnn0Ohjg2cwuqK5zzU9p/N+S9x7Ck8wUI53DKm8jUJE8WAG7WLj/oCOWEh+ic6NIwTdAkEAj0X8nhx6AXsgCYRql1klbqtVmL8+95KZK7PnLWG/IfjQUy3pPGoSaZ7fdquG8bq8oyf5+dzjE/oTXcByS+6XRQJAP/5ciy1bL3NhUhsaOVy55MHXnPjdcTX0FaLi+ybXZIfIQ2P4rb19mVq1feMbCXhz+L1rG8oat5lYKfpe8k83ZA==";
-        function gethtml(u, body, headers) {
-            var hd = fetch(u, {
+      async  function gethtml(u, body, headers) {
+            var hd = await fetch(u, {
                 headers: headers,
                 body: body,
                 method: 'POST',
@@ -745,7 +497,7 @@ const VOD = {
             'Connection': 'Keep-Alive',
             'User-Agent': 'okhttp/3.12.0'
         }
-        var html = gethtml(url, body, headers)
+        var html = await gethtml(url, body, headers)
         //console.log("nskjsnwkjdnejd===="+html)
 
         var list = JSON.parse(html).list; //log(list)
@@ -759,7 +511,6 @@ const VOD = {
                 url: `${data.vod_id}/${data.vod_continu}`,
             })
         })
-        setResult(d)
-    }),
-    */
+       return setResult(d)
+    },
 }
