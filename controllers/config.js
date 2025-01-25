@@ -249,13 +249,12 @@ sites.forEach(site => {
     .replace(/hdmoli/g, '莫离')
     .replace(/素白白/g, '素白[优]')
     .replace(/瓜子H5/g, '瓜子[优]')
-    .replace(/^(.*?短剧)(?!.*\[短\])/gm, '$1[短]')
+    .replace(/(短剧.*?|.*?短剧)\(DS\)$/gs, '$1[短](DS)')
     .replace(/\b动漫/g, '动漫[漫]')
     .replace(/盘搜\[盘\]/g, '盘搜[搜]')
     .replace(/随身听/, '随身')
     .replace(/DR2/, 'DR')
     .replace(/(\[[^]]*\])\[.*?\]/, '$1')
-   // .replace(/\[[^]]*\].*/, site.name.match(/\[[^]]*\]/)[0])
  //   .replace(/[\[短\]][\[盘\]]/g, '[短]')
 // .replace(/\[搜\]盘\]/, '[搜]')
     .replace(/\[短\]\[盘\]/, '[短]')
@@ -331,7 +330,7 @@ let emojiMap = {
     "[慢]": "🐢",
     "[画]": "🖼️",
     "密": "🚫",
-    "直播": "▶️",
+    "直播": "🚀",
     "哔哩": "🅱️",
     "[搜]": "🔎",
     "[播]": "🖥️",
@@ -376,11 +375,11 @@ let addedEmoji = '';
 function shouldExclude(site) {
     const excludeKeywords = ['6587','PTT', '密', '低端', 
     '金牌[优](DR)', '📺', '虎牙直播[官](DR)', '擦', '皮皮',
-  '豆瓣', 'ACG', 'Omo', '人人', '好乐','非凡','PTT',
-   '木偶','玩偶','多多','欧哥','六趣',
-  '团长', '奥秘' , '六趣'
+  '豆瓣', 'ACG', 'Omo', 'gcvbh', '好乐','非凡','PTT',
+   '木偶','玩偶','多多','58569',
+  '团长', '奥秘'
     ];
-    //,'虎斑'
+    //,'虎斑', '六趣'
     // 判断 site.name 是否包含任何一个排除关键词
     return excludeKeywords.some(keyword => site.name.includes(keyword));
 }
