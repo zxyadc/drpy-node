@@ -267,7 +267,7 @@ sites.forEach(site => {
 function customSort(a, b) {
     // 定义排序顺序
     let order = ['[APP]','[优]', '💿', '中心', '交互', '[合]', '直播', '🏠', '[短]', '📻', '[听]', '[书]', '[漫]', '[儿]', '🅱️', '[磁]', '[搜]'];
-    let js_order = ['🏆瓜子[APP]', '🏆瓜子[优]', '🏆金牌[优]'];
+    let js_order = ['🏆瓜子[APP]', '🏆人人[APP]','🏆瓜子[优]', '🏆金牌[优]'];
 
     // 先按照 js_order 排序
     let i = js_order.indexOf(a.name.split('(')[0]);
