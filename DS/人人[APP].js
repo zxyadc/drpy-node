@@ -6,6 +6,7 @@ const {getPublicIp} = $.require('_lib.request.js');
 var rule = {
     类型: '影视',
     host: 'https://jiekou-1314054699.cos.ap-chongqing.myqcloud.com/1.txt',
+   // host: 'http://59.153.164.124:6655',
     title: '人人视频',
     desc: '人人视频纯js版本',
     homeUrl: '',
@@ -21,7 +22,7 @@ var rule = {
     headers: {
         'User-Agent': 'okhttp/3.14.9',
     },
-    timeout: 5000,
+    //timeout: 5000,
     play_parse: true,
     hostJs: async function () {
         let {HOST} = this;
@@ -54,7 +55,6 @@ var rule = {
         let {input} = this;
         //log(input);
         console.log('input的结果:', input);
-        //http://59.153.164.124:6655/jj.php/getappapi.index/typeFilterVodList?area=全部&year=全部&type_id=2&page=1&sort=最新&lang=全部&class=全部
         let d = [];
         let html = await post(input.split('?')[0], {
             body: input.split('?')[1],
