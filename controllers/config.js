@@ -252,6 +252,8 @@ sites.forEach(site => {
     .replace(/(短剧.*?|.*?短剧)\(DS\)$/gs, '$1[短](DS)')
     .replace(/\b动漫/g, '动漫[漫]')
     .replace(/盘搜\[盘\]/g, '盘搜[搜]')
+    .replace(/夸克盘搜\[搜\]/g, '夸克盘搜[盘]')
+    .replace(/短剧\[盘\]/g, '短剧[短]')
     .replace(/随身听/, '随身')
     .replace(/DR2/, 'DR')
     .replace(/(\[[^]]*\])\[.*?\]/, '$1')
@@ -322,6 +324,7 @@ let emojiMap = {
     "[优]": "🏆",
     "[合]": "🎁",
     "短": "📲",
+    "[直]": "📡",
   //  "[影视]": "📺",
     "[戏]": "🎭",
     "博": "📻",
@@ -373,7 +376,7 @@ let addedEmoji = '';
 
 //console.log(sites);
 function shouldExclude(site) {
-    const excludeKeywords = ['6587','PTT', '密', '低端', 
+    const excludeKeywords = ['6587','PTT', '密', 'KKK', 
     '金牌[优](DR)', '📺', '虎牙直播[官](DR)', '擦', '皮皮',
   '豆瓣', 'ACG', 'Omo', 'gcvbh', '好乐','非凡','PTT',
    '木偶','玩偶','多多','58569',
