@@ -792,7 +792,7 @@ async function initParse(rule, env, vm, context) {
     } else {
         rule.searchUrl = rule.host && rule.searchUrl ? urljoin(rule.host, rule.searchUrl) : rule.searchUrl;
     }
-    rule.timeout = rule.timeout || 5000;
+    rule.timeout = rule.timeout || 50000;
     rule.encoding = rule.编码 || rule.encoding || 'utf-8';
     rule.search_encoding = rule.搜索编码 || rule.search_encoding || '';
     rule.图片来源 = rule.图片来源 || '';
