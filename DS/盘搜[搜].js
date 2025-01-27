@@ -14,7 +14,7 @@ var rule = {
     quickSearch: 0,
     play_parse: true,
 lazy: async function (flag, id, flags) {
-        let {getProxyUrl, input} = this;
+        let {input, mediaProxyUrl} = this;
         const ids = input.split('*');
         const urls = [];
         const headers = []

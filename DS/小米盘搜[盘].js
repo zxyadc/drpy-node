@@ -29,7 +29,7 @@ var rule = {
     lazy: async function () {
     },*/
     lazy: async function (flag, id, flags) {
-        let {getProxyUrl, input} = this;
+        let {input, mediaProxyUrl} = this;
         console.log('orId的结果:', input);
         
        const ids = input.split('*');

@@ -25,7 +25,7 @@ var rule = {
     hikerListCol: "text_1",
     hikerClassListCol: "text_1",
     lazy: async function (flag, id, flags) {
-        let {getProxyUrl, input} = this;
+        let {input, mediaProxyUrl} = this;
         const ids = input.split('*');
         const urls = [];
         const headers = []

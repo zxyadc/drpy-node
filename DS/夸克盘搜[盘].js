@@ -64,7 +64,7 @@ for (let i = 0; i < jsonArray.length; i++) {
         return setResult(d);
     },
     lazy: async function (flag, id, flags) {
-        let {getProxyUrl, input} = this;
+        let {input, mediaProxyUrl} = this;
         const ids = input.split('*');
         const urls = [];
         const headers = []
