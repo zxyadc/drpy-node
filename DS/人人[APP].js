@@ -5,8 +5,8 @@
 const {getPublicIp} = $.require('_lib.request.js');
 var rule = {
     类型: '影视',
-    host: 'https://jiekou-1314054699.cos.ap-chongqing.myqcloud.com/1.txt',
-   // host: 'http://59.153.164.124:6655',
+    //host: 'https://jiekou-1314054699.cos.ap-chongqing.myqcloud.com/1.txt',
+    host: 'http://59.153.164.124:6655',
     title: '人人视频',
     desc: '人人视频纯js版本',
     homeUrl: '',
@@ -24,11 +24,13 @@ var rule = {
     },
     //timeout: 5000,
     play_parse: true,
+    /*
     hostJs: async function () {
         let {HOST} = this;
         HOST = await request(HOST, {headers: {'User-Agent': 'MOBILE_UA'}});
         return HOST;
     },
+    */
     class_parse: async function () {
         let filters = {};
         let years = '2025&2024&2023&2022&2021&2020&2019&2018&2017&2016&2015&2014&2013&2012&2011&2010&2009&2008&2007&2006&2005&2004&2003&2002&2001&2000'.split('&');
@@ -214,16 +216,36 @@ var rule = {
 };
 
 
+
 function Decrypt(word) {
-    const key = CryptoJS.enc.Utf8.parse("F51F5D52D23CBF27");
-    const iv = CryptoJS.enc.Utf8.parse("F51F5D52D23CBF27");
-    let decrypt = CryptoJS.AES.decrypt(word, key, {
-        iv: iv,
-        mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7,
-    });
-    let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
-    return decryptedStr.toString();
+    try {
+        const key = CryptoJS.enc.Utf8.parse("F51F5D52D23CBF27");
+        const iv = CryptoJS.enc.Utf8.parse("F51F5D52D23CBF27");
+        let decrypt = CryptoJS.AES.decrypt(word, key, {
+            iv: iv,
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7,
+        });
+        let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
+        return decryptedStr.toString();
+    } catch (e) {
+        console.error('解密错误:', e.message);
+        console.error('原始数据:', word);
+        return null;
+    }
+}
+
+async function fetchAndParse(url, body) {
+    try {
+        let html = await post(url, { body: body });
+        console.log('获取的数据:', html);
+        let html1 = Decrypt(JSON.parse(html).data);
+        console.log('解密后的数据:', html1);
+        return JSON.parse(html1);
+    } catch (e) {
+        console.error('数据处理错误:', e.message);
+        return null;
+    }
 }
 
 function Encrypt(word) {
