@@ -93,7 +93,9 @@ var rule = {
                 url: item.vod_id,
             })
         });
+        console.log('d的结果:', d);
         return setResult(d);
+        
     },
     二级: async function (ids) {
         let {input} = this;
