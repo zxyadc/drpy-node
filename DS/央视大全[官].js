@@ -59,7 +59,8 @@ var rule = {
         }
         return {
             parse: 0,
-            url: url.replace(/zhxy.eu.org/g, 'drpys.540734621.xyz:31038'),
+         //   url: url.replace(/zhxy.eu.org/g, 'drpys.540734621.xyz:31038'),
+            url: url.replace(/zhxy.eu.org/g, '45.204.193.33:9097'),
             //ds.playdreamer.cn
             //.replace(/127.0.0.1:5757/g, 'ds.playdreamer.cn'),
             
