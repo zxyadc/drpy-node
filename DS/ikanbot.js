@@ -42,7 +42,7 @@ var rule = {
         return []
     },
     一级: async function (tid, pg, filter, extend) {
-        let {getProxyUrl, MY_CATE, input} = this;
+        let {mediaProxyUrl, MY_CATE, input} = this;
         if (pg <= 0) pg = 1;
         const link = rule.homeUrl + (extend.tag || tid).replace('.html', pg > 1 ? `-p-${pg}.html` : '.html');
         const html = (await getHtml({
@@ -57,7 +57,7 @@ var rule = {
             return {
                 vod_id: item.attribs.href,
                 vod_name: img.attribs.alt,
-                vod_pic: getProxyUrl() + '&url=' + base64Encode(img.attribs['data-src']),
+                vod_pic: mediaProxyUrl() + '&url=' + base64Encode(img.attribs['data-src']),
                 vod_remarks: '',
             };
         }).toArray();
@@ -173,7 +173,7 @@ var rule = {
         return videos;
     },
     lazy: async function (flag, id, flags) {
-        let {getProxyUrl, input} = this;
+        let {mediaProxyUrl, input} = this;
         return {parse: 0, url: input}
     },
     proxy_rule: async function (params) {

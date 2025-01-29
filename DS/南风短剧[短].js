@@ -31,7 +31,7 @@ var rule = {
     filter: 'H4sIAAAAAAAAA6vmUgACJUMlK4VoMBMEquEssGR2aiVQWulZ36Snu/qVdFAl8xJzU3HLliXmlKaimI3dDoRxYLOmb3s5fQtWExEmgxSWZAItx5CvxdSCz7Ynu3Y92zCFCNsyMkuKKbbtxfqWpx1tRNhWnJxfhM1zKCKxXKjisRATlYxG43NYxafxaHwOq/g0GY3PYRWfpqPxOazi02w0PodVfJqPxuewik+L0fgcHvHJVQsAg4rcm4IOAAA=',
     cate_exclude: '最新短剧|热播榜',
     lazy: async function (flag, id, flags) {
-        let {getProxyUrl, input} = this;
+        let {mediaProxyUrl, input} = this;
         console.log('orId的结果:', input);
         
        const ids = input.split('*');

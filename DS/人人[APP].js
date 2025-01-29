@@ -157,7 +157,7 @@ var rule = {
         return setResult(d);
     },
     lazy: async function (flag, id, flags) {
-        let {getProxyUrl, input} = this;
+        let {mediaProxyUrl, input} = this;
         let params = decodeURIComponent(input).split('#');
         log(params);
         input = params[0];
@@ -167,7 +167,7 @@ var rule = {
             return input
         }
         if (/m3u8/.test(input)) {
-            return {parse: 0, url: getProxyUrl() + '&url=' + input}
+            return {parse: 0, url: mediaProxyUrl() + '&url=' + input}
         }
         if (parse.includes('http')) {
             let html = await post(parse + input, {
@@ -178,7 +178,7 @@ var rule = {
             try {
                 let url = JSON.parse(html).url + '#isVideo=true#'
                 if (url.includes('&vkey=')) {
-                    return {parse: 0, url: getProxyUrl() + '&url=' + url}
+                    return {parse: 0, url: mediaProxyUrl() + '&url=' + url}
                 }
                 return {parse: 0, url: url}
             } catch (e) {
@@ -197,7 +197,7 @@ var rule = {
             if (json.code === 1) {
                 let url = JSON.parse(JSON.parse(Decrypt(json.data)).json).url + '#isVideo=true#';
                 if (url.includes('.m3u8')) {
-                    return {parse: 0, url: getProxyUrl() + '&url=' + url}
+                    return {parse: 0, url: mediaProxyUrl() + '&url=' + url}
                 }
                 return {parse: 0, url: url}
             }

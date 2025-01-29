@@ -157,7 +157,7 @@ var rule = {
         
     },
     lazy: async function (flag, id, flags) {
-        let {getProxyUrl,input} = this;
+        let {mediaProxyUrl,input} = this;
         return {parse:0,url:id}
     },
     proxy_rule:async function(params){

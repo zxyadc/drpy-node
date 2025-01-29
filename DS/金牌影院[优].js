@@ -164,7 +164,7 @@ var rule = {
         return setResult(d)
     },
     lazy: async function (flag, id, flags) {
-        let {getProxyUrl,input} = this;
+        let {mediaProxyUrl,input} = this;
         const pid = input.split('/')[3]
         const nid = input.split('/')[5]
         const t = new Date().getTime()

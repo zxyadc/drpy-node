@@ -33,10 +33,10 @@ var rule = {
     推荐: async function (...args) {
         console.log('执行了推荐函数');
         log('rule.title',rule.title);
-        // log(typeof (getProxyUrl));
-        // log(getProxyUrl());
-        let {getProxyUrl} = this;
-        log(getProxyUrl());
+        // log(typeof (mediaProxyUrl));
+        // log(mediaProxyUrl());
+        let {mediaProxyUrl} = this;
+        log(mediaProxyUrl());
         console.log(typeof (jsp))
         console.log(typeof (pdfh))
         console.log('pako:', typeof (pako))
@@ -55,7 +55,7 @@ var rule = {
                 vod_name: '测试电影1',
                 vod_pic: '1.png',
                 vod_remarks: '测试描述1',
-                vod_id: getProxyUrl() + '&url=' + 'https://hls09.cntv.myhwcdn.cn/asp/hls/2000/0303000a/3/default/d9b0eaa065934f25abd193d391f731b6/2000.m3u8'
+                vod_id: mediaProxyUrl() + '&url=' + 'https://hls09.cntv.myhwcdn.cn/asp/hls/2000/0303000a/3/default/d9b0eaa065934f25abd193d391f731b6/2000.m3u8'
             },
             {vod_name: '测试电影2', vod_pic: '2.png', vod_remarks: '测试描述2', vod_id: 'http://www.2.com'},
         ]

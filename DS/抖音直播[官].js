@@ -117,7 +117,7 @@ var rule = {
         return setResult(d);
     },
     lazy: async function (flag, id, flags) {
-        let { input, hostUrl, hostname,getProxyUrl } = this;
+        let { input, hostUrl, hostname,mediaProxyUrl } = this;
         // log('hostUrl:', hostUrl);
         // log('hostname:', hostname);
         if (input === 'off') {
@@ -138,7 +138,7 @@ var rule = {
             connectWebSocket(hostname, room_id, ttwid);
             // let danmu = `web://${hostUrl}:4201/danmu.html`;
             // return {parse: 0, url: url, danmaku: danmu};
-            return { parse: 0, url: url, danmaku: 'web://' + getProxyUrl() + '&url=danmu.html' };
+            return { parse: 0, url: url, danmaku: 'web://' + mediaProxyUrl() + '&url=danmu.html' };
         }
     },
     proxy_rule: async function () {
