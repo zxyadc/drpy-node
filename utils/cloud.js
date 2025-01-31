@@ -1,12 +1,10 @@
 import '../libs_drpy/jsencrypt.js'
-import {ENV} from "./env.js";
 import axios from "axios";
 import qs from "qs"
 
-
 class CloudDrive {
     constructor() {
-        this.regex = /https:\/\/cloud\.189\.cn\/web\/share\?code=([^&]+)/;//https://cloud.189.cn/web/share?code=qI3aMjqYRrqa
+        this.regex = /https:\/\/cloud\.189\.cn\/web\/share\?code=([^&]+)/; // https://cloud.189.cn/web/share?code=qI3aMjqYRrqa
         this.config = {
             clientId: '538135150693412',
             model: 'KB2000',
@@ -38,20 +36,20 @@ class CloudDrive {
         if (this.cookie) {
             console.log('天翼cookie获取成功' + this.cookie)
         } else {
-            ENV.set('cloud_cookie', await this.login(this.account, this.password))
+            this.cookie = await this.login(this.account, this.password);
         }
     }
 
     get account() {
-        return ENV.get('cloud_account')
+        return "13261418545";
     }
 
     get password() {
-        return ENV.get('cloud_password')
+        return "Admin@lsq12";
     }
 
     get cookie() {
-        return ENV.get('cloud_cookie')
+        return "SSON=6fed2a2d88501afbd2062a776662071571f56f67deccb3e63dea8ffe88cfb9657fa4b9b18f3a24b59bf2459b4bb1c6efad58a44a7cb3be45be879a858257962282a7921e01e8ac065a4e610f3210d4de23e4e16bdc1b41d065f9c7d18a9ff01cce6ca55cf396c9c13e0d73ac4fc5c9db98d894609f4666a5015031e6ecd65543fed3a49dd68fd11385fc8fd645c392ac888c9f2bd478ca54386ba1448c666d110dd9ee29846150db;OPENINFO=33c28688ef52ce9e3a9ef87388047efbde5e3e2e4c7ef6ef267632468c7dfaf294ff59fa59d34801;GRAYNUMBER=3D9E1023747492E4A8B9B90A9D8475A0;JSESSIONID=aaaaru0_8psw387ABqpsz; JSESSIONID=6DBA54D957007E7A14C0822DBCCAAEE3;COOKIE_LOGIN_USER=9B1830EC2D8FFBE62D83EAAC32C79D265E15A0CCD5E4996CB448864236E333E6674102F6F1E6997615CC7EA7A28A1C5E4E8F84D3E3993053354DDDE0C6C481506CF44E85BD09DC526992CF6634D8F5522242B41E";
     }
 
     async login(uname, passwd) {
@@ -104,7 +102,7 @@ class CloudDrive {
                     validateStatus: null
                 });
                 cookies += '; ' + resp.headers['set-cookie'].map(it => it.split(';')[0]).join(';');
-                ENV.set('cloud_cookie', cookies)
+                return cookies;
             } else {
                 console.error('Error during login:', resp.data);
             }
