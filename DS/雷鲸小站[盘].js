@@ -53,7 +53,7 @@ var rule = {
             videos.push({
                 "vod_name": a.children[0].data,
                 "vod_id": a.attribs.href,
-                "vod_pic": ''
+                "vod_pic": 'https://pan.losfer.cn/view.php/67dfe2a4d2381c12c29ba27ac8f702ef.jpg'
             })
         })
         return videos
