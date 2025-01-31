@@ -1,6 +1,5 @@
 {
     "live_urls": [
-        "https://zhxy.eu.org/proxy/iptv/live"
         "https://www.freetv.top/migu.m3u",
         "https://mpimg.cn/down.php/fd1375d29cb8d65325ec2fb948f84d30.txt",
         "http://rihou.cc:567/cctvgg",
@@ -10,8 +9,7 @@
     "epg_url": "https://epg.mxdyeah.top/api/diyp/?ch={name}&date={date}",
     "logo_url": "https://live.mxdyeah.top/logo/{name}.png",
     "names": [
-        "开源IPTV"
-        "咪咕M3U"
+        "咪咕M3U",
         "直播",
         "分享",
         "livetv",
