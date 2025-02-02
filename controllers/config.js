@@ -246,7 +246,7 @@ sites.forEach(site => {
     .replace(/百忙无果/g, '芒果')  
     .replace(/特下饭/g, '下饭')
     .replace(/ikanbot/g, '爱看[虫]')
-    .replace(/hdmoli/g, '莫离')
+    .replace(/hdmoli|HDmoli/g, '莫离')
     .replace(/素白白/g, '素白[优]')
     .replace(/瓜子H5/g, '瓜子[优]')
     .replace(/(短剧.*?|.*?短剧)\(DS\)$/gs, '$1[短](DS)')
@@ -379,7 +379,7 @@ function shouldExclude(site) {
     const excludeKeywords = ['6587','PTT', '密', 'KKK', 
     '金牌[优](DR)', '📺', '虎牙直播[官](DR)', '擦', '皮皮',
   '豆瓣', 'ACG', 'Omo', 'gcvbh', '好乐','非凡','PTT',
-   '木偶','玩偶','多多','58569',
+   '木偶','玩偶','多多','虎斑',
   '团长', '奥秘'
     ];
     //,'虎斑', '六趣'
