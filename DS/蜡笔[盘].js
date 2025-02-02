@@ -4,7 +4,7 @@ const {
 } = misc;
 var rule = {
     title: '蜡笔[盘]',
-    host: 'https://feimaoai.site/',
+    host: 'http://feimaoai.site/',
     url: '/index.php/vod/show/id/fyfilter.html',
     filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
     searchUrl: '/index.php/vod/search/page/fypage/wd/**.html',
@@ -175,7 +175,14 @@ filter_def: {
             uniqueArray.push(item + '#' + count[item]);
         }
     });
-
+// 确保优汐排在前面
+    uniqueArray.sort((a, b) => {
+        const aIsYouXi = a.startsWith("优汐");
+        const bIsYouXi = b.startsWith("优汐");
+        if (aIsYouXi && !bIsYouXi) return -1;
+        if (!aIsYouXi && bIsYouXi) return 1;
+        return 0;
+    });
     // 连接成字符串
     VOD.vod_play_from = uniqueArray.join("$$$");
     VOD.vod_play_url = playurls.join("$$$");

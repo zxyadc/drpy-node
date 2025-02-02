@@ -211,6 +211,14 @@ var rule = {
         uniqueArray.push(item + '#' + count[item]);
     }
 });
+// 确保优汐排在前面
+    uniqueArray.sort((a, b) => {
+        const aIsYouXi = a.startsWith("优汐");
+        const bIsYouXi = b.startsWith("优汐");
+        if (aIsYouXi && !bIsYouXi) return -1;
+        if (!aIsYouXi && bIsYouXi) return 1;
+        return 0;
+    });
       VOD.vod_play_from = uniqueArray.join("$$$")
    VOD.vod_play_url = playurls.join("$$$");
    VOD.vod_play_pan = playPans.join("$$$")

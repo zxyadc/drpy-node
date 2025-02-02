@@ -2,6 +2,7 @@ const {getHtml} = $.require('./_lib.request.js')
 const {
     formatPlayUrl,
 } = misc;
+
 var rule = {
 	title:'校长影视[云盘]',
 	host:'https://xzys.fun',
@@ -29,7 +30,6 @@ var rule = {
 			jx:0
 		}
 	}],
-	lazy:'',
 	limit:6,
 	//推荐:'div.container div.row a:has(>img);img&&alt;img&&src;img&&alt;a&&href',
 	推荐: async function () {
@@ -94,16 +94,15 @@ var rule = {
         });
         let playform = [];
      let playurls = [];
-     
+     let playPans = [];
     if (/pan.quark.cn/.test(pans)) {     
-        const shareData = Quark.getShareData(pans);
+    playPans.push(pans);
+       const shareData = Quark.getShareData(pans);
+        console.log('shareData的结果:', shareData);
         if (shareData) {
             const videos = await Quark.getFilesByShareUrl(shareData);
             if (videos.length > 0) {
                 playform.push('Quark-' + shareData.shareId);
-                //console.log('playform的结果:', playform);
-             //   playurls = videos.map((v) => {
-             
                 playurls.push(videos.map((v) => {
                     const list = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle? v.subtitle.fid : '', v.subtitle? v.subtitle.share_fid_token : ''];
                     return v.file_name + '$' + list.join('*');
@@ -119,6 +118,7 @@ var rule = {
     }
     if (/drive.uc.cn/.test(pans)) {
         const shareData = UC.getShareData(pans);
+        playPans.push(pans);
         //  console.log('shareData的结果:', shareData);
         if (shareData) {
             const videos = await UC.getFilesByShareUrl(shareData);
@@ -136,6 +136,7 @@ var rule = {
     }
     if (/www.alipan.com/.test(pans)) {
     const shareData = Ali.getShareData(input);
+    playPans.push(pans);
     if (shareData) {
         const videos = await Ali.getFilesByShareUrl(shareData);
         if (videos.length > 0) {
@@ -166,8 +167,17 @@ var rule = {
         uniqueArray.push(item + '#' + count[item]);
     }
     });
+    // 确保优汐排在前面
+    uniqueArray.sort((a, b) => {
+        const aIsYouXi = a.startsWith("优汐");
+        const bIsYouXi = b.startsWith("优汐");
+        if (aIsYouXi && !bIsYouXi) return -1;
+        if (!aIsYouXi && bIsYouXi) return 1;
+        return 0;
+    });
       VOD.vod_play_from = uniqueArray.join("$$$");
      VOD.vod_play_url = playurls.join("$$$");
+     VOD.vod_play_pan = playPans.join("$$$")
     //console.log('VOD.vod_play_url的结果:', VOD.vod_play_url); 
     return VOD;
 },

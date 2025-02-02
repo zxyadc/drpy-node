@@ -29,34 +29,21 @@ var rule = {
     预处理: async () => {
         return []
     },
-    /*
-推荐: async function () {
-    let {input, pdfa, pdfh, pd} = this;
-    let html = await request(input);
-    console.log('html的结果:', html);
-    let d = [];
-    let data = pdfa(html, '.module-items .module-item');
-    data.forEach((it) => {
-        d.push({
-            title: pd(it, 'a&&title'),
-            pic_url: pd(it, 'img&&data-src'),
-            desc: pdfh(it, '.module-item-text&&Text'),
-            url: pd(it, 'a&&href')
-        })
-    });
-    return setResult(d)
-},
-*/
+
 推荐: async function () {
     const {input, pdfa, pdfh, pd} = this;
     try {
         const html = await request(input);
         const data = pdfa(html, '.module-items .module-item');
+        if (!data || !Array.isArray(data)) {
+            console.error('未获取到有效数据');
+            return setResult([]);
+        }
         const result = data.map((item) => ({
-            title: pd(item, 'a&&title'),
-            pic_url: pd(item, 'img&&data-src'),
-            desc: pdfh(item, '.module-item-text&&Text'),
-            url: pd(item, 'a&&href')
+            title: pd(item, 'a&&title') || '未知标题',
+            pic_url: pd(item, 'img&&data-src') || '',
+            desc: pdfh(item, '.module-item-text&&Text') || '',
+            url: pd(item, 'a&&href') || ''
         }));
         return setResult(result);
     } catch (error) {
@@ -64,77 +51,105 @@ var rule = {
         throw error;
     }
 },
-   
-   一级: async function () {
+一级: async function () {
     let {input, pdfa, pdfh, pd} = this;
     let html = await request(input);
     let d = [];
     let data = pdfa(html, '.module-items .module-item');
+    if (!data || !Array.isArray(data)) {
+        console.error('未获取到有效数据');
+        return setResult([]);
+    }
     data.forEach((it) => {
         d.push({
-            title: pd(it, 'a&&title'),
-            pic_url: pd(it, 'img&&data-src'),
-            desc: pdfh(it, '.module-item-text&&Text'),
-            url: pd(it, 'a&&href')
-        })
+            title: pd(it, 'a&&title') || '未知标题',
+            pic_url: pd(it, 'img&&data-src') || '',
+            desc: pdfh(it, '.module-item-text&&Text') || '',
+            url: pd(it, 'a&&href') || ''
+        });
     });
-    return setResult(d)
+    return setResult(d);
 },
+
 二级: async function (ids) {
-        let {input} = this;
-        let html = (await getHtml(input)).data
-        const $ = pq(html)
-        let VOD = {};
-        VOD.vod_name = pdfh(html, 'h1&&Text');
-        VOD.type_name = pdfh(html, '.tag-link&&Text');
-        VOD.vod_pic = pd(html, '.lazyload&&data-original||data-src||src');
-        VOD.vod_content = pdfh(html, '.sqjj_a--span&&Text');
-        VOD.vod_remarks = pdfh(html, '.video-info-items:eq(3)&&Text');
-        VOD.vod_year = pdfh(html, '.tag-link:eq(2)&&Text');
-        VOD.vod_area = pdfh(html, '.tag-link:eq(3)&&Text');
-        VOD.vod_actor = pdfh(html, '.video-info-actor:eq(1)&&Text');
-        VOD.vod_director = pdfh(html, '.video-info-actor:eq(0)&&Text');
-        let playform = []
-        let playurls = []
-        let playPans = [];
-        for (const item of $('.module-row-title')) {
-            const a = $(item).find('p:first')[0];
-            let link = a.children[0].data.trim()
-            if (/pan.quark.cn/.test(link)) {
+    let {input} = this;
+    let html = (await getHtml(input)).data;
+    const $ = pq(html);
+
+    let VOD = {};
+    VOD.vod_name = pdfh(html, 'h1&&Text') || '未知标题';
+    VOD.type_name = pdfh(html, '.tag-link&&Text') || '未知类型';
+    VOD.vod_pic = pd(html, '.lazyload&&data-original||data-src||src') || '';
+    VOD.vod_content = pdfh(html, '.sqjj_a--span&&Text') || '暂无简介';
+    VOD.vod_remarks = pdfh(html, '.video-info-items:eq(3)&&Text') || '';
+    VOD.vod_year = pdfh(html, '.tag-link:eq(2)&&Text') || '';
+    VOD.vod_area = pdfh(html, '.tag-link:eq(3)&&Text') || '';
+    VOD.vod_actor = pdfh(html, '.video-info-actor:eq(1)&&Text') || '';
+    VOD.vod_director = pdfh(html, '.video-info-actor:eq(0)&&Text') || '';
+
+    let playform = [];
+    let playurls = [];
+    let playPans = [];
+
+    // 检查是否存在有效的模块标题
+    const moduleRowTitles = $('.module-row-title');
+    if (!moduleRowTitles || moduleRowTitles.length === 0) {
+        console.warn('未找到有效的模块标题');
+        VOD.vod_play_from = '';
+        VOD.vod_play_url = '';
+        VOD.vod_play_pan = '';
+        return VOD;
+    }
+
+    for (const item of moduleRowTitles) {
+        const a = $(item).find('p:first')[0];
+        if (!a || !a.children || a.children.length === 0) {
+            console.warn('模块标题中未找到有效链接');
+            continue;
+        }
+        let link = a.children[0].data.trim();
+        if (!link) {
+            console.warn('模块标题中链接为空');
+            continue;
+        }
+
+        if (/pan.quark.cn/.test(link)) {
             playPans.push(link);
-                const shareData = Quark.getShareData(link);
-                if (shareData) {
-                    const videos = await Quark.getFilesByShareUrl(shareData);
-                    if (videos.length > 0) {
-                        playform.push('Quark-' + shareData.shareId);
-                        playurls.push(videos.map((v) => {
-                            const list = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle ? v.subtitle.fid : '', v.subtitle ? v.subtitle.share_fid_token : ''];
-                            return v.file_name + '$' + list.join('*');
-                        }).join('#'))
-                    } else {
-                        playform.push('Quark-' + shareData.shareId);
-                        playurls.push("资源已经失效，请访问其他资源")
-                    }
-                }
-            } 
-             if (/drive.uc.cn/.test(link)) {
-             playPans.push(link);
-                const shareData = UC.getShareData(link);
-                if (shareData) {
-                    const videos = await UC.getFilesByShareUrl(shareData);
-                    if (videos.length > 0) {
-                        playform.push('UC-' + shareData.shareId);
-                        playurls.push(videos.map((v) => {
-                            const list = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle ? v.subtitle.fid : '', v.subtitle ? v.subtitle.share_fid_token : ''];
-                            return v.file_name + '$' + list.join('*');
-                        }).join('#'))
-                    } else {
-                        playform.push('UC-' + shareData.shareId);
-                        playurls.push("资源已经失效，请访问其他资源")
-                    }
+            const shareData = Quark.getShareData(link);
+            if (shareData) {
+                const videos = await Quark.getFilesByShareUrl(shareData);
+                if (videos.length > 0) {
+                    playform.push('Quark-' + shareData.shareId);
+                    playurls.push(videos.map((v) => {
+                        const list = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle ? v.subtitle.fid : '', v.subtitle ? v.subtitle.share_fid_token : ''];
+                        return v.file_name + '$' + list.join('*');
+                    }).join('#'));
+                } else {
+                    playform.push('Quark-' + shareData.shareId);
+                    playurls.push("资源已经失效，请访问其他资源");
                 }
             }
-            if (/www.alipan.com/.test(link)) {
+        }
+
+        if (/drive.uc.cn/.test(link)) {
+            playPans.push(link);
+            const shareData = UC.getShareData(link);
+            if (shareData) {
+                const videos = await UC.getFilesByShareUrl(shareData);
+                if (videos.length > 0) {
+                    playform.push('UC-' + shareData.shareId);
+                    playurls.push(videos.map((v) => {
+                        const list = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle ? v.subtitle.fid : '', v.subtitle ? v.subtitle.share_fid_token : ''];
+                        return v.file_name + '$' + list.join('*');
+                    }).join('#'));
+                } else {
+                    playform.push('UC-' + shareData.shareId);
+                    playurls.push("资源已经失效，请访问其他资源");
+                }
+            }
+        }
+
+        if (/www.alipan.com/.test(link)) {
             playPans.push(link);
             const shareData = Ali.getShareData(link);
             if (shareData) {
@@ -142,38 +157,55 @@ var rule = {
                 if (videos.length > 0) {
                     playform.push('Ali-' + shareData.shareId);
                     playurls.push(videos.map((v) => {
-                        const ids = [v.share_id, v.file_id, v.subtitle? v.subtitle.file_id : ''];
+                        const ids = [v.share_id, v.file_id, v.subtitle ? v.subtitle.file_id : ''];
                         return formatPlayUrl('', v.name) + '$' + ids.join('*');
-                    }).join('#'))
+                    }).join('#'));
                 } else {
                     playform.push('Ali-' + shareData.shareId);
-                    playurls.push("资源已经失效，请访问其他资源")
+                    playurls.push("资源已经失效，请访问其他资源");
                 }
             }
         }
+    }
+
+    // 去除后缀
+    let processedArray = playform.map(str => {
+        if (str) {
+            return str.replace(/-[\w]+$/, "").replace(/UC/, "优汐").replace(/Quark/, "夸克").replace(/Ali/, "阿里");
         }
-        // 去除后缀
-    let processedArray = playform.map(str => str.replace(/-[\w]+$/, "").replace(/UC/, "优汐").replace(/Quark/, "夸克").replace(/Ali/, "阿里"));
+        return str;
+    });
 
     // 处理重复元素
     let uniqueArray = [];
     let count = {};
     processedArray.forEach((item) => {
-        if (!count[item]) {
+        if (item && !count[item]) {
             count[item] = 1;
             uniqueArray.push(item + '#' + count[item]);
-        } else {
+        } else if (item) {
             count[item]++;
             uniqueArray.push(item + '#' + count[item]);
         }
     });
 
+    // 确保优汐排在前面
+    uniqueArray.sort((a, b) => {
+        const aIsYouXi = a.startsWith("优汐");
+        const bIsYouXi = b.startsWith("优汐");
+        if (aIsYouXi && !bIsYouXi) return -1;
+        if (!aIsYouXi && bIsYouXi) return 1;
+        return 0;
+    });
+
     // 连接成字符串
     VOD.vod_play_from = uniqueArray.join("$$$");
     VOD.vod_play_url = playurls.join("$$$");
-    VOD.vod_play_pan = playPans.join("$$$")
-    return VOD
-    },
+    VOD.vod_play_pan = playPans.join("$$$");
+
+    return VOD;
+},
+
 
 搜索: async function (wd, quick, pg) {
         let {input, pdfa, pdfh, pd} = this;
