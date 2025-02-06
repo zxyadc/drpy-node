@@ -30,7 +30,8 @@ const imgUrl = function (pic) {
 var rule = {
     类型: '听书',//影视|听书|漫画|小说
     title: '老白故事[听]',
-    host: 'https://lags.oss-cn-hangzhou.aliyuncs.com/',
+    // host: 'https://lags.oss-cn-hangzhou.aliyuncs.com/',
+    host: 'https://lbgs-1306000603.cos.ap-nanjing.myqcloud.com/',
     url: '',
     searchUrl: '#fypage',
     searchable: 2,
