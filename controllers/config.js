@@ -263,7 +263,7 @@ async function generateSiteJSON(options, requestHost, sub, pwd) {
 async function generateParseJSON(jxDir, requestHost) {
     const files = readdirSync(jxDir);
     const jx_files = files.filter((file) => file.endsWith('.js') && !file.startsWith('_')) // 筛选出不是 "_" 开头的 .js 文件
-    const jx_dict = getParsesDict();
+    const jx_dict = getParsesDict(requestHost);
     let parses = [];
     const tasks = jx_files.map((file) => {
         return {

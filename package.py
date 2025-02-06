@@ -7,7 +7,7 @@ import re
 EXCLUDE_DIRS = ['.git', '.idea', 'soft', 'pyTools', 'drop_code', 'jstest', 'local', 'logs', '对话1.txt','vod_cache']
 
 # 要排除的文件列表
-EXCLUDE_FILES = ['config/env.json', '.env','js/UC分享.js','js/百忙无果[官].js','json/UC分享.json','jx/奇奇.js','data/settings/link_data.json','index.json','custom.json']
+EXCLUDE_FILES = ['config/env.json', '.env','js/UC分享.js','js/百忙无果[官].js','json/UC分享.json','jx/奇奇.js','jx/芒果关姐.js','data/settings/link_data.json','index.json','custom.json']
 
 def get_script_dir():
     """

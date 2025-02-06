@@ -183,8 +183,8 @@ var rule = {
     aliScanCheck: null,
     biliScanCheck: null,
     host: 'http://empty',
-    class_name: '推送&夸克&UC&阿里&天翼&哔哩&系统配置&测试&接口挂载',
-    class_url: 'push&quark&uc&ali&cloud&bili&system&test&apiLink',
+    class_name: '推送&夸克&UC&阿里&天翼&哔哩&系统配置&测试&接口挂载&视频解析',
+    class_url: 'push&quark&uc&ali&cloud&bili&system&test&apiLink&videoParse',
     url: '/fyclass',
 
     预处理: async function (env) {
@@ -356,6 +356,10 @@ var rule = {
                 d.push(genMultiInput('enable_link_jar', '设置允许挂载Jar', '设置为1可以启用。默认即关闭。设置其他值禁用', images.settings));
                 d.push(getInput('get_enable_link_jar', '查看允许挂载Jar', images.settings));
 
+                break;
+            case 'videoParse':
+                d.push(genMultiInput('mg_hz', '设置芒果解析画质', '默认为4，可自行配置成其他值 (视频质量，9=4K, 4=1080p, 3=720p, 2=560p)', images.settings));
+                d.push(getInput('get_mg_hz', '查看芒果解析画质', images.settings));
                 break;
         }
         return d
@@ -1002,6 +1006,7 @@ var rule = {
             'enable_link_data',
             'enable_link_push',
             'enable_link_jar',
+            'mg_hz',
         ];
         let get_cookie_sets = [
             'get_quark_cookie',
@@ -1027,6 +1032,7 @@ var rule = {
             'get_enable_link_data',
             'get_enable_link_push',
             'get_enable_link_jar',
+            'get_mg_hz',
         ];
         if (cookie_sets.includes(action) && value) {
             try {

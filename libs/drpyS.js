@@ -1329,7 +1329,9 @@ export async function jx(filePath, env, params) {
     try {
         const jxObj = await initJx(filePath, env); // 确保模块已初始化
         const lazy = await jxObj.lazy;
-        return await lazy(params.url || '', params)
+        const result =  await lazy(params.url || '', params);
+        // log(`[jx]: ${JSON.stringify(result)}`);
+        return result;
     } catch (e) {
         return {code: 404, url: '', msg: `${filePath} 代理解析错误:${e.message}`, cost: ''}
     }
