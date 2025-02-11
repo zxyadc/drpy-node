@@ -27,6 +27,7 @@ import {gbkTool} from '../libs_drpy/gbk.js'
 import {base64Decode, base64Encode, md5, rc4, rc4_decode, rc4Decrypt, rc4Encrypt} from "../libs_drpy/crypto-util.js";
 import {getContentType, getMimeType} from "../utils/mime-type.js";
 import {getParsesDict} from "../utils/file.js";
+import {getFirstLetter} from "../utils/pinyin-tool.js";
 import "../utils/random-http-ua.js";
 import template from '../libs_drpy/template.js'
 import batchExecute from '../libs_drpy/batchExecute.js';
@@ -152,7 +153,6 @@ try {
 
 let simplecc = null;
 try {
-    // 尝试动态导入模块puppeteerHelper
     const simWasm = await import('simplecc-wasm');  // 使用动态 import
     simplecc = simWasm.simplecc;
     console.log('simplecc imported successfully');
@@ -184,7 +184,7 @@ export async function getSandbox(env = {}) {
         getProxyUrl,
         hostUrl,
         fServer,
-        getContentType, getMimeType, getParsesDict
+        getContentType, getMimeType, getParsesDict, getFirstLetter
     };
     const drpySanbox = {
         jsp,
@@ -612,14 +612,14 @@ async function invokeWithInjectVars(rule, method, injectVars, args) {
             result = await homeParseAfter(result, rule.类型, rule.hikerListCol, rule.hikerClassListCol, injectVars);
             break;
         case '一级':
-            result = await cateParseAfter(result, args[1]);
+            result = await cateParseAfter(rule, result, args[1]);
             console.log(`一级 ${injectVars.input} 执行完毕,结果为:`, JSON.stringify(result.list.slice(0, 2)));
             break;
         case '二级':
             result = await detailParseAfter(result);
             break;
         case '搜索':
-            result = await searchParseAfter(result, args[2]);
+            result = await searchParseAfter(rule, result, args[2]);
             console.log(`搜索 ${injectVars.input} 执行完毕,结果为:`, JSON.stringify(result.list.slice(0, 2)));
             break;
         case 'lazy':
@@ -1037,12 +1037,12 @@ async function cateParse(rule, tid, pg, filter, extend) {
     }
 }
 
-async function cateParseAfter(d, pg) {
+async function cateParseAfter(rule, d, pg) {
     return d.length < 1 ? nodata : {
         'page': parseInt(pg),
-        'pagecount': 999,
-        'limit': 20,
-        'total': 999,
+        'pagecount': 9999,
+        'limit': Number(rule.limit) || 20,
+        'total': 999999,
         'list': d,
     }
 }
@@ -1148,12 +1148,12 @@ async function searchParse(rule, wd, quick, pg) {
 
 }
 
-async function searchParseAfter(d, pg) {
+async function searchParseAfter(rule, d, pg) {
     return {
         'page': parseInt(pg),
-        'pagecount': 10,
-        'limit': 20,
-        'total': 100,
+        'pagecount': 9999,
+        'limit': Number(rule.limit) || 20,
+        'total': 999999,
         'list': d,
     }
 }
@@ -1329,7 +1329,7 @@ export async function jx(filePath, env, params) {
     try {
         const jxObj = await initJx(filePath, env); // 确保模块已初始化
         const lazy = await jxObj.lazy;
-        const result =  await lazy(params.url || '', params);
+        const result = await lazy(params.url || '', params);
         // log(`[jx]: ${JSON.stringify(result)}`);
         return result;
     } catch (e) {

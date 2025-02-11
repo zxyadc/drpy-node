@@ -1,6 +1,6 @@
 {
   "name": "drpy-node",
-  "version": "1.1.16",
+  "version": "1.1.18",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -38,6 +38,7 @@
     "mime-types": "^2.1.35",
     "minizlib": "^3.0.1",
     "p-queue": "^8.0.1",
+    "pinyin": "2.10.2",
     "qs": "^6.13.1",
     "queue": "^7.0.0",
     "rotating-file-stream": "^3.2.5",
