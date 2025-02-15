@@ -40,7 +40,7 @@
 6. 修复移动盘播放问题
 7. 不夜的推送不讲规矩，只支持get不支持post，需要壳适配。一级不讲规则，ac只能detail才有数据，list/videolist不行
 8. 统一挨着修改网盘源，增加二级数据返回 vod_play_pan，按$$$分割的原始网盘链接，包括push也有效，方便海阔本地小程序播放
-9. 增加 [源动力](https://www.sourcepower.top/source) 官方出品的`短剧库.js`
+9. 增加 [源动力](https://sourcepower.top/source) 官方出品的`短剧库.js`
 10. 设置中心推送视频去掉编码，交给壳子处理，防止双层编码导致的问题
 
 ### 20250121
@@ -49,7 +49,7 @@
 
 1. 猫源ds在线配置支持接口密码
 2. 修复移动网盘工具类(移动1可以，2和3还是不行)
-3. 新增 [源动力](https://www.sourcepower.top/source) 官方出品的两个源 `麦田影院.js` `凡客TV.js`
+3. 新增 [源动力](https://sourcepower.top/source) 官方出品的两个源 `麦田影院.js` `凡客TV.js`
 4. 设置中心增加接口挂载功能，可以挂载hipy-t4和不夜t4(box在线配置)
 5. 多线程播放加速新增 磁盘加速模式
 
