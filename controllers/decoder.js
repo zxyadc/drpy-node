@@ -1,6 +1,17 @@
 import {getOriginalJs, jsDecoder} from '../libs/drpyS.js';
-import {readFileSync, existsSync} from 'fs';
+import {readFileSync, writeFileSync, existsSync} from 'fs';
 import path from "path";
+
+// 检测命令行参数
+const args = process.argv.slice(2);
+
+if (args.length > 0) {
+    // 如果有参数，读取文件并打印内容
+    const filePath = args[0]; // 第一个参数作为文件路径
+    let content = readFileSync(filePath, 'utf8');
+    console.log(`文件 ${filePath} 的内容长度为:${content.length}`);
+    writeFileSync(filePath.replace(/\.gz$/, '.ugz'), jsDecoder.ungzip(content), 'utf-8');
+}
 
 // 仅仅支持json post 如: {"code":"xxx"}
 export default (fastify, options, done) => {

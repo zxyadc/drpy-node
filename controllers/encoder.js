@@ -1,4 +1,16 @@
 import {jsEncoder} from '../libs/drpyS.js';
+import {readFileSync, writeFileSync} from 'fs';
+
+// 检测命令行参数
+const args = process.argv.slice(2);
+
+if (args.length > 0) {
+    // 如果有参数，读取文件并打印内容
+    const filePath = args[0]; // 第一个参数作为文件路径
+    let content = readFileSync(filePath, 'utf8');
+    console.log(`文件 ${filePath} 的内容长度为:${content.length}`);
+    writeFileSync(filePath + '.gz', jsEncoder.gzip(content), 'utf-8');
+}
 
 // 仅仅支持json post 如: {"type":"gzip","code":"xxx"}
 export default (fastify, options, done) => {

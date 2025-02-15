@@ -12,7 +12,7 @@ const {fastify} = fastlogger;
 // 获取当前路径
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = 5757;
-const MAX_TEXT_SIZE = 100 * 1024; // 设置最大文本大小为 100 KB
+const MAX_TEXT_SIZE = 0.1 * 1024 * 1024; // 设置最大文本大小为 0.1 MB
 
 // 静态资源
 fastify.register(fastifyStatic, {
