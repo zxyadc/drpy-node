@@ -483,7 +483,7 @@ function customSort(a, b) {
 function shouldExclude(site) {
     const excludeKeywords = ['短剧库','PTT', '密', '莫离', 
     '金牌', '📺', '虎牙直播[官](DR)', '擦', '皮皮',
-  '豆瓣', 'ACG', 'Omo', 'NO', '好乐','非凡','文采','人人','4K-A',
+  '豆瓣', 'ACG', 'Omo', 'NO', '好乐','非凡','文采','人人','4K-A','苹果','耐看',
   '木偶','多多','虎斑','低端','欧哥',
      '玩偶',
   '团长', '奥秘'
