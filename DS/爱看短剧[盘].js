@@ -128,7 +128,7 @@ var rule = {
                 title: it.name,
                 year: it.addtime,
                 desc: '更新时间' + it.addtime,
-                img: 'https://mpimg.cn/view.php/65d81bbeebef411dfeb11b63b662cec2.png',
+                img: 'https://mpimg.cn/view.php/e076264131dd42303d4fa35938c2a62c.png',
             });
         });
 
