@@ -44,35 +44,28 @@ var index_config_default = {
     categories: ["国产剧", "香港剧", "韩国剧", "欧美剧", "台湾剧", "日本剧", "海外剧", "泰国剧", "短剧", "动作片", "喜剧片", "爱情片", "科幻片", "恐怖片", "剧情片", "战争片", "动漫片", "大陆综艺", "港台综艺", "日韩综艺", "欧美综艺", "国产动漫", "日韩动漫", "欧美动漫", "港台动漫", "海外动漫", "记录片"]
   },
   alist: [
+
+
     {
-      "name": "丫仙女",
-      "server": "http://localhost:5244",
-      "startPage": "/",
-      "showAll": false,
-      "search": true,
-      "login": {
-        "username": "admin",
-        "password": "admin",
-        "otp_code": ""
-      },
-      "params": {
-        "/abc": {
-          "password": "123"
-        },
-        "/abc/abc": {
-          "password": "123"
-        }
-      }
+      "name": "🟢 小丫",
+      "server": "http://alist.xiaoya.pro/"
+    },
+
+    {
+      "name": "🟢 多多",
+      "server": "https://pan.xwbeta.com"
     },
     {
-      name: "🐉神族九帝",
-      server: "https://alist.shenzjd.com"
+      "name": "🟢 七米",
+      "server": "https://al.chirmyram.com"
     },
     {
-      name: "💢repl",
-      server: "https://ali.liucn.repl.co"
+      "name": "🟢 星梦",
+      "server": "https://pan.bashroot.top"
     }
+    
   ],
+ 
   color: [
     {
       light: {

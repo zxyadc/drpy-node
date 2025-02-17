@@ -14,7 +14,7 @@ export function getQueryObj(query) {
 
 export function getSitesMap(configDir) {
     let SitesMap = {};
-    let SitesMapPath = path.join(configDir, './map.txt');
+    let SitesMapPath = path.join(configDir, './传参.txt');
     if (existsSync(SitesMapPath)) {
         try {
             let SitesMapText = readFileSync(SitesMapPath, 'utf-8');

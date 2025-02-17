@@ -1,0 +1,18 @@
+{
+    "live_urls": [
+        "https://www.freetv.top/migu.m3u",
+        "https://mpimg.cn/down.php/fd1375d29cb8d65325ec2fb948f84d30.txt",
+        "http://rihou.cc:567/cctvgg",
+        "http://yyrj.fun/tv",
+        "https://mirror.ghproxy.com/https://raw.githubusercontent.com/YueChan/Live/main/Radio.m3u"
+    ],
+    "epg_url": "https://epg.mxdyeah.top/api/diyp/?ch={name}&date={date}",
+    "logo_url": "https://live.mxdyeah.top/logo/{name}.png",
+    "names": [
+        "咪咕M3U",
+        "直播",
+        "分享",
+        "玉玉",
+        "广播"
+    ]
+}

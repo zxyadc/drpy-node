@@ -1,0 +1,17 @@
+[
+    {
+        "name": "📱短剧库1",
+        "server": "https://duanjuzy.com/",
+        "startPage": "/",
+        "showAll": false,
+        "search": true,
+        "params": {
+            "/abc": {
+                "password": "123"
+            },
+            "/abc/abc": {
+                "password": "123"
+            }
+        }
+    }
+]
