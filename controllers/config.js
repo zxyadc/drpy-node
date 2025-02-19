@@ -141,7 +141,7 @@ async function generateSiteJSON(options, requestHost, sub, pwd) {
             return {
                 func: async ({file, dr2Dir, requestHost, pwd, drpy, SitesMap}) => {
                     const baseName = path.basename(file, '.js'); // 去掉文件扩展名
-                    let api = `assets://js/lib/drpy2.js`;  // 使用内置drpy2
+                    let api = `https://gitee.com/zhxyad/YsBox/raw/master/drpy_libs/drpy2.min.js`;  // 使用内置drpy2
                     let ext = `${requestHost}/js/${file}`;
                     if (pwd) {
                         ext += `?pwd=${pwd}`;
@@ -244,9 +244,12 @@ async function generateSiteJSON(options, requestHost, sub, pwd) {
         } catch (e) {
         }
     }
+     
 // 读取 custom.json 文件
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const customFilePath = path.join(__dirname, '../config/custom.json');
+
+
 //console.log('customFilePath的结果:', customFilePath);
 // 检查路径是否有效
   const customSites = JSON.parse(readFileSync(customFilePath, 'utf-8'));
@@ -264,6 +267,7 @@ sites.forEach(site => {
   .replace(/(雷鲸小站|资源汇)\[盘\]/g, '$1[天翼]')
   .replace(/(盘它)\[盘\]/g, '$1[移动]')
   .replace(/(AList)\[盘\]/g, '$1[存储]')
+  .replace(/(夸克分享)\[盘\]/g, '$1[分享]')
   .replace(/设置中心/g, '设置[中心]')
   .replace(/动作交互/g, '动作[交互]')
   .replace(/推送/g, '手机[推送]')
@@ -326,6 +330,7 @@ if (newName.includes('[听]')) {
     "[移动]": "🟡",
     "[优汐]": "🔴",
     "[存储]": "🗂️",
+    "[分享]": "🗂️",
     "[盘]": "🔵",
     "[APP]": "🔶",
     "[优]": "❤️",
@@ -482,13 +487,13 @@ function customSort(a, b) {
 
 function shouldExclude(site) {
     const excludeKeywords = ['短剧库','PTT', '密', '莫离', 
-    '金牌', '📺', '虎牙直播[官](DR)', '擦', '皮皮',
+    '金牌', '555', '虎牙直播[官](DR)', '擦', '皮皮',
   '豆瓣', 'ACG', 'Omo', 'NO', '好乐','非凡','文采','人人','4K-A','苹果','耐看',
-  '木偶','多多','虎斑','低端','欧哥',
+  '多多','虎斑','低端','欧哥',
      '玩偶',
   '团长', '奥秘'
     ];
-    //,'虎斑', '六趣'
+    //,'虎斑', '六趣' '木偶',
     // 判断 site.name 是否包含任何一个排除关键词
     return excludeKeywords.some(keyword => site.name.includes(keyword));
 }
