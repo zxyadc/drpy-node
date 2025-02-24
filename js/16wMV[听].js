@@ -61,7 +61,8 @@ var rule = {
         let t2 = (new Date()).getTime();
         log(`读取文件并转json耗时:${t2 - t1}毫秒`);
     },
-    lazy: async function () {
+    lazy: async function (flag, id, flags) {
+        return {parse: 0, url: id}
     },
     proxy_rule: async function (params) {
         let {input, proxyPath, getProxyUrl} = this;

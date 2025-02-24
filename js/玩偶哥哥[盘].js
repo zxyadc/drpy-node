@@ -4,7 +4,8 @@ const {
 } = misc;
 var rule = {
     title: '玩偶哥哥[盘]',
-    host: 'https://www.wogg.net',
+    // host: 'https://www.wogg.net',
+    host: 'https://www.wogg.one/',
     url: '/vodshow/fyclass-fyfilter.html',
     filter_url: '{{fl.area}}-{{fl.by or "time"}}-{{fl.class}}-----fypage---{{fl.year}}',
     searchUrl: '/vodsearch/**--------fypage---.html',
@@ -177,15 +178,22 @@ var rule = {
                 if (down) UCDownloadingCache[ids[1]] = down;
             }
             downUrl = UCDownloadingCache[ids[1]].download_url;
+            const headers = {
+                "Referer": "https://drive.uc.cn/",
+                "cookie": UC.cookie,
+                "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch'
+            };
             urls.push("UC原画", downUrl);
+            urls.push("原代服", mediaProxyUrl + `?thread=${ENV.get('thread') || 6}&form=urlcode&randUa=1&url=` + encodeURIComponent(downUrl) + '&header=' + encodeURIComponent(JSON.stringify(headers)));
+            if (ENV.get('play_local_proxy_type', '1') === '2') {
+                urls.push("原代本", `http://127.0.0.1:7777/?thread=${ENV.get('thread') || 6}&form=urlcode&randUa=1&url=` + encodeURIComponent(downUrl) + '&header=' + encodeURIComponent(JSON.stringify(headers)));
+            } else {
+                urls.push("原代本", `http://127.0.0.1:5575/proxy?thread=${ENV.get('thread') || 6}&chunkSize=256&url=` + encodeURIComponent(downUrl));
+            }
             return {
                 parse: 0,
                 url: urls,
-                header: {
-                    "Referer": "https://drive.uc.cn/",
-                    "cookie": UC.cookie,
-                    "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch'
-                },
+                header: headers,
             }
         }
     },

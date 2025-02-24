@@ -1,6 +1,6 @@
 {
   "name": "drpy-node",
-  "version": "1.1.18",
+  "version": "1.1.19",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -8,6 +8,8 @@
     "dev": "node index.js",
     "dev-win": "chcp 65001 && node --trace-deprecation index.js",
     "pm2": "pm2 start index.js --name drpys",
+    "node22": "node --experimental-sqlite index.js",
+    "node22-win": "chcp 65001 && node --trace-deprecation --experimental-sqlite index.js",
     "package": "python package.py",
     "package-green": "python package.py -g",
     "packageJS": "node package.js",
@@ -45,6 +47,8 @@
     "queue": "^7.0.0",
     "rotating-file-stream": "^3.2.5",
     "simplecc-wasm": "^1.1.0",
+    "sqlite": "4.2.1",
+    "sqlite3": "^5.1.7",
     "sync-fetch": "^0.6.0-2",
     "tunnel": "^0.0.6",
     "ws": "^8.18.0",

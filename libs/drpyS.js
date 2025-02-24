@@ -162,6 +162,19 @@ try {
 }
 globalThis.simplecc = simplecc;
 
+let DataBase = null;
+let database = null;
+try {
+    const sqliteUtil = await import('../utils/database.js');  // 使用动态 import
+    DataBase = sqliteUtil.DataBase;
+    database = sqliteUtil.database;
+    console.log('sqlite3 database imported successfully');
+} catch (error) {
+    console.log(`Failed to import sqlite3:${error.message}`);
+}
+globalThis.DataBase = DataBase;
+globalThis.database = database;
+
 
 export async function getSandbox(env = {}) {
     const {getProxyUrl, hostUrl, fServer} = env;
@@ -299,6 +312,8 @@ export async function getSandbox(env = {}) {
         Ali,
         Cloud,
         Yun,
+        DataBase,
+        database,
         require,
         WebSocket,
         WebSocketServer,

@@ -49,7 +49,7 @@ var index_config_default = {
       "server": "http://localhost:5244",
       "startPage": "/",
       "showAll": false,
-      "search": true,
+      "sort": true,
       "login": {
         "username": "admin",
         "password": "admin",

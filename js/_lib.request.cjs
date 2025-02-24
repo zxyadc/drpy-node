@@ -1,4 +1,4 @@
-const axios = require('axios');
+// const axios = require('axios');
 
 async function getPublicIp1() {
     let ip_obj = JSON.parse((await req('http://httpbin.org/ip')).content);

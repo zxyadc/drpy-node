@@ -11,7 +11,7 @@ class UCHandler {
         this.regex = /https:\/\/drive\.uc\.cn\/s\/([^\\|#/]+)/;
         this.pr = 'pr=UCBrowser&fr=pc';
         this.baseHeader = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) uc-cloud-drive/1.8.5 Chrome/100.0.4896.160 Electron/18.3.5.16-b62cf9c50d Safari/537.36 Channel/ucpan_other_ch',
             Referer: 'https://drive.uc.cn/',
         };
         this.apiUrl = 'https://pc-api.uc.cn/1/clouddrive';
@@ -156,11 +156,11 @@ class UCHandler {
 
 
     async api(url, data, headers, method, retry) {
-        let cookie = this.cookie || '';
         headers = headers || {};
         Object.assign(headers, this.baseHeader);
         Object.assign(headers, {
-            Cookie: cookie,
+            'Content-Type': 'application/json',
+            Cookie: this.cookie || '',
         });
         method = method || 'post';
         const resp =
@@ -176,16 +176,6 @@ class UCHandler {
                 return err.response || {status: 500, data: {}};
             });
         const leftRetry = retry || 3;
-        if (resp.headers['set-cookie']) {
-            const puus = resp.headers['set-cookie'].join(';;;').match(/__puus=([^;]+)/);
-            if (puus) {
-                if (cookie.match(/__puus=([^;]+)/)[1] !== puus[1]) {
-                    cookie = cookie.replace(/__puus=[^;]+/, `__puus=${puus[1]}`);
-                    console.log('[uc] api:更新cookie:', cookie);
-                    ENV.set('uc_cookie', cookie);
-                }
-            }
-        }
         if (resp.status === 429 && leftRetry > 0) {
             await this.delay(1000);
             return await this.api(url, data, headers, method, leftRetry - 1);
@@ -409,7 +399,7 @@ class UCHandler {
 
         }
 
-        const down = await this.api(`file/download?${this.pr}`, {
+        const down = await this.api(`file/download?${this.pr}&sys=win32&ve=1.8.5&ut=Nk3UvPSOMurIrtiKrHXzCmx/iPIGIRI1HG5yX5zQL7ln7A%3D%3D`, {
 
             fids: [this.saveFileIdCaches[fileId]],
 

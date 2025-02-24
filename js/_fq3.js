@@ -4,9 +4,10 @@ const path = require('path');
 const absolutePath = path.resolve('./');
 console.log(absolutePath);
 const data = fs.readFileSync('./js/_360.js', 'utf8');
-console.log(data);
-
+// console.log(data);
+console.log(1111)
 const {getPublicIp1, getPublicIp2} = require('../js/_lib.request.cjs');
+console.log(2222)
 const {XMLHttpRequest} = require("xmlhttprequest");
 console.log('typeof getPublicIp1:', typeof getPublicIp1);
 console.log('typeof getPublicIp2:', typeof getPublicIp2);
@@ -18,6 +19,7 @@ return jsEncoder.gzip(a+'')
 }
 `, 123);
 console.log('a:', a);
+
 
 function test_rc4() {
     /*
@@ -98,6 +100,10 @@ const rule = {
         // log(JSON.parse(a));
         // log(JSON.parse(a).fileListAO.folderList);
         // log(JsonBig.parse(a).fileListAO.folderList);
+        log(DataBase);
+        await database.startDb();
+        // console.log('database:',database);
+        await database.endDb();
     },
     class_parse2: async function () {
         let {proxyUrl, getRule} = this;
