@@ -32,7 +32,7 @@
   {
     "name": "仅网盘",
     "code": "pan",
-    "reg": "\\[[盘]\\]|push_agent|推送",
+    "reg": "\\[[盘]\\]|云盘|设置|阿里|APP|优汐|天翼|移动|存储|push_agent|推送",
     "mode": 0,
     "status": 1
   }

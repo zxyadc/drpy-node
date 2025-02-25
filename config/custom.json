@@ -1,0 +1,12 @@
+[
+    {
+        "key": "drjs_AList",
+        "name": "AList[盘](DR)",
+        "type": 3,
+        "api": "https://cnb.cool/zhyadc/YsBox/-/git/raw/main/drpy_libs/alist.min.js",
+        "searchable": 1,
+        "filterable": 1,
+        "quickSearch": 0,
+        "ext": "https://cnb.cool/zhyadc/YsBox/-/git/raw/main/json/alist.json"
+    }
+]

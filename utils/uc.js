@@ -8,10 +8,11 @@ import {PassThrough} from 'stream';
 
 class UCHandler {
     constructor() {
+        this._cookie = this.getCookie(); // 初始化时读取cookie
         this.regex = /https:\/\/drive\.uc\.cn\/s\/([^\\|#/]+)/;
         this.pr = 'pr=UCBrowser&fr=pc';
         this.baseHeader = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) uc-cloud-drive/1.8.5 Chrome/100.0.4896.160 Electron/18.3.5.16-b62cf9c50d Safari/537.36 Channel/ucpan_other_ch',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch',
             Referer: 'https://drive.uc.cn/',
         };
         this.apiUrl = 'https://pc-api.uc.cn/1/clouddrive';
@@ -24,15 +25,121 @@ class UCHandler {
         this.maxCache = 1024 * 1024 * 100;
         this.urlHeadCache = {};
         this.subtitleExts = ['.srt', '.ass', '.scc', '.stl', '.ttml'];
-
     }
 
+    get cookie() {
+        return this._cookie;
+    }
+
+    set cookie(newCookie) {
+        this._cookie = newCookie;
+    }
+
+    getCookie() {
+        const filePath = './config/tokenm.json';
+        try {
+            const data = fs.readFileSync(filePath, 'utf8');
+            const jsonData = JSON.parse(data);
+            if (!jsonData.hasOwnProperty('uc_cookie')) {
+                console.log('tokenm.json中未找到uc_cookie字段');
+                return null;
+            }
+            if (typeof jsonData.uc_cookie !== 'string') {
+                console.log('uc_cookie的数据类型错误，应为字符串');
+                return null;
+            }
+            if (jsonData.uc_cookie === "") {
+                console.log('读取uc_cookie错误，值为空');
+                return null;
+            }
+            return jsonData.uc_cookie;
+        } catch (err) {
+            if (err.code === 'ENOENT') {
+                console.log('文件不存在。返回默认值。');
+                return null;
+            } else if (err instanceof SyntaxError) {
+                console.log('tokenm.json文件格式错误');
+                return null;
+            } else {
+                console.log('获取uc_cookie时出现未知错误:', err.message);
+                return null;
+            }
+        }
+    }
+async refreshUcCookie(from = '') {
+    const nowCookie = this.cookie;
+    const cookieSelfRes = await axios({
+        url: "https://pc-api.uc.cn/1/clouddrive/config?pr=UCBrowser&fr=pc",
+        method: "GET",
+        headers: {
+            "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch',
+            Origin: 'https://drive.uc.cn',
+            Referer: 'https://drive.uc.cn/',
+            Cookie: nowCookie
+        }
+    });
+    const cookieResDataSelf = cookieSelfRes.headers;
+    const resCookie = cookieResDataSelf['set-cookie'];
+    if (!resCookie) {
+        console.log(`${from}自动更新UC cookie: 没返回新的cookie`);
+        return;
+    }
+    const cookieObject = COOKIE.parse(resCookie);
+    if (cookieObject.__puus) {
+        const oldCookie = COOKIE.parse(nowCookie);
+        const newCookie = COOKIE.stringify({
+            __pus: oldCookie.__pus,
+            __puus: cookieObject.__puus,
+        });
+
+        // 更新类的cookie属性
+        this.cookie = newCookie;
+
+        console.log(`${from}自动更新UC cookie: ${newCookie}`);
+        return newCookie;
+    }
+}
+
+async getDownload(shareId, stoken, fileId, fileToken, clean) {
+    if (!this.saveFileIdCaches[fileId]) {
+        const saveFileId = await this.save(shareId, stoken, fileId, fileToken, clean);
+        if (!saveFileId) return null;
+        this.saveFileIdCaches[fileId] = saveFileId;
+    }
+
+    const down = await this.api(`file/download?${this.pr}`, {
+        fids: [this.saveFileIdCaches[fileId]],
+    });
+
+    if (down.data) {
+        const low_url = down.data[0].download_url;
+        const low_headers = {
+            "Referer": "https://drive.uc.cn/",
+            "cookie": this.cookie, // 使用最新的cookie
+            "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch'
+        };
+
+        const test_result = await this.testSupport(low_url, low_headers);
+        if (!test_result[0]) {
+            try {
+                await this.refreshUcCookie('getDownload');
+            } catch (e) {
+                console.log(`getDownload:自动刷新UC cookie失败:${e.message}`);
+            }
+        }
+
+        return down.data[0];
+    }
+
+    return null;
+}
+/*
     // 使用 getter 定义动态属性
     get cookie() {
         // console.log('env.cookie.uc:',ENV.get('uc_cookie'));
         return ENV.get('uc_cookie');
     }
-
+*/
     getShareData(url) {
         let matches = this.regex.exec(url);
         if (matches[1].indexOf("?") > 0) {
@@ -159,7 +266,6 @@ class UCHandler {
         headers = headers || {};
         Object.assign(headers, this.baseHeader);
         Object.assign(headers, {
-            'Content-Type': 'application/json',
             Cookie: this.cookie || '',
         });
         method = method || 'post';
@@ -354,83 +460,6 @@ class UCHandler {
         return null;
 
     }
-
-    async refreshUcCookie(from = '') {
-        const nowCookie = this.cookie;
-        const cookieSelfRes = await axios({
-            url: "https://pc-api.uc.cn/1/clouddrive/config?pr=UCBrowser&fr=pc",
-            method: "GET",
-            headers: {
-                "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch',
-                Origin: 'https://drive.uc.cn',
-                Referer: 'https://drive.uc.cn/',
-                Cookie: nowCookie
-            }
-        });
-        const cookieResDataSelf = cookieSelfRes.headers;
-        const resCookie = cookieResDataSelf['set-cookie'];
-        if (!resCookie) {
-            console.log(`${from}自动更新UC cookie: 没返回新的cookie`);
-            return
-        }
-        const cookieObject = COOKIE.parse(resCookie);
-        // console.log(cookieObject);
-        if (cookieObject.__puus) {
-            const oldCookie = COOKIE.parse(nowCookie);
-            const newCookie = COOKIE.stringify({
-                __pus: oldCookie.__pus,
-                __puus: cookieObject.__puus,
-            });
-            console.log(`${from}自动更新UC cookie: ${newCookie}`);
-            ENV.set('uc_cookie', newCookie);
-        }
-    }
-
-
-    async getDownload(shareId, stoken, fileId, fileToken, clean) {
-
-        if (!this.saveFileIdCaches[fileId]) {
-
-            const saveFileId = await this.save(shareId, stoken, fileId, fileToken, clean);
-
-            if (!saveFileId) return null;
-
-            this.saveFileIdCaches[fileId] = saveFileId;
-
-        }
-
-        const down = await this.api(`file/download?${this.pr}&sys=win32&ve=1.8.5&ut=Nk3UvPSOMurIrtiKrHXzCmx/iPIGIRI1HG5yX5zQL7ln7A%3D%3D`, {
-
-            fids: [this.saveFileIdCaches[fileId]],
-
-        });
-
-        if (down.data) {
-            const low_url = down.data[0].download_url;
-            const low_cookie = this.cookie;
-            const low_headers = {
-                "Referer": "https://drive.uc.cn/",
-                "cookie": low_cookie,
-                "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch'
-            };
-            // console.log('low_url:', low_url);
-            const test_result = await this.testSupport(low_url, low_headers);
-            // console.log('test_result:', test_result);
-            if (!test_result[0]) {
-                try {
-                    await this.refreshUcCookie('getDownload');
-                } catch (e) {
-                    console.log(`getDownload:自动刷新UC cookie失败:${e.message}`)
-                }
-            }
-            return down.data[0];
-
-        }
-
-        return null;
-
-    }
-
 
     async testSupport(url, headers) {
 

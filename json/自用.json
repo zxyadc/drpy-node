@@ -1,0 +1,25 @@
+[
+
+{
+    "name": "咪咕M3U",
+    "url": "https://www.freetv.top/migu.m3u",
+    "img": "https://mpimg.cn/view.php/b7e3e1a74bb92c82ce71247fe95e5dbd.jpg"
+  },
+  
+  {
+    "name": "天微",
+    "url": "https://mpimg.cn/down.php/80327eb496e349425e7fbd73ef47fb36.txt",
+    "img": "https://mpimg.cn/view.php/b7e3e1a74bb92c82ce71247fe95e5dbd.jpg"
+  },
+  {
+    "name": "Guovin",
+    "url": "https://cdn.jsdelivr.net/gh/Guovin/iptv-api@gd/output/result.m3u",
+    "img": "https://mpimg.cn/view.php/b7e3e1a74bb92c82ce71247fe95e5dbd.jpg"
+  },
+  {
+    "name": "盒子",
+    "url": "https://pan.losfer.cn/down.php/08dc912d8c87ece4e25022b447d663fb.txt",
+    "img": "https://mpimg.cn/view.php/b7e3e1a74bb92c82ce71247fe95e5dbd.jpg"
+  }
+
+]
