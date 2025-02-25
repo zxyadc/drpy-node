@@ -1,3 +1,4 @@
+
 class QRCodeHandler {
     // 状态常量
     static STATUS_NEW = "NEW";            // 待扫描
@@ -10,6 +11,7 @@ class QRCodeHandler {
     static PLATFORM_QUARK = "quark";      // 夸克
     static PLATFORM_ALI = "ali";          // 阿里云盘
     static PLATFORM_UC = "uc";            // UC
+    static PLATFORM_UC_TOKEN = "uc_token";            // uc_token
     static PLATFORM_BILI = "bili";        // 哔哩哔哩
 
     // 通用请求头
@@ -24,7 +26,21 @@ class QRCodeHandler {
             [QRCodeHandler.PLATFORM_QUARK]: null,
             [QRCodeHandler.PLATFORM_ALI]: null,
             [QRCodeHandler.PLATFORM_UC]: null,
+            [QRCodeHandler.PLATFORM_UC_TOKEN]: null,
             [QRCodeHandler.PLATFORM_BILI]: null
+        };
+        this.Addition = {
+            DeviceID: '07b48aaba8a739356ab8107b5e230ad4',
+            RefreshToken: '',
+            AccessToken: ''
+        }
+        this.conf = {
+            api:      "https://open-api-drive.uc.cn",
+            clientID: "5acf882d27b74502b7040b0c65519aa7",
+            signKey:  "l3srvtd7p42l0d0x1u8d7yc8ye9kki4d",
+            appVer:   "1.6.8",
+            channel:  "UCTVOFFICIALWEB",
+            codeApi:  "http://api.extscreen.com/ucdrive",
         };
     }
 
@@ -107,6 +123,8 @@ class QRCodeHandler {
                 return await this._startAliScan();
             case QRCodeHandler.PLATFORM_UC:
                 return await this._startUCScan();
+            case QRCodeHandler.PLATFORM_UC_TOKEN:
+                return await this._startUC_TOKENScan();
             case QRCodeHandler.PLATFORM_BILI:
                 return await this._startBiliScan();
             default:
@@ -122,6 +140,8 @@ class QRCodeHandler {
                 return await this._checkAliStatus();
             case QRCodeHandler.PLATFORM_UC:
                 return await this._checkUCStatus();
+            case QRCodeHandler.PLATFORM_UC_TOKEN:
+                return await this._checkUC_TOKENStatus();
             case QRCodeHandler.PLATFORM_BILI:
                 return await this._checkBiliStatus();
             default:
@@ -380,14 +400,12 @@ class QRCodeHandler {
             });
             const resData = res.data;
             const token = resData.data.data.members.token;
-
             const qrUrl = `https://su.uc.cn/1_n0ZCv?token=${token}&client_id=381&uc_param_str=&uc_biz_str=S%3Acustom%7CC%3Atitlebar_fix`;
 
             this.platformStates[QRCodeHandler.PLATFORM_UC] = {
                 token: token,
                 request_id: requestId
             };
-
             const qrCode = await this._generateQRCode(qrUrl);
             return {
                 qrcode: qrCode,
@@ -404,8 +422,8 @@ class QRCodeHandler {
         if (!state) {
             return {status: QRCodeHandler.STATUS_EXPIRED};
         }
-
         try {
+
             const res = await axios({
                 url: "/http",
                 method: "POST",
@@ -426,9 +444,12 @@ class QRCodeHandler {
                     }
                 }
             });
+            // this.code = await this.getCode(this.token)
+            // let access_token = await this.refreshToken(this.code);
+            // console.log(access_token)
             const resData = res.data;
-
             if (resData.data.status === 2000000) { // 扫码成功
+
                 const serviceTicket = resData.data.data.members.service_ticket;
                 const cookieRes = await axios({
                     url: "/http",
@@ -478,6 +499,178 @@ class QRCodeHandler {
             }
         } catch (e) {
             this.platformStates[QRCodeHandler.PLATFORM_UC] = null;
+            throw new Error(e.message);
+        }
+    }
+
+    generateDeviceID(timestamp) {
+        return CryptoJS.MD5(timestamp).toString().slice(0, 16); // 取前16位
+    }
+
+    generateReqId(deviceID, timestamp) {
+        return CryptoJS.MD5(deviceID + timestamp).toString().slice(0, 16);
+    }
+
+    generateXPanToken(method, pathname, timestamp, key) {
+        const data = method + '&' + pathname + '&' + timestamp + '&' + key;
+        return CryptoJS.SHA256(data).toString();
+    }
+
+    //uc_token
+    async _startUC_TOKENScan() {
+        try {
+            const pathname = '/oauth/authorize'
+            const timestamp = Math.floor(Date.now() / 1000).toString()+'000'; // 13位时间戳需调整
+            const deviceID = this.Addition.DeviceID || this.generateDeviceID(timestamp);
+            const reqId = this.generateReqId(deviceID, timestamp);
+            const token = this.generateXPanToken('GET', pathname, timestamp, this.conf.signKey);
+            const headers = {
+                Accept: 'application/json, text/plain, */*',
+                'User-Agent': 'Mozilla/5.0 (Linux; U; Android 13; zh-cn; M2004J7AC Build/UKQ1.231108.001) AppleWebKit/533.1 (KHTML, like Gecko) Mobile Safari/533.1',
+                'x-pan-tm': timestamp,
+                'x-pan-token': token,
+                'x-pan-client-id': this.conf.clientID,
+                ...(this.Addition.AccessToken ? { 'Authorization': `Bearer ${this.Addition.AccessToken}` } : {})
+            };
+            const res = await axios({
+                url: "/http",
+                method: "POST",
+                data: {
+                    url: `${this.conf.api}${pathname}`,
+                    headers: headers,
+                    params: {
+                        req_id: reqId,
+                        access_token: this.Addition.AccessToken,
+                        app_ver: this.conf.appVer,
+                        device_id: deviceID,
+                        device_brand: 'Xiaomi',
+                        platform: 'tv',
+                        device_name: 'M2004J7AC',
+                        device_model: 'M2004J7AC',
+                        build_device: 'M2004J7AC',
+                        build_product: 'M2004J7AC',
+                        device_gpu: 'Adreno (TM) 550',
+                        activity_rect: '{}',
+                        channel: this.conf.channel,
+                        auth_type : 'code',
+                        client_id : this.conf.clientID,
+                        scope : 'netdisk',
+                        qrcode : '1',
+                        qr_width : '460',
+                        qr_height : '460',
+                    },
+                }
+            });
+            const resData = res.data;
+            this.query_token = resData.data.query_token;
+            const qrCode = resData.data.qr_data;
+            this.platformStates[QRCodeHandler.PLATFORM_UC_TOKEN] = {
+                query_token: this.query_token,
+                request_id: reqId
+            };
+            return {
+                qrcode: 'data:image/png;base64,'+qrCode,
+                status: QRCodeHandler.STATUS_NEW
+            };
+        } catch (e) {
+            this.platformStates[QRCodeHandler.PLATFORM_UC_TOKEN] = null;
+            throw e;
+        }
+    }
+
+    async _checkUC_TOKENStatus() {
+        const state = this.platformStates[QRCodeHandler.PLATFORM_UC_TOKEN];
+        if (!state) {
+            return {status: QRCodeHandler.STATUS_EXPIRED};
+        }
+        const pathname = '/oauth/code';
+        const timestamp = Math.floor(Date.now() / 1000).toString()+'000'; // 13位时间戳需调整
+        const deviceID = this.Addition.DeviceID || this.generateDeviceID(timestamp);
+        const reqId = this.generateReqId(deviceID, timestamp);
+        const x_pan_token = this.generateXPanToken("GET", pathname, timestamp, this.conf.signKey);
+        const headers = {
+            Accept: 'application/json, text/plain, */*',
+            'User-Agent': 'Mozilla/5.0 (Linux; U; Android 13; zh-cn; M2004J7AC Build/UKQ1.231108.001) AppleWebKit/533.1 (KHTML, like Gecko) Mobile Safari/533.1',
+            'x-pan-tm': timestamp,
+            'x-pan-token': x_pan_token,
+            'x-pan-client-id': this.conf.clientID,
+            ...(this.Addition.AccessToken ? { 'Authorization': `Bearer ${this.Addition.AccessToken}` } : {})
+        };
+        try {
+            const res = await axios({
+                url: "/http",
+                method: "POST",
+                data: {
+                    url: `${this.conf.api}${pathname}`,
+                    headers: headers,
+                    params: {
+                        req_id: reqId,
+                        access_token: this.Addition.AccessToken,
+                        app_ver: this.conf.appVer,
+                        device_id: deviceID,
+                        device_brand: 'Xiaomi',
+                        platform: 'tv',
+                        device_name: 'M2004J7AC',
+                        device_model: 'M2004J7AC',
+                        build_device: 'M2004J7AC',
+                        build_product: 'M2004J7AC',
+                        device_gpu: 'Adreno (TM) 550',
+                        activity_rect: '{}',
+                        channel: this.conf.channel,
+                        client_id: this.conf.clientID,
+                        scope: 'netdisk',
+                        query_token: this.query_token
+                    }
+                }
+            }).catch(err => err.response);
+            const resData = res.data;
+            if (resData.status === 200) { // 扫码成功
+                const pathname = '/token';
+                const timestamp = Math.floor(Date.now() / 1000).toString()+'000';
+                const reqId = this.generateReqId(this.Addition.DeviceID, timestamp);
+                const data = JSON.stringify({
+                    req_id: reqId,
+                    app_ver: this.conf.appVer,
+                    device_id: this.Addition.DeviceID,
+                    device_brand: 'Xiaomi',
+                    platform: 'tv',
+                    device_name: 'M2004J7AC',
+                    device_model: 'M2004J7AC',
+                    build_device: 'M2004J7AC',
+                    build_product: 'M2004J7AC',
+                    device_gpu: 'Adreno (TM) 550',
+                    activity_rect: '{}',
+                    channel: this.conf.channel,
+                    code:resData.data.code
+                });
+                const response = await axios({
+                    url: '/http',
+                    method: "POST",
+                    data:{
+                        url:`${this.conf.codeApi}${pathname}`,
+                        method: "POST",
+                        headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
+                        'Accept': 'application/json, text/plain, */*',
+                        'Content-Type': 'application/json',
+                        },
+                        data:data
+                    }
+                });
+                const resp = response.data;
+                if(resp.status === 200) {
+                    this.platformStates[QRCodeHandler.PLATFORM_UC_TOKEN] = null;
+                    return {
+                        status: QRCodeHandler.STATUS_CONFIRMED,
+                        cookie: resp.data.data.access_token
+                    };
+                }
+
+            } else if (resData.status === 400){
+                return {status: QRCodeHandler.STATUS_NEW};
+            }
+        } catch (e) {
+            this.platformStates[QRCodeHandler.PLATFORM_UC_TOKEN] = null;
             throw new Error(e.message);
         }
     }

@@ -24,6 +24,19 @@ class UCHandler {
         this.maxCache = 1024 * 1024 * 100;
         this.urlHeadCache = {};
         this.subtitleExts = ['.srt', '.ass', '.scc', '.stl', '.ttml'];
+        this.Addition = {
+            DeviceID: '07b48aaba8a739356ab8107b5e230ad4',
+            RefreshToken: '',
+            AccessToken: ''
+        }
+        this.conf = {
+            api: "https://open-api-drive.uc.cn",
+            clientID: "5acf882d27b74502b7040b0c65519aa7",
+            signKey: "l3srvtd7p42l0d0x1u8d7yc8ye9kki4d",
+            appVer: "1.6.8",
+            channel: "UCTVOFFICIALWEB",
+            codeApi: "http://api.extscreen.com/ucdrive",
+        };
 
     }
 
@@ -31,6 +44,10 @@ class UCHandler {
     get cookie() {
         // console.log('env.cookie.uc:',ENV.get('uc_cookie'));
         return ENV.get('uc_cookie');
+    }
+
+    get token() {
+        return ENV.get('uc_token_cookie');
     }
 
     getShareData(url) {
@@ -386,6 +403,19 @@ class UCHandler {
         }
     }
 
+    generateDeviceID(timestamp) {
+        return CryptoJS.MD5(timestamp).toString().slice(0, 16); // 取前16位
+    }
+
+    generateReqId(deviceID, timestamp) {
+        return CryptoJS.MD5(deviceID + timestamp).toString().slice(0, 16);
+    }
+
+    generateXPanToken(method, pathname, timestamp, key) {
+        const data = method + '&' + pathname + '&' + timestamp + '&' + key;
+        return CryptoJS.SHA256(data).toString();
+    }
+
 
     async getDownload(shareId, stoken, fileId, fileToken, clean) {
 
@@ -398,36 +428,123 @@ class UCHandler {
             this.saveFileIdCaches[fileId] = saveFileId;
 
         }
-
-        const down = await this.api(`file/download?${this.pr}&sys=win32&ve=1.8.5&ut=Nk3UvPSOMurIrtiKrHXzCmx/iPIGIRI1HG5yX5zQL7ln7A%3D%3D`, {
-
-            fids: [this.saveFileIdCaches[fileId]],
-
-        });
-
-        if (down.data) {
-            const low_url = down.data[0].download_url;
-            const low_cookie = this.cookie;
-            const low_headers = {
-                "Referer": "https://drive.uc.cn/",
-                "cookie": low_cookie,
-                "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch'
-            };
-            // console.log('low_url:', low_url);
-            const test_result = await this.testSupport(low_url, low_headers);
-            // console.log('test_result:', test_result);
-            if (!test_result[0]) {
-                try {
-                    await this.refreshUcCookie('getDownload');
-                } catch (e) {
-                    console.log(`getDownload:自动刷新UC cookie失败:${e.message}`)
+        if (this.token) {
+            let video = []
+            const pathname = '/file';
+            const timestamp = Math.floor(Date.now() / 1000).toString() + '000'; // 13位时间戳需调整
+            const deviceID = this.Addition.DeviceID || this.generateDeviceID(timestamp);
+            const reqId = this.generateReqId(deviceID, timestamp);
+            const x_pan_token = this.generateXPanToken("GET", pathname, timestamp, this.conf.signKey);
+            let config = {
+                method: 'GET',
+                url: `https://open-api-drive.uc.cn/file`,
+                params: {
+                    req_id: reqId,
+                    access_token: this.token,
+                    app_ver: this.conf.appVer,
+                    device_id: deviceID,
+                    device_brand: 'Xiaomi',
+                    platform: 'tv',
+                    device_name: 'M2004J7AC',
+                    device_model: 'M2004J7AC',
+                    build_device: 'M2004J7AC',
+                    build_product: 'M2004J7AC',
+                    device_gpu: 'Adreno (TM) 550',
+                    activity_rect: '{}',
+                    channel: this.conf.channel,
+                    method: "streaming",
+                    group_by: "source",
+                    fid: this.saveFileIdCaches[fileId],
+                    resolution: "low,normal,high,super,2k,4k",
+                    support: "dolby_vision"
+                },
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Linux; U; Android 9; zh-cn; RMX1931 Build/PQ3A.190605.05081124) AppleWebKit/533.1 (KHTML, like Gecko) Mobile Safari/533.1',
+                    'Connection': 'Keep-Alive',
+                    'Accept-Encoding': 'gzip',
+                    'x-pan-tm': timestamp,
+                    'x-pan-token': x_pan_token,
+                    'content-type': 'text/plain;charset=UTF-8',
+                    'x-pan-client-id': this.conf.clientID
                 }
             }
-            return down.data[0];
+            let req = await axios.request(config);
+            if (req.status === 200) {
+                let videoInfo = req.data.data.video_info
+                videoInfo.forEach((item) => {
+                    video.push({
+                        name: item.resolution,
+                        url: item.url
+                    })
+                })
+                return video;
+            }
+        } else {
+            const down = await this.api(`file/download?${this.pr}`, {
+
+                fids: [this.saveFileIdCaches[fileId]],
+
+            });
+
+            if (down.data) {
+                const low_url = down.data[0].download_url;
+                const low_cookie = this.cookie;
+                const low_headers = {
+                    "Referer": "https://drive.uc.cn/",
+                    "cookie": low_cookie,
+                    "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch'
+                };
+                // console.log('low_url:', low_url);
+                const test_result = await this.testSupport(low_url, low_headers);
+                // console.log('test_result:', test_result);
+                if (!test_result[0]) {
+                    try {
+                        await this.refreshUcCookie('getDownload');
+                    } catch (e) {
+                        console.log(`getDownload:自动刷新UC cookie失败:${e.message}`)
+                    }
+                }
+                return down.data[0];
+            }
+
 
         }
 
         return null;
+
+    }
+
+    async getLazyResult(downCache, mediaProxyUrl) {
+        const urls = [];
+
+        downCache.forEach((it) => {
+            urls.push(it.name, it.url);
+        });
+
+        return {parse: 0, url: urls}
+
+        /*
+        // 旧的加速写法
+        const downUrl = downCache.download_url;
+        const headers = {
+            "Referer": "https://drive.uc.cn/",
+            "cookie": this.cookie,
+            "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch'
+        };
+        urls.push("UC原画", downUrl);
+        urls.push("原代服", mediaProxyUrl + `?thread=${ENV.get('thread') || 6}&form=urlcode&randUa=1&url=` + encodeURIComponent(downUrl) + '&header=' + encodeURIComponent(JSON.stringify(headers)));
+        if (ENV.get('play_local_proxy_type', '1') === '2') {
+            urls.push("原代本", `http://127.0.0.1:7777/?thread=${ENV.get('thread') || 6}&form=urlcode&randUa=1&url=` + encodeURIComponent(downUrl) + '&header=' + encodeURIComponent(JSON.stringify(headers)));
+        } else {
+            urls.push("原代本", `http://127.0.0.1:5575/proxy?thread=${ENV.get('thread') || 6}&chunkSize=256&url=` + encodeURIComponent(downUrl));
+        }
+
+        return {
+            parse: 0,
+            url: urls,
+            header: headers,
+        }
+        */
 
     }
 

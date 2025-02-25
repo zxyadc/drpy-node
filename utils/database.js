@@ -1,66 +1,25 @@
-import sqlite3 from 'sqlite3'
-import {open} from 'sqlite'
+// 1️⃣ 导入时用别名重命名原模块的 Database
+import pkg from 'node-sqlite3-wasm';
+
+const {Database: SQLite3Database} = pkg; // 👈 关键别名
 import {fileURLToPath} from "url";
 import path from 'path';
 
-async function main() {
-    // 打开数据库（若不存在则创建）
-    const db = await open({
-        filename: '../database.db',
-        driver: sqlite3.Database
-    });
-
-    // 创建表
-    await db.run(`
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL
-    )
-  `);
-
-    // 插入数据
-    await db.run('INSERT INTO users (name) VALUES (?)', ['Alice']);
-    await db.run('INSERT INTO users (name) VALUES (?)', ['Bob']);
-
-    // 查询数据
-    const users = await db.all('SELECT * FROM users');
-    console.log(users);
-
-    // 更新数据
-    await db.run('UPDATE users SET name = ? WHERE id = ?', ['Charlie', 1]);
-
-    // 查询更新后的数据
-    const updatedUsers = await db.all('SELECT * FROM users');
-    console.log(updatedUsers);
-
-    // 删除数据
-    await db.run('DELETE FROM users WHERE id = ?', [2]);
-
-    // 查询删除后的数据
-    const finalUsers = await db.all('SELECT * FROM users');
-    console.log(finalUsers);
-
-    // 关闭数据库
-    await db.close();
-}
-
-// main().catch(err => console.error(err));
+// 2️⃣ 定义你的自定义类（可继承/扩展/完全重写）
 export class DataBase {
     constructor(db_file) {
         this.db_file = db_file || './database.db';
         this.db = null;
     }
 
+    // 自定义方法
     async initDb() {
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = path.dirname(__filename);
         const __rootPath = path.join(__dirname, '../');
         const __dbpath = path.join(__rootPath, this.db_file);
         // console.log('__dbpath:', __dbpath);
-        const db = await open({
-            filename: __dbpath,
-            driver: sqlite3.Database
-        });
+        const db = new SQLite3Database(__dbpath);
         this.db = db;
         return db
     }
@@ -79,4 +38,44 @@ export class DataBase {
     }
 }
 
+async function main() {
+    // 打开数据库（若不存在则创建）
+    const db = new SQLite3Database("../database.db");
+
+    // 创建表
+    db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL
+    )
+  `);
+
+    // 插入数据
+    db.run('INSERT INTO users (name) VALUES (?)', ['Alice']);
+    db.run('INSERT INTO users (name) VALUES (?)', ['Bob']);
+
+    // 查询数据
+    const users = db.all('SELECT * FROM users');
+    console.log(users);
+
+    // 更新数据
+    db.run('UPDATE users SET name = ? WHERE id = ?', ['Charlie', 1]);
+
+    // 查询更新后的数据
+    const updatedUsers = db.all('SELECT * FROM users');
+    console.log(updatedUsers);
+
+    // 删除数据
+    db.run('DELETE FROM users WHERE id = ?', [2]);
+
+    // 查询删除后的数据
+    const finalUsers = db.all('SELECT * FROM users');
+    console.log(finalUsers);
+
+    // 关闭数据库
+    db.close();
+}
+
 export const database = new DataBase('./database.db');
+
+// main().catch(err => console.error(err));

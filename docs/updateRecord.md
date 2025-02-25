@@ -1,4 +1,12 @@
 # drpyS更新记录
+
+### 20250225
+
+更新至V1.1.20
+
+1. UC整体逻辑修改，并在扫码插件增加了UC_TOKEN扫码逻辑
+2. 数据库sqlite3优化，寻找另一个wasm实现的库平替了兼容性极差的sqlite3原生库
+
 ### 20250224
 
 更新至V1.1.19
@@ -6,9 +14,10 @@
 1. 修复 推送和所有网盘源涉及的UC播放问题，支持原代本和原代服务加速
 2. 更新猫爪的 alist.js
 3. 新增 `sqlite` `sqlite3` 依赖，在ds源里的异步方法里直接使用，示例:
+
 ```javascript
 await database.startDb();
-console.log('database:',database);
+console.log('database:', database);
 const db = database.db;
 // 创建表
 await db.run(`

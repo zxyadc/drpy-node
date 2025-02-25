@@ -1,6 +1,6 @@
 {
   "name": "drpy-node",
-  "version": "1.1.19",
+  "version": "1.1.20",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -41,14 +41,13 @@
     "lru-cache": "^9.1.2",
     "mime-types": "^2.1.35",
     "minizlib": "^3.0.1",
+    "node-sqlite3-wasm": "^0.8.35",
     "p-queue": "^8.0.1",
     "pinyin": "2.10.2",
     "qs": "^6.13.1",
     "queue": "^7.0.0",
     "rotating-file-stream": "^3.2.5",
     "simplecc-wasm": "^1.1.0",
-    "sqlite": "4.2.1",
-    "sqlite3": "^5.1.7",
     "sync-fetch": "^0.6.0-2",
     "tunnel": "^0.0.6",
     "ws": "^8.18.0",
