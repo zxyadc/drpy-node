@@ -20,6 +20,7 @@ import {UC} from "../utils/uc.js";
 import {Ali} from "../utils/ali.js";
 import {Cloud} from "../utils/cloud.js";
 import {Yun} from "../utils/yun.js";
+import {Pan} from "../utils/pan123.js";
 import AIS from '../utils/ais.js';
 // const { req } = await import('../utils/req.js');
 import {gbkTool} from '../libs_drpy/gbk.js'
@@ -58,6 +59,7 @@ globalThis.UC = UC;
 globalThis.Ali = Ali;
 globalThis.Cloud = Cloud;
 globalThis.Yun = Yun;
+globalThis.Pan = Pan;
 globalThis.require = createRequire(import.meta.url);
 globalThis._fetch = fetch;
 globalThis.XMLHttpRequest = XMLHttpRequest;
@@ -312,6 +314,7 @@ export async function getSandbox(env = {}) {
         Ali,
         Cloud,
         Yun,
+        Pan,
         DataBase,
         database,
         require,
