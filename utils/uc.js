@@ -5,9 +5,38 @@ import '../libs_drpy/crypto-js.js';
 import {join} from 'path';
 import fs from 'fs';
 import {PassThrough} from 'stream';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+// 获取当前模块的目录路径
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// 读取 tokenm.json 文件
+function getTokenConfig() {
+    const filePath = path.join(__dirname, '../config/tokenm.json');
+    try {
+        const data = fs.readFileSync(filePath, 'utf8');
+        const jsonData = JSON.parse(data);
+        return {
+            uc_cookie: jsonData.uc_cookie || '',
+            uc_token_cookie: jsonData.uc_token_cookie || ''
+        };
+    } catch (err) {
+        if (err.code === 'ENOENT') {
+            console.error('文件不存在。返回默认值。', err);
+        } else if (err instanceof SyntaxError) {
+            console.error('tokenm.json文件格式错误', err);
+        } else {
+            console.error('获取配置时出现未知错误:', err.message);
+        }
+        return {uc_cookie: '', uc_token_cookie: ''};
+    }
+}
 
 class UCHandler {
     constructor() {
+ //   this._cookie = this.getTokenConfig(); // 初始化时读取cookie
+    this._cookie = getTokenConfig(); // 直接调用函数
         this.regex = /https:\/\/drive\.uc\.cn\/s\/([^\\|#/]+)/;
         this.pr = 'pr=UCBrowser&fr=pc';
         this.baseHeader = {
@@ -37,9 +66,37 @@ class UCHandler {
             channel: "UCTVOFFICIALWEB",
             codeApi: "http://api.extscreen.com/ucdrive",
         };
-
+// 加载 token 配置
+        const tokenConfig = getTokenConfig();
+        this.tokenConfig = tokenConfig;
     }
 
+    get cookie() {
+    return this._cookie.uc_cookie;
+    }
+    set cookie(newCookie) {
+        this._cookie = newCookie;
+    }
+/*
+    get cookie() {
+        return this._cookie;
+    }
+
+    set cookie(newCookie) {
+        this._cookie = newCookie;
+    }
+ 
+ 
+    get cookie() {
+        return this.tokenConfig.uc_cookie;
+    }
+*/
+    get token() {
+        return this.tokenConfig.uc_token_cookie;
+    }
+
+
+/*
     // 使用 getter 定义动态属性
     get cookie() {
         // console.log('env.cookie.uc:',ENV.get('uc_cookie'));
@@ -49,7 +106,7 @@ class UCHandler {
     get token() {
         return ENV.get('uc_token_cookie');
     }
-
+*/
     getShareData(url) {
         let matches = this.regex.exec(url);
         if (matches[1].indexOf("?") > 0) {
@@ -373,35 +430,38 @@ class UCHandler {
     }
 
     async refreshUcCookie(from = '') {
-        const nowCookie = this.cookie;
-        const cookieSelfRes = await axios({
-            url: "https://pc-api.uc.cn/1/clouddrive/config?pr=UCBrowser&fr=pc",
-            method: "GET",
-            headers: {
-                "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch',
-                Origin: 'https://drive.uc.cn',
-                Referer: 'https://drive.uc.cn/',
-                Cookie: nowCookie
-            }
-        });
-        const cookieResDataSelf = cookieSelfRes.headers;
-        const resCookie = cookieResDataSelf['set-cookie'];
-        if (!resCookie) {
-            console.log(`${from}自动更新UC cookie: 没返回新的cookie`);
-            return
+    const nowCookie = this.cookie;
+    const cookieSelfRes = await axios({
+        url: "https://pc-api.uc.cn/1/clouddrive/config?pr=UCBrowser&fr=pc",
+        method: "GET",
+        headers: {
+            "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch',
+            Origin: 'https://drive.uc.cn',
+            Referer: 'https://drive.uc.cn/',
+            Cookie: nowCookie
         }
-        const cookieObject = COOKIE.parse(resCookie);
-        // console.log(cookieObject);
-        if (cookieObject.__puus) {
-            const oldCookie = COOKIE.parse(nowCookie);
-            const newCookie = COOKIE.stringify({
-                __pus: oldCookie.__pus,
-                __puus: cookieObject.__puus,
-            });
-            console.log(`${from}自动更新UC cookie: ${newCookie}`);
-            ENV.set('uc_cookie', newCookie);
-        }
+    });
+    const cookieResDataSelf = cookieSelfRes.headers;
+    const resCookie = cookieResDataSelf['set-cookie'];
+    if (!resCookie) {
+        console.log(`${from}自动更新UC cookie: 没返回新的cookie`);
+        return;
     }
+    const cookieObject = COOKIE.parse(resCookie);
+    if (cookieObject.__puus) {
+        const oldCookie = COOKIE.parse(nowCookie);
+        const newCookie = COOKIE.stringify({
+            __pus: oldCookie.__pus,
+            __puus: cookieObject.__puus,
+        });
+
+        // 更新类的cookie属性
+        this.cookie = newCookie;
+
+        console.log(`${from}自动更新UC cookie: ${newCookie}`);
+        return newCookie;
+    }
+}
 
     generateDeviceID(timestamp) {
         return CryptoJS.MD5(timestamp).toString().slice(0, 16); // 取前16位

@@ -33,7 +33,7 @@ fastify.register(fastifyStatic, {
 });
 
 fastify.register(fastifyStatic, {
-    root: path.join(__dirname, 'js_dr2'),
+    root: path.join(__dirname, 'DR'),
     prefix: '/js/', // 新的访问路径前缀
     decorateReply: false, // 禁用 sendFile
 });
@@ -75,8 +75,8 @@ import {registerRoutes} from './controllers/index.js';
 registerRoutes(fastify, {
     rootDir: __dirname,
     docsDir: path.join(__dirname, 'docs'),
-    jsDir: path.join(__dirname, 'js'),
-    dr2Dir: path.join(__dirname, 'js_dr2'),
+    jsDir: path.join(__dirname, 'DS'),
+    dr2Dir: path.join(__dirname, 'DR'),
     jxDir: path.join(__dirname, 'jx'),
     viewsDir: path.join(__dirname, 'views'),
     configDir: path.join(__dirname, 'config'),
