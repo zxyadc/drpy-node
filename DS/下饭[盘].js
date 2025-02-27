@@ -1,3 +1,5 @@
+
+
 const { readFileSync } = require('fs');
 const config = JSON.parse(readFileSync('./config/tokenm.json', 'utf-8'));
 
@@ -33,19 +35,9 @@ var rule = {
     预处理: async () => {
         return []
     },
-推荐: async function () {
-        const {input, pdfa, pdfh, pd} = this;
-        const html = await request(input);
-        const data = pdfa(html, '.module-items .module-item');
-        const result = data.map((item) => ({
-            title: pd(item, 'a&&title'),
-            pic_url: pd(item, 'img&&data-src'),
-            desc: pdfh(item, '.module-item-text&&Text'),
-            url: pd(item, 'a&&href')
-        }));
-        return setResult(result);
-},
-
+    推荐: async function () {
+    return this.一级();
+    },
    
    一级: async function () {
     let {input, pdfa, pdfh, pd} = this;
@@ -62,7 +54,6 @@ var rule = {
     });
     return setResult(d)
 },
-    
 二级: async function (ids) {
         let {input} = this;
         let html = (await getHtml(input)).data
@@ -183,6 +174,7 @@ lazy: async function (flag, id, flags) {
         // 获取线程数
         const threadCount = config.thread || 10; // 默认值为 10
         const threadParam = `thread=${threadCount}`;
+        const playProxy = config.play_proxy || 1; // 默认值为 10
         if (flag.startsWith('夸克')) {
             console.log("夸克网盘解析开始");
             const down = await Quark.getDownload(ids[0], ids[1], ids[2], ids[3], true);
@@ -192,13 +184,13 @@ lazy: async function (flag, id, flags) {
                 'referer': 'https://pan.quark.cn/',
                 'Cookie': Quark.cookie
             };
-                urls.push("原画", `http://127.0.0.1:5575/proxy?${threadParam}&chunkSize=256&url=${encodeURIComponent(down.download_url)}`)
+
+          urls.push("原画", `http://127.0.0.1:5575/proxy?${threadParam}&chunkSize=256&url=${encodeURIComponent(down.download_url)}`)
 
                 urls.push("原代本", `http://127.0.0.1:7777/?${threadParam}&form=urlcode&randUa=1&url=` + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)));
 
             // http://ip:port/?thread=线程数&form=url与header编码格式&url=链接&header=所需header
          urls.push("原代服", mediaProxyUrl + `?${threadParam}&form=urlcode&randUa=1&url=` + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)))
-            const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
             const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
             transcoding.forEach((t) => {
                 urls.push(t.resolution === 'low' ? "流畅" : t.resolution === 'high' ? "高清" : t.resolution === 'super' ? "超清" : t.resolution, t.video_info.url)
@@ -233,7 +225,7 @@ lazy: async function (flag, id, flags) {
             console.log("网盘解析开始")
             const down = await Ali.getDownload(ids[0], ids[1], flag === 'down');
             urls.push("原画", down.url + "#isVideo=true##ignoreMusic=true#")
-            urls.push("极速原画", down.url + "#fastPlayMode##threads=10#")
+            urls.push("极速原画", `${down.url}#fastPlayMode##${threadParam}`)
             const transcoding = (await Ali.getLiveTranscoding(ids[0], ids[1])).sort((a, b) => b.template_width - a.template_width);
             transcoding.forEach((t) => {
                 if (t.url !== '') {
