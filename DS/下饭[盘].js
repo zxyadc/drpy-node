@@ -2,7 +2,7 @@ const { readFileSync } = require('fs');
 const config = JSON.parse(readFileSync('./config/tokenm.json', 'utf-8'));
 
 console.log('线程数量:', config.thread); 
-console.log('线路排序:', config.lineOrder);
+//console.log('线路排序:', config.lineOrder);
 
 const {getHtml} = $.require('./_lib.request.js')
 const { formatPlayUrl } = misc;
@@ -192,14 +192,13 @@ lazy: async function (flag, id, flags) {
                 'referer': 'https://pan.quark.cn/',
                 'Cookie': Quark.cookie
             };
-            if (ENV.get('play_local_proxy_type', '1') === '2') {
-                urls.push("原代本", `http://127.0.0.1:7777/?thread=${ENV.get('thread') || 6}&form=urlcode&randUa=1&url=` + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)));
-            } else {
-                urls.push("原代本", `http://127.0.0.1:5575/proxy?thread=${ENV.get('thread') || 6}&chunkSize=256&url=` + encodeURIComponent(down.download_url));
-            }
-            urls.push("原画", down.download_url + '#fastPlayMode##threads=10#')
+                urls.push("原画", `http://127.0.0.1:5575/proxy?${threadParam}&chunkSize=256&url=${encodeURIComponent(down.download_url)}`)
+
+                urls.push("原代本", `http://127.0.0.1:7777/?${threadParam}&form=urlcode&randUa=1&url=` + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)));
+
             // http://ip:port/?thread=线程数&form=url与header编码格式&url=链接&header=所需header
-         urls.push("原代服", mediaProxyUrl + `?thread=${ENV.get('thread') || 6}&form=urlcode&randUa=1&url=` + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)))
+         urls.push("原代服", mediaProxyUrl + `?${threadParam}&form=urlcode&randUa=1&url=` + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)))
+            const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
             const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
             transcoding.forEach((t) => {
                 urls.push(t.resolution === 'low' ? "流畅" : t.resolution === 'high' ? "高清" : t.resolution === 'super' ? "超清" : t.resolution, t.video_info.url)
