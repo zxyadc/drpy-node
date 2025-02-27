@@ -167,13 +167,20 @@ globalThis.simplecc = simplecc;
 let DataBase = null;
 let database = null;
 try {
-    const sqliteUtil = await import('../utils/database.js');  // 使用动态 import
-    DataBase = sqliteUtil.DataBase;
-    database = sqliteUtil.database;
+    if (typeof fetchByHiker !== 'undefined' && typeof globalThis.import === 'function') {
+        const sqliteUtil = await globalThis.import('../utils/database.js'); // 海阔放在globalThis里去动态引入
+        DataBase = sqliteUtil.DataBase;
+        database = sqliteUtil.database;
+    } else {
+        const sqliteUtil = await import('../utils/database.js');  // 使用动态 import
+        DataBase = sqliteUtil.DataBase;
+        database = sqliteUtil.database;
+    }
     console.log('sqlite3 database imported successfully');
 } catch (error) {
     console.log(`Failed to import sqlite3:${error.message}`);
 }
+
 globalThis.DataBase = DataBase;
 globalThis.database = database;
 
