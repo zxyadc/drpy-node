@@ -142,7 +142,7 @@ proxy_rule: async function () {
             parse: 0,
             url: getProxyUrl() + '&url=' + await jxx(parts[0]),
             jx: 0,
-          //  danmaku:getProxyUrl()+ '&url=' + getYoukuVideoUrl(parts[0],parts[1])
+           // danmaku:getProxyUrl()+ '&url=' + getYoukuVideoUrl(parts[0],parts[1])
         };
     },
     推荐: async function () {
@@ -205,6 +205,5 @@ proxy_rule: async function () {
        return setResult(d); // 设置最终结果
     
 }
+
 }
-
-
