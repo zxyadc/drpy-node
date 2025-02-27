@@ -17,6 +17,6 @@
         "searchable": 1,
         "filterable": 1,
         "quickSearch": 0,
-        "ext": "../json/alist.json"
+        "ext": "https://cnb.cool/zhyadc/YsBox/-/git/raw/main/json/alist.json"
     }
 ]
