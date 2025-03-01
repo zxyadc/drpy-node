@@ -1,14 +1,5 @@
 [
-{
-        "key": "drjs_金牌",
-        "name": "金牌[优](DR)",
-        "type": 3,
-        "api": "https://cnb.cool/zhyadc/YsBox/-/git/raw/main/drpy_libs/drpy2.min.js",
-        "searchable": 1,
-        "filterable": 1,
-        "quickSearch": 0,
-        "ext": "https://d.kstore.dev/download/3029/YsBox/drpy_js/金牌[优].js"
-    },
+
     {
         "key": "drjs_苹果",
         "name": "苹果[优](DR)",
