@@ -1,5 +1,5 @@
 globalThis.hosts = [
-  'http://www.特下饭.xyz',
+  'https://erxiaofn.click',
   'http://txfpan.top',
   'http://mihdr.top',
   'http://www.miqk.cc'
@@ -9,7 +9,7 @@ const { readFileSync } = require('fs');
 const config = JSON.parse(readFileSync('./config/tokenm.json', 'utf-8'));
 
 console.log('线程数量:', config.thread); 
-//console.log('线路排序:', config.lineOrder);
+console.log('线路排序:', config.lineOrder);
 
 const {getHtml} = $.require('./_lib.request.js')
 const { formatPlayUrl } = misc;
@@ -20,7 +20,7 @@ var rule = {
     url: '/index.php/vod/show/id/fyfilter.html',
     filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
     searchUrl: '/index.php/vod/search/page/fypage/wd/**.html',
-    filter: 'H4sIAAAAAAAAA+2ZW08bRxTH3/kY+0zlWUOB5C33kPv9qjw4qdVGpVQCtxJCSGnADpeAA6J2aEyaqoAhhWDSNk1sGb6Mdxe+RWaZ8Zmzf0fFEX2hmsf9/47PzPxnds4eebDFcZ3Dd1sGnW+TA85h50Eilez+yml1ehPfJeVzsFHxXk7I5x8TPT9I4e6g0ytlL728M7wcyvLBdYZatfyiWisXtdxBsr9aDDantNxpotPvapWclrucoXtDrWYePYn+fjMNb6zoD6f/fRomb64g47Ua280U01o9JBjd0PlMiNZo0j898x/loiFao4HGl2vVAgykNBqoOO19qMBASqMstDaWRWk0l9HntfIYzEVp9ZDttSXv6etoiNZoLuPrQRVCtMZWFMxWGlYUahSy+KRhRVqj6a4t1TZfwXSVRlkyMztzK5BFaZTl5Wu5RsiitM/YI//xapCbhhClUcjwuP/4FwhRGllXyXrp92Cd0uohO/Mz/vPFaIjWaKDck+2xMgykNPJl800w+7dX3QBrSKbA7ML273hqlEYhUxkv+xZClEanZuuZ3F44NUozO1Xw56dxp3Y1ChnZCv6ApWuNDKxOB5XCp5YWIeEdUL8CEn3JBLsBCiXvabnZG2ChuDOXqY8TJoppiXZrac5/vx6J0JIxuOR/2IzmUBKtaXNKXniRCC3Rhv/5M0ZoiTZgYgMjtEQ58ot+YTWaQ0m0ll9XMIeWzKn6ByO0ZGZaapxpKZJjsuSVl6I5lEQ5RrLSZW90JZqGVFrz4laQXQvG5qLLJtVcRq/8iS354+igpH6yjuggJfHj1JPo/docp+31te3lR80epxdVGV8fIEwU0xLbRozQEh2WtwsYoSXaxnzVm8xjkFHZdjcEKYkdGYzQEjuYDRFKYkemYc1KYrZ7b4ajEUritg8kE33Gdj//bif/V5O2x0X8y3r6ME1sV2C0HWk7p21I2ziNI41z6iJ1ORVIBaPuIaBSYLQLaRennUg7Oe1A2sEpeuVyr1z0yuVeueiVy71y0SuXe+WiVy73ykWvXO6VQK8E90qgV4J7JdArwb0S6JXgXgn0SnCvBHoluFcCvRLcK4FeCe6VQK8E90qgV1KI3GDJVCrJXiZvLe+vTzb5Mh2hF3U3S+wIkaNAjhI5BuQYkeNAjhM5AeQEkZNAThI5BeQUkdNAThPpBtJN5AyQM0TOAjlL5ByQc0TOAzlP5AKQC0QuArlI5BKQS0QuA7lM5AqQK0SuArlK5BqQa0SuA7lO5AaQG0RuArlJ5BaQW0RuA7lN5A6QO0TEF4eAhQp/Be4PsFoyNeOVsw3H35SYMM/9gVjqoQyvD1Erl/3SLKPfPEz1mzK+PuKNZhjtf/B9XzKcwb3WFie+30bZXAWqUTZdKrtvZaUOv94MMpeP6qMZMreW/HKVX6cMddh+2vbTtp+2/bS5A/bTUGfSMj7aYkFDvWcT+l+03Hs3w8005Xu1uk005bmS7EO9+d+iaUj9vNbU9ki2R7I9ku2RbI9ke6QD3iO17bdHMhdF5M9EVj5Ug1TX2Z+PvNaGpYp/+9gSa0usLbG2xNoSa0vsAS+x7bzE2rpm65qta7au2bpm69qBrmuOrD22rtm6ZuuarWu2rtm69j+pa0MfAcZxdzZhMQAA',
+    filter: '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',
     filter_def: {
         1: {cateId: '1'},
         2: {cateId: '2'},
@@ -33,10 +33,38 @@ var rule = {
     searchable: 1,
     filterable: 1,
     quickSearch: 0,
-    class_name: '电影&剧集&动漫&综艺',
-    class_url: '1&2&3&4',
+  //  class_name: '电影&剧集&动漫&综艺',
+   // class_url: '1&2&3&4',
 
-   
+ 推荐: async function () {
+    return this.一级();
+    },
+    
+    
+ class_parse: async function () {
+    let { input, pdfa, pdfh, pd } = this;
+    let html = await request(input); // 获取 HTML 内容
+    let classes = [];
+    let data = pdfa(html, '.grid-box&&ul&&li'); // 解析目标元素
+    data.forEach((it, index) => {
+        let typeName = pdfh(it, 'a&&Text'); // 提取文本内容
+        let href = pd(it, 'a&&href'); // 提取 href 属性
+          //  console.log("href 结果:", href); // 打印最终解析结果
+            // 使用正则表达式提取 ID
+            let matchResult = href.match(/.*\/(.*?).html/); 
+            if (!matchResult) {
+                return; 
+            }
+            let typeId = matchResult[1];
+            classes.push({
+                type_name: typeName,
+                type_id: typeId,
+            });
+    });    
+    return { class: classes };
+  },
+  
+
    一级: async function () {
     let {input, pdfa, pdfh, pd} = this;
     let html = await request(input);
@@ -138,6 +166,15 @@ var rule = {
             count[item]++;
             uniqueArray.push(item + '#' + count[item]);
         }
+    });
+    // 修改排序逻辑为：
+    const lineOrder = config.lineOrder || ['夸克', '优汐', '阿里'];
+    uniqueArray.sort((a, b) => {
+        // 提取前缀（去掉#数字部分）
+        const aPrefix = a.split('#')[0].replace(/\d+$/, ""); // 示例："优汐#1" → "优汐"
+        const bPrefix = b.split('#')[0].replace(/\d+$/, ""); 
+        // 按配置顺序排序
+        return lineOrder.indexOf(aPrefix) - lineOrder.indexOf(bPrefix);
     });
 
     // 连接成字符串

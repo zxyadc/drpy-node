@@ -25,33 +25,9 @@ filter: 'H4sIAAAAAAAAA51bWW9bR5b+K4afZoAMQN6NZL+5Y7i7k04cJ5PBLOgHY+JpDJK2B86kMY1
     timeout:5000,
     limit:8,
     play_parse:true,
- 
  推荐: async function () {
-  let {input} = this;
-  let d = [];
-  let jo = JSON.parse(await request(input)).data.datas;
-  for (let it of jo) {
-    let totalCount = it.totalCount;
-    let y = (totalCount / 1e8).toFixed(2) +'亿';
-    let w = (totalCount / 1e4).toFixed(2) + '万';
-    if (totalCount < 1e8) {
-      totalCount = w;
-    } else {
-      totalCount = y;
-    }
-    d.push({
-      //url:it.profileRoom,
-      // 标题 链接 图片 观看 up主
-      url: it.introduction + '┃' + it.profileRoom + '┃' + it.screenshot +'┃' +  totalCount + '┃' + it.nick + '┃' + it.gameFullName + '┃' + it.nick + '┃' + it.introduction,
-      title: it.introduction,
-      img: it.screenshot,
-      desc: totalCount + '🆙' + it.nick
-    });
-  }
-//  return d;
-  return setResult(d);
-},
-
+    return this.一级();
+    },
 一级: async function () {
   let {input} = this;
   let d = [];
@@ -66,9 +42,9 @@ filter: 'H4sIAAAAAAAAA51bWW9bR5b+K4afZoAMQN6NZL+5Y7i7k04cJ5PBLOgHY+JpDJK2B86kMY1
       totalCount = y;
     }
     d.push({
-      //url:it.profileRoom,
+      url:it.profileRoom,
       // 标题 链接 图片 观看 up主
-      url: it.introduction + '┃' + it.profileRoom + '┃' + it.screenshot +'┃' +  totalCount + '┃' + it.nick + '┃' + it.gameFullName + '┃' + it.nick + '┃' + it.introduction,
+  //    url: it.introduction + '┃' + it.profileRoom + '┃' + it.screenshot +'┃' +  totalCount + '┃' + it.nick + '┃' + it.gameFullName + '┃' + it.nick + '┃' + it.introduction,
       title: it.introduction,
       img: it.screenshot,
       desc: '👥 人气' +   totalCount + '🆙' + it.nick
@@ -83,17 +59,18 @@ filter: 'H4sIAAAAAAAAA51bWW9bR5b+K4afZoAMQN6NZL+5Y7i7k04cJ5PBLOgHY+JpDJK2B86kMY1
    
 
     二级: async function () {
-    let {input} = this;
+    let {input,orId} = this;
     let jminput = decodeURIComponent(input);
   //  console.log('input的结果:', input);
-    let info = jminput.split("┃");
+ //  let info = jminput.split("/");
     
-    console.log('info的结果:', info);
-    let rid = info[1];
-  //  console.log('rid的结果:', rid);
+   //console.log('info的结果:', info[2]);
+    let rid = orId;
+   console.log('rid的结果:', rid);
     // 以下获取链接的操作改为异步
     let hlsData = await request('https://mp.huya.com/cache.php?m=Live&do=profileRoom&roomid=' + rid);
     let hlsJson = JSON.parse(hlsData);
+    // console.log('hlsJson的结果:', hlsJson);
     let live_url = hlsJson.data.stream.hls.multiLine[0].url;
  //   console.log('live_url的结果:', live_url);
     async function getRealUrl(live_url) {
@@ -124,15 +101,20 @@ filter: 'H4sIAAAAAAAAA51bWW9bR5b+K4afZoAMQN6NZL+5Y7i7k04cJ5PBLOgHY+JpDJK2B86kMY1
     }
 
     let purl = await getRealUrl(live_url);
-    console.log('purl的结果:', purl);
+    //console.log('purl的结果:', purl);
 
     let VOD = {};
+    VOD.vod_name = hlsJson.data.liveDataintroduction;
+    VOD.vod_content = hlsJson.data.welcomeText;
+    VOD.vod_remarks = hlsJson.data.liveData.nick;
+    /*
     VOD.vod_id = 'no_use';
     VOD.vod_name = info[6];
     VOD.vod_actor = info[4];
     VOD.vod_remarks = info[5];
     VOD.vod_pic = info[2];
     VOD.vod_content = info[0].replace(/https:\/\/www.huya.com\//g, '') +'\n' + '👥 人气' + info[3] + '--------' + '🆙' + info[4];
+    */
     VOD.vod_play_from = '虎牙';
     VOD.vod_play_url = '超清$' + purl + '#高清$' + purl.replace(/4000/g, '2000') + '#流畅$' + purl.replace(/4000/g, '500');
 
@@ -142,16 +124,18 @@ filter: 'H4sIAAAAAAAAA51bWW9bR5b+K4afZoAMQN6NZL+5Y7i7k04cJ5PBLOgHY+JpDJK2B86kMY1
 // 搜索异步函数修改后
 搜索: async function () {
     let {input} = this;
+   // console.log('input的结果:', input);
     let d = [];
     let jo = JSON.parse(await request(input)).response[3].docs;
+    //console.log('jo的结果:', jo);
     for (let it of jo) {
         d.push({
             url: it.room_id,
-            title: it.game_roomName,
+            title: it.game_introduction,
             img: it.game_screenshot,
             desc: '👁' + it.game_total_count +'🆙' + it.game_nick,
         });
     }
-    return d;
+  return setResult(d);
 }
 }
