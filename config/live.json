@@ -1,6 +1,5 @@
 {
     "live_urls": [
-        "https://ty.ly93.cc/1491/223631180984662892/tvzb.txt",
         "http://rihou.cc:567/cctvgg",
         "http://yyrj.fun/tv",
         "https://mirror.ghproxy.com/https://raw.githubusercontent.com/YueChan/Live/main/Radio.m3u"
@@ -8,7 +7,6 @@
     "epg_url": "https://epg.mxdyeah.top/api/diyp/?ch={name}&date={date}",
     "logo_url": "https://live.mxdyeah.top/logo/{name}.png",
     "names": [
-        "直播",
         "分享",
         "玉玉",
         "广播"
