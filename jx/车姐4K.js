@@ -27,6 +27,6 @@ async function lazy(input, params) {
     log('input:', input);
     let headers = {'User-Agent': PC_UA};
     let timeout = 8000;
-    let obj = await requestJson('https://bbs.ystv.cc/baidu.php?key=520abcd&url=' + input, {headers, timeout});
+    let obj = await requestJson('https://bbs.ystv.cc/baidu.php?key=5201314&url=' + input, {headers, timeout});
     return obj.url
 }
