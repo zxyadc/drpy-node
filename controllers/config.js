@@ -60,8 +60,8 @@ async function generateSiteJSON(options, requestHost, sub, pwd) {
         return {
             func: async ({file, jsDir, requestHost, pwd, drpy, SitesMap, jsEncoder}) => {
                 const baseName = path.basename(file, '.js'); // 去掉文件扩展名
-            let api = `${requestHost}/api/${baseName}`;  // 使用请求的 host 地址，避免硬编码端口
-          //    let api = `https://zhxy.eu.org/api/${baseName}`;  // 使用请求的 host 地址，避免硬编码端口
+          let api = `${requestHost}/api/${baseName}`;  // 使用请求的 host 地址，避免硬编码端口
+      //  let api = `https://zhxy.eu.org/api/${baseName}`;  // 使用请求的 host 地址，避免硬编码端口
                 if (pwd) {
                     api += `?pwd=${pwd}`;
                 }
@@ -142,8 +142,8 @@ async function generateSiteJSON(options, requestHost, sub, pwd) {
             return {
                 func: async ({file, dr2Dir, requestHost, pwd, drpy, SitesMap}) => {
                     const baseName = path.basename(file, '.js'); // 去掉文件扩展名
-                //  let api = `https://gitee.com/zhxyad/YsBox/raw/master/drpy_libs/drpy2.min.js`;  // 使用内置drpy2
-                 let api = `https://cnb.cool/zhyadc/YsBox/-/git/raw/main/drpy_libs/drpy2.min.js`;  // 使用内置drpy2
+                let api = `https://gitee.com/zhxyad/YsBox/raw/master/drpy_libs/drpy2.min.js`;  // 使用内置drpy2
+              //   let api = `https://cnb.cool/zhyadc/YsBox/-/git/raw/main/drpy_libs/drpy2.min.js`;  // 使用内置drpy2
                     let ext = `${requestHost}/js/${file}`;
                     if (pwd) {
                         ext += `?pwd=${pwd}`;
@@ -276,6 +276,7 @@ sites.forEach(site => {
   .replace(/动漫巴士/g, '巴士')
   .replace(/短剧库/g, '剧库')
   .replace(/KTV歌厅/g, 'KTV')
+  .replace(/点歌欢唱\[B\]/g, '点歌欢唱[听]')
  // .replace(/云盘资源网/g, '阿里资源网')
   
   .replace(/金牌/g, '金牌[优]')
@@ -495,7 +496,7 @@ function shouldExclude(site) {
     '玩偶',
   '团长', '奥秘'
     ];
-    //,'虎斑', '六趣' '木偶',
+    //,'虎斑', '六趣' '木偶','下饭'
     // 判断 site.name 是否包含任何一个排除关键词
     return excludeKeywords.some(keyword => site.name.includes(keyword));
 }
