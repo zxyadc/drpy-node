@@ -60,8 +60,8 @@ async function generateSiteJSON(options, requestHost, sub, pwd) {
         return {
             func: async ({file, jsDir, requestHost, pwd, drpy, SitesMap, jsEncoder}) => {
                 const baseName = path.basename(file, '.js'); // 去掉文件扩展名
-          let api = `${requestHost}/api/${baseName}`;  // 使用请求的 host 地址，避免硬编码端口
-      //  let api = `https://zhxy.eu.org/api/${baseName}`;  // 使用请求的 host 地址，避免硬编码端口
+        let api = `${requestHost}/api/${baseName}`;  // 使用请求的 host 地址，避免硬编码端口
+   //   let api = `https://zhxy.eu.org/api/${baseName}`;  // 使用请求的 host 地址，避免硬编码端口
                 if (pwd) {
                     api += `?pwd=${pwd}`;
                 }
@@ -490,8 +490,8 @@ function customSort(a, b) {
 
 function shouldExclude(site) {
     const excludeKeywords = ['短剧库','PTT', '密', '莫离', 
-    'hvd', '88855', '虎牙直播[官](DR)', '擦', '皮皮',   '📺','小熊','资源',
-  '豆瓣', 'ACG', 'Omo', 'NO', '好乐','非凡','文采','人人','4K-A','KKK','耐看',
+    'hvd', '瓜子┃[优质]', '虎牙直播[官](DR)', '擦', '皮皮',   '📺','小熊','资源',
+  '豆瓣', 'ACG', 'Omo', 'NO', '好乐','非凡','文采','人人','4K-A','点歌','耐看',
   '多多','虎斑','低端','欧哥','ggg','六趣',
     '玩偶',
   '团长', '奥秘'
