@@ -5,5 +5,5 @@
 采集之王[合]@?type=url&params=../json/采集[zy]静态.json$1@采王zy[密]
 采集之王[合]@?type=url&params=../json/采集[密]静态.json$1$@采王成人[密]
 采集之王[合]@?type=url&params=../json/采集2024静态.json$1$@采王2024
-点歌欢唱[听]@?type=url&params=../json/十六万歌曲.txt
+点歌欢唱[B]@?type=url&params=../json/十六万歌曲.txt
 夸克分享[盘]@?type=url&params=../json/夸克分享.json@夸克分享[盘]
