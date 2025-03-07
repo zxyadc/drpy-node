@@ -47,9 +47,9 @@ var rule = {
         log(`传入参数:${_url}`);
         let _init = getItem('init');
         if (_init === '1') {
-            mv_list = JSON.parse(pathLib.readFile('./mv/十六万歌曲.json'));
-            authors = JSON.parse(pathLib.readFile('./mv/十六万歌曲作者.json'));
-            authorsPy = JSON.parse(pathLib.readFile('./mv/十六万歌曲作者拼音.json'));
+            mv_list = JSON.parse(pathLib.readFile('https://d.kstore.dev/download/3029/YsBox/json/十六万歌曲.json'));
+            authors = JSON.parse(pathLib.readFile('https://d.kstore.dev/download/3029/YsBox/json/十六万歌曲作者.json'));
+            authorsPy = JSON.parse(pathLib.readFile('https://d.kstore.dev/download/3029/YsBox/json/十六万歌曲作者拼音.json'));
         } else {
             mv_list = (await request(_url)).split('\n').map((it) => {
                 it = it.trim();
