@@ -79,9 +79,9 @@ var rule = {
                 return author;
             }))];
             authors = authors.sort((a, b) => a.localeCompare(b, 'zh-CN', {numeric: true, sensitivity: 'base'}));
-            pathLib.writeFile('./mv/十六万歌曲.json', JSON.stringify(mv_list));
-            pathLib.writeFile('./mv/十六万歌曲作者.json', JSON.stringify(authors));
-            pathLib.writeFile('./mv/十六万歌曲作者拼音.json', JSON.stringify(authorsPy));
+            pathLib.writeFile('https://d.kstore.dev/download/3029/YsBox/json/十六万歌曲.json', JSON.stringify(mv_list));
+            pathLib.writeFile('https://d.kstore.dev/download/3029/YsBox/json/十六万歌曲作者.json', JSON.stringify(authors));
+            pathLib.writeFile('https://d.kstore.dev/download/3029/YsBox/json/十六万歌曲作者拼音.json', JSON.stringify(authorsPy));
             setItem('init', '1');
         }
         let t2 = (new Date()).getTime();
