@@ -1,46 +1,47 @@
-globalThis.hosts = [
-  'http://www.特下饭.xyz',
-  'http://txfpan.top',
-  'http://mihdr.top',
-  'http://www.miqk.cc'
-];
-
 const { readFileSync } = require('fs');
 const config = JSON.parse(readFileSync('./config/tokenm.json', 'utf-8'));
-
-console.log('线程数量:', config.thread); 
-//console.log('线路排序:', config.lineOrder);
+console.log('线程数量:', config.thread);
 
 const {getHtml} = $.require('./_lib.request.js')
 const { formatPlayUrl } = misc;
-
 var rule = {
-    title: '特下饭[盘]',
-   host: hosts[0],
+    title: '六趣[盘]',
+    host: 'https://wp.0v.fit',
     url: '/index.php/vod/show/id/fyfilter.html',
-    filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
-    searchUrl: '/index.php/vod/search/page/fypage/wd/**.html',
-    filter: 'H4sIAAAAAAAAA+2ZW08bRxTH3/kY+0zlWUOB5C33kPv9qjw4qdVGpVQCtxJCSGnADpeAA6J2aEyaqoAhhWDSNk1sGb6Mdxe+RWaZ8Zmzf0fFEX2hmsf9/47PzPxnds4eebDFcZ3Dd1sGnW+TA85h50Eilez+yml1ehPfJeVzsFHxXk7I5x8TPT9I4e6g0ytlL728M7wcyvLBdYZatfyiWisXtdxBsr9aDDantNxpotPvapWclrucoXtDrWYePYn+fjMNb6zoD6f/fRomb64g47Ua280U01o9JBjd0PlMiNZo0j898x/loiFao4HGl2vVAgykNBqoOO19qMBASqMstDaWRWk0l9HntfIYzEVp9ZDttSXv6etoiNZoLuPrQRVCtMZWFMxWGlYUahSy+KRhRVqj6a4t1TZfwXSVRlkyMztzK5BFaZTl5Wu5RsiitM/YI//xapCbhhClUcjwuP/4FwhRGllXyXrp92Cd0uohO/Mz/vPFaIjWaKDck+2xMgykNPJl800w+7dX3QBrSKbA7ML273hqlEYhUxkv+xZClEanZuuZ3F44NUozO1Xw56dxp3Y1ChnZCv6ApWuNDKxOB5XCp5YWIeEdUL8CEn3JBLsBCiXvabnZG2ChuDOXqY8TJoppiXZrac5/vx6J0JIxuOR/2IzmUBKtaXNKXniRCC3Rhv/5M0ZoiTZgYgMjtEQ58ot+YTWaQ0m0ll9XMIeWzKn6ByO0ZGZaapxpKZJjsuSVl6I5lEQ5RrLSZW90JZqGVFrz4laQXQvG5qLLJtVcRq/8iS354+igpH6yjuggJfHj1JPo/docp+31te3lR80epxdVGV8fIEwU0xLbRozQEh2WtwsYoSXaxnzVm8xjkFHZdjcEKYkdGYzQEjuYDRFKYkemYc1KYrZ7b4ajEUritg8kE33Gdj//bif/V5O2x0X8y3r6ME1sV2C0HWk7p21I2ziNI41z6iJ1ORVIBaPuIaBSYLQLaRennUg7Oe1A2sEpeuVyr1z0yuVeueiVy71y0SuXe+WiVy73ykWvXO6VQK8E90qgV4J7JdArwb0S6JXgXgn0SnCvBHoluFcCvRLcK4FeCe6VQK8E90qgV1KI3GDJVCrJXiZvLe+vTzb5Mh2hF3U3S+wIkaNAjhI5BuQYkeNAjhM5AeQEkZNAThI5BeQUkdNAThPpBtJN5AyQM0TOAjlL5ByQc0TOAzlP5AKQC0QuArlI5BKQS0QuA7lM5AqQK0SuArlK5BqQa0SuA7lO5AaQG0RuArlJ5BaQW0RuA7lN5A6QO0TEF4eAhQp/Be4PsFoyNeOVsw3H35SYMM/9gVjqoQyvD1Erl/3SLKPfPEz1mzK+PuKNZhjtf/B9XzKcwb3WFie+30bZXAWqUTZdKrtvZaUOv94MMpeP6qMZMreW/HKVX6cMddh+2vbTtp+2/bS5A/bTUGfSMj7aYkFDvWcT+l+03Hs3w8005Xu1uk005bmS7EO9+d+iaUj9vNbU9ki2R7I9ku2RbI9ke6QD3iO17bdHMhdF5M9EVj5Ug1TX2Z+PvNaGpYp/+9gSa0usLbG2xNoSa0vsAS+x7bzE2rpm65qta7au2bpm69qBrmuOrD22rtm6ZuuarWu2rtm69j+pa0MfAcZxdzZhMQAA',
-    filter_def: {
+filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
+   searchUrl: '/index.php/vod/search/page/fypage/wd/**.html',
+   filter: 'H4sIAAAAAAAAA+2bW08iSRTHn+Vj8OwGW53r29zv9/tM5oGZkN3Jum6i7ibGmKgIg44KGkeGBW873lcUL+siLPJlqG74FtNQxenqf5vYJu7G3dQjv/+fU9Wniq5zaOjxNHg178U3noYe74+Bbu9F7/s2f2ent9Hb7v8pYL5kQ8t6MGS+/tXf9osJ3vR426s4tFIJrlSx+cLb2yjoVMr0C+qrRfIJVrcYkS0Rz7IIVrfo/TG9b8puEYwGGl4pFVIwEGc00PI428/DQJxRFLo2KQpnNJfIl1JuCObCWd1STi+xkTW7RTCay/CmUQCLYNIVGZN5xxVVGVkWPzquSDCabnqpdDAH0+WMooQnKolViMIZRZlZM68RonB2jDXSB9aNqXGwcEaW4LA+8BtYOKPU5aMslIXUcVa3VKYn9C+LdotgNNDUx/JQDgbijPJysGFM/skKW5AawmSMLpS/4q7hjCxjYRbdBgtntGuKMXN5YddwZq1USp8ex5WqMbIMFo0/4NIFowQWxo186rBLsym9b6tv4LcAf0fAL90BUhk2knN7B1hYriTC9XGqgXylbJolC0KgNVtK6NnNQ3xCsJKd0fcPDovHBVrg+KKeWrf5BKIRZ1fNt9kcAlGmDsbQIRCNsvMZHQLRsn7aQodA1j77Cx0CWaNknKNkbDFGMyy3ZI/BEcUYjJoZZ5FVexiiNN/FohFNG0MJ+5SJWrenOf1T0XyzfVCi5AvtlfJTdhNH8gZr87d/b22w8ma6vNLndoMlC6a/PkA1kE8gaQnQIRAt9PYCOgSizRIvsNE4miwqbSqHiSNpY6JDIGlTORwcSVvGcc0cSWlnG0G7gyM57d0Bf4eVdj2+V4nvukx7c1PzmXr4ahhfDUhqK6qtstqCaousNqPaLKsaqpqsNqHaJKnaBVBNIKnnUT0vq+dQPSerZ1E9K6uYK03OlYa50uRcaZgrTc6VhrnS5FxpmCtNzpWGuTKB7VMZ6OoKSBuEpeP65qjLDXKJNl8tiu8SKZdBuUzKFVCukHIVlKukXAPlGinXQblOyg1QbpByE5SbpNwC5RYpt0G5TcodUO6QcheUu6TcA+UeKfdBuU/KA1AekPIQlIekPALlESmPQXlMyhNQnpDyFJSnpDwD5Rkpz0F5TsoLUF6Q8hKUl6S8AuUVKa9BeU1K03cXQKsS+SPwrlu6P45NsFzUsf2t22Y1zrtuX9cH014fopTL6ZlJSf3hQ1endTRtDrJIWFI73//cEajO4G2jx9t8cn3Y0SWqi8aG19Csf48Fo4dV10I5RvPHNvZYLg0Wzo7XKh3V/LlolVw0fy7KeBftSWl/3lHGC2b1QSE9sQmLwRnN5XPY0ZMJJlX6jgUQ7PDyTERx1meqAVANgGoA/q0GQBXvqnhXxbsq3lXx/h8u3ltPrHivFn6Ds85i0GR0fh39bMMIpsvzfWDhjAYaWzFiYRiIM7LEZox1/A6fMzq9jn6eUI5Nl8eg1xCMBpqbZ0noDAQ7Rtmvp3LOBxec0VyO/t7dRWvEMmayd2EunMmWxR2nxWS0RgsHpb/h8YdgVgsyyyJJbEFqzNq12ywdg/6CMxooOawn4PGHYFZ2t1gxjtmtMdU8qOZBNQ+qeVDNg2oeVPMgKap5UM3DiTQPLSfWPFT6hoxlKPsFO0Z/Ud4oljMRKJI5oygTaX0YfnkimHV4hfQsfDcumHUC7pT2oXYVTKqrKl9huoKRJbfGNmbAwhnNJbnt/AEQZxRlclbfxaaKM4qSzeqRaCk34WghbAqlcfd3Iw+PTgSjiFsD5f4RiMWZqqlVTW1NWdXUqqZWNbWqqVVNrWpqVVO7qKnPVGvq0/OnBje/Gv///alB/WPhn/zHwmn4l4H5cfeoikhVRKoiUhWRqohOdUVk3rqkkkh1/K47fnXAqQNOHXDqgFMH3Ck+4Dyeht5vUgPagc5AAAA=',
+filter_def: {
         1: {cateId: '1'},
         2: {cateId: '2'},
         3: {cateId: '3'},
         4: {cateId: '4'},
+        25: {cateId: '25'},
     },
     cate_exclude: '网址|专题|全部影片',
-    tab_rename: {'KUAKE1': '夸克1', 'KUAKE11': '夸克2', 'YOUSEE1': 'UC1', 'YOUSEE11': 'UC2',},
+    // tab_rename: {'KUAKE1': '夸克1', 'KUAKE11': '夸克2', 'YOUSEE1': 'UC1', 'YOUSEE11': 'UC2',},
     play_parse: true,
     searchable: 1,
     filterable: 1,
     quickSearch: 0,
-    headers: { "User-Agent": "PC_UA" },
-    class_name: '电影&剧集&动漫&综艺',
-  class_url: '1&2&3&4',
-推荐: async function () {
-    return this.一级();
+    class_name: '电影&剧集&综艺&动漫&纪录片',
+    class_url: '1&2&3&4&25',
+    预处理: async () => {
+        return []
     },
-    
- 
+推荐: async function () {
+        const {input, pdfa, pdfh, pd} = this;
+        const html = await request(input);
+        const data = pdfa(html, '.module-items .module-item');
+        const result = data.map((item) => ({
+            title: pd(item, 'a&&title'),
+            pic_url: pd(item, 'img&&data-src'),
+            desc: pdfh(item, '.module-item-text&&Text'),
+            url: pd(item, 'a&&href')
+        }));
+        return setResult(result);
+},
+
    
    一级: async function () {
     let {input, pdfa, pdfh, pd} = this;
@@ -57,6 +58,7 @@ var rule = {
     });
     return setResult(d)
 },
+    
 二级: async function (ids) {
         let {input} = this;
         let html = (await getHtml(input)).data
@@ -111,7 +113,7 @@ var rule = {
                     }
                 }
             }
-if (/www.alipan.com|www.aliyundrive.com/.test(link)) {
+            if (/www.alipan.com|www.aliyundrive.com/.test(link)) {
             playPans.push(link);
             const shareData = Ali.getShareData(link);
             if (shareData) {
@@ -168,15 +170,22 @@ let processedLines = playform.map((line, index) => {
     };
 });
 
+
 const countMap = {};
+let skipUCOnce = true; // 添加一个标志，用于判断是否跳过第一个优汐
 processedLines = processedLines.map(item => {
     if (['Yun', 'Cloud'].includes(item.sortKey)) {
         return item;
     }
+    if (item.sortKey === 'UC' && skipUCOnce) { // 跳过第一个优汐
+        skipUCOnce = false;
+        return null;
+    }
     countMap[item.sortKey] = (countMap[item.sortKey] || 0) + 1;
     item.raw = `${item.raw.split('-')[0]}#${countMap[item.sortKey]}`;
     return item;
-});
+}).filter(item => item !== null); // 过滤掉被跳过的优汐#1
+
 
 processedLines.sort((a, b) => {
     const aMapped = nameMapping[a.sortKey] || a.sortKey;
@@ -188,14 +197,13 @@ processedLines.sort((a, b) => {
 
 VOD.vod_play_from = processedLines.map(item => item.raw).join("$$$");
 VOD.vod_play_url = processedLines.map(item => playurls[item.index]).join("$$$");
-VOD.vod_play_pan = playPans.join("$$$");
-
+VOD.vod_play_pan = playPans.join("$$$")
 
 return VOD;
-
 },
 
-搜索: async function (wd, quick, pg) {
+
+    搜索: async function (wd, quick, pg) {
         let {input, pdfa, pdfh, pd} = this;
         let html = await request(input);
         let d = [];
@@ -230,11 +238,12 @@ lazy: async function (flag, id, flags) {
                 'referer': 'https://pan.quark.cn/',
                 'Cookie': Quark.cookie
             };
-            urls.push("影视原画", `http://127.0.0.1:7777/?${threadParam}&form=urlcode&randUa=1&url=${encodeURIComponent(down.download_url)}`);
-            urls.push("通用原画", `http://127.0.0.1:5575/proxy?${threadParam}&chunkSize=256&url=${encodeURIComponent(down.download_url)}`)
-           // urls.push("原画", down.download_url + '#fastPlayMode##threads=10#')
+          urls.push("原画", `http://127.0.0.1:5575/proxy?${threadParam}&chunkSize=256&url=${encodeURIComponent(down.download_url)}`)
+
+                urls.push("原代本", `http://127.0.0.1:7777/?${threadParam}&form=urlcode&randUa=1&url=` + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)));
+
             // http://ip:port/?thread=线程数&form=url与header编码格式&url=链接&header=所需header
-            
+         urls.push("原代服", mediaProxyUrl + `?${threadParam}&form=urlcode&randUa=1&url=` + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)))
             const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
             transcoding.forEach((t) => {
                 urls.push(t.resolution === 'low' ? "流畅" : t.resolution === 'high' ? "高清" : t.resolution === 'super' ? "超清" : t.resolution, t.video_info.url)
@@ -244,7 +253,7 @@ lazy: async function (flag, id, flags) {
                 url: urls,
                 header: headers
             }
-        }
+        } 
          if (flag.startsWith('优汐')) {
             console.log("UC网盘解析开始");
             if (!UCDownloadingCache[ids[1]]) {

@@ -1,15 +1,12 @@
 globalThis.hosts = [
-  'https://xzys.fun',
-  '',
-  '',
-  ''
+  'https://xzys.fun'
 ];
 
 const { readFileSync } = require('fs');
 const config = JSON.parse(readFileSync('./config/tokenm.json', 'utf-8'));
 
 console.log('线程数量:', config.thread); 
-console.log('线路排序:', config.lineOrder);
+//console.log('线路排序:', config.lineOrder);
 
 const {getHtml} = $.require('./_lib.request.js')
 const { formatPlayUrl } = misc;
@@ -42,27 +39,31 @@ var rule = {
 		}
 	}],
 	limit:6,
-	//推荐:'div.container div.row a:has(>img);img&&alt;img&&src;img&&alt;a&&href',
+	
 	推荐: async function () {
     let {input, pdfa, pdfh, pd} = this;
     let html = await request(input);
     let d = [];
     let data = pdfa(html, 'div.container div.row a:has(>img)');
-    console.log('data的结果:', data);
+    //console.log('data的结果:', data);
     data.forEach((it) => {
     let title = pdfh(it, 'img&&alt');
+    let desc = pdfh(it, 'h2&&Text');
+  //console.log('desc的结果:', desc);
+  let matchResult = desc.match(/\[更\d+\]/);
+    let result = matchResult?.[0]?? '完结';
     if (!title.includes('置顶')) {
         d.push({
             title: title,
             img: pd(it, 'img&&src'),
-            desc: pdfh(it, 'img&&alt'),
+           desc: result,
             url: pd(it, 'a&&href')
         });
         }
     });
     return setResult(d);
 },
-//	一级:'div.container div.row div.list-boxes;img&&alt;img&&src;div.list-actions&&Text;a&&href',
+
 	一级: async function () {
     let {input, pdfa, pdfh, pd} = this;
     let html = await request(input);
@@ -71,11 +72,15 @@ var rule = {
   //  console.log('data的结果:', data);
     data.forEach((it) => {
     let title = pdfh(it, 'img&&alt');
+    let desc = pdfh(it, 'h2&&Text');
+  //console.log('desc的结果:', desc);
+  let matchResult = desc.match(/\[更\d+\]/);
+    let result = matchResult?.[0]?? '完结';
     if (!title.includes('置顶')) {
         d.push({
             title: title,
             img: pd(it, 'img&&src'),
-            desc: pdfh(it, 'div.list-actions&&Text'),
+           desc: result,
             url: pd(it, 'a&&href')
         });
         }
@@ -212,12 +217,11 @@ lazy: async function (flag, id, flags) {
                 'referer': 'https://pan.quark.cn/',
                 'Cookie': Quark.cookie
             };
-            urls.push("原画", `http://127.0.0.1:5575/proxy?${threadParam}&chunkSize=256&url=${encodeURIComponent(down.download_url)}`)
-                urls.push("原代本", `http://127.0.0.1:7777/?${threadParam}&form=urlcode&randUa=1&url=` + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)));
-
+            urls.push("影视原画", `http://127.0.0.1:7777/?${threadParam}&form=urlcode&randUa=1&url=${encodeURIComponent(down.download_url)}`);
+            urls.push("通用原画", `http://127.0.0.1:5575/proxy?${threadParam}&chunkSize=256&url=${encodeURIComponent(down.download_url)}`)
            // urls.push("原画", down.download_url + '#fastPlayMode##threads=10#')
             // http://ip:port/?thread=线程数&form=url与header编码格式&url=链接&header=所需header
-         urls.push("原代服", mediaProxyUrl + `?${threadParam}&form=urlcode&randUa=1&url=` + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)))
+            
             const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
             transcoding.forEach((t) => {
                 urls.push(t.resolution === 'low' ? "流畅" : t.resolution === 'high' ? "高清" : t.resolution === 'super' ? "超清" : t.resolution, t.video_info.url)
@@ -276,7 +280,7 @@ lazy: async function (flag, id, flags) {
     let html = await request(input);
     let d = [];
     let data = pdfa(html, 'div.container div.row a:has(>img)');
-    console.log('data的结果:', data);
+ //   console.log('data的结果:', data);
     data.forEach((it) => {
     let title = pdfh(it, 'img&&alt');
     if (!title.includes('置顶')) {

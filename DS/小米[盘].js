@@ -1,3 +1,6 @@
+globalThis.host1 = 'http://www.mucpan.cc';
+globalThis.host2 = 'https://www.milvdou.fun';
+
 const { readFileSync } = require('fs');
 const config = JSON.parse(readFileSync('./config/tokenm.json', 'utf-8'));
 
@@ -6,59 +9,35 @@ console.log('线路排序:', config.lineOrder);
 
 const {getHtml} = $.require('./_lib.request.js')
 const { formatPlayUrl } = misc;
-
 var rule = {
-    title: '闪电优汐[盘]',
-    host: 'http://1.95.79.193',
+    title: '小米[盘]',
+    author: '道长',
+    host: host1,
     url: '/index.php/vod/show/id/fyfilter.html',
     filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
     searchUrl: '/index.php/vod/search/page/fypage/wd/**.html',
-    filter: 'H4sIAAAAAAAAA+2YW08bVxSFn8OviOaZymdsl1zecg+536/Kg5NabVRKJXArIYSUhku4BBwQtUPjpJEKGFIcm7RJiF3Dn/HMwL/ozJzjffYs04goaoXU8+j1be9zZs3xnuXpt2zr4O22Pf3Wt+k+66B1ryvV22u1W92p79L+R2es6A4O+59/THX94Au3+63uQB5e2hpcCmT/gzXQrtRcwa9XaizsFFNas8QbXVX9dInSmiXuT0/cB7loidJoofGlRr0AC0mNFipOOx9qsJDUqAtdG+siNdrL6NNGdQz2IrVmyWZp0Xn8KlqiNNrLeNmrQ4nS2BV5s7WWKwo0Kll41HJFSqPtlhYb6y9hu1KjLiMzW3PL0EVq1OXFK/8aoYvUPuEeuQ9XvNw0lEiNSgbH3Ye/QInUyLpa1hleA+uk1izZej7jPl2IliiNFso92hyrwkJSI1/WX3uzb536KlhDMhVm5zd/w1MjNSqZGnGyb6BEanRqNp74txdOjdT0nSq4z6fxToUalQxteL/DpSuNDKxPe7XCdpcWIQN3Btr1EEj1pFNsBhQqzuPqTmfAfHFrbqS5UtAo1lgrOc/qCtBdW5xz18rb1Cmg7a64H9a36ycB3eL8gltYidQpiVb8ddn/WqRCSeTV+hRWKIlW+eNnrFAS3diJVaxQkj5p77FCSXqVSusqlUiPyYpTXYz2kBL1GMr6jjujy9E2pNJ+Fza8bMkbm4tumVQ9oF66Exv+l6OLkkp1w+8atVy0SErBEWsesK5U99f6gG2WS5tLD3Z6wJ7V/frmAkGjmJLYLcAKJdGNfjOPFUqiw5KvO5N5LNIqO1QtRVJiBxMrlMQOVUuFlNiRablmKTHbndeD0Qopcdv70qkebbubf7eV/3OHtsdF/Mtm+6BNLBQYTSJNcppAmuA0jjTOqY3U5lQgFYzaB4D6AqP7ke7ndB/SfZx2IO3gFL2yuVc2emVzr2z0yuZe2eiVzb2y0Sube2WjV74Q+VWmM5k0OyBOKe+WJ3d4QA7R4Qu7xA4ROQzkMJEjQI4QOQrkKJFjQI4ROQ7kOJETQE4QOQnkJJFOIJ1ETgE5ReQ0kNNEzgA5Q+QskLNEzgE5R+Q8kPNELgC5QOQikItELgG5ROQykMtErgC5QuQqkKtErgG5RuQ6kOtEbgC5QeQmkJtEbgG5RUR8cQBYoPCfwN0+Nh+nZpxqtuX467EZ9LnbF8vc98ubSzSqVbcyy+g39zO9+tFUHnJGRxjtvfd9TzrYwZ12Kx78EdtLf8RSmXTnV3o33mrNeTHx8R+jHgX+I7FRLep/Y/5vXT9v1sp+eOJMf89dKQaRhzE9fPzHVhCYGEvK3LjX5EaTG//V3KiPmIkwJsKYCGMijIkwuzHCJKLvkj8vwoQPfq/2l351l+ApJkwjgPUQkkEGMMsyYQYCHDevwUyc+U/izB4TZ0ycMXHGxBkTZ3ZznEl+dpyBFzJKTfI3LmGOIcAiSphgCLBoE2YXAnqOuW/fO/M5DkycMXHGxBkTZ0ycMXHGxJn/e5zpCJcwk9pMajOpzaQ2k3rXTuo2KyGCv55mWJth/U/DmqhArwT3SqBXgnsl0CvBvRLoleBeCfRKcK8EeiW4VwK9EtwrgV4J7pVArwT3SqBXwjzYzIPNPNh2xYOtrW3gb7bX1stwNAAA',
+    headers: { "User-Agent": "PC_UA" },
+    timeout: 10000,
+    play_parse: true,
+    double: false,
+   filter: 'H4sIAAAAAAAAA+2XW08bRxiG7/0z9prKs4aSw13OIefzqcqFk1ptVEolcCuhCCkN2OEQcEDUDo1JUxUwpDg2aZsmtgx/xru2/0V2PbPffPu6Cm6bi6rMpd/n8zc778zOzns/YtnWwc/uW18lRq2D1t3B+MiI1WMNxb9OeD+dqYI7nvJ+fxcf/DbRrhvy5dR6a3zdl70f1liPUrN5r16p0XanqNKCksbkluqnS5QWlLjfP3EfZMMlSqOBptfrtTwMJDUaqDDvvKvCQFKjLjQ31kVq9CyTT+uVKXgWqQUlzeKa8/hluERp9CzTpUYNSpTGZtRYrHbMyNeoZPVRx4yURo9bXKtvv4DHlRp1SS+0ljagi9Soy/OX3hyhi9T+xhq5Dzcb2XkokRqVjE+7D3+EEqmRddWMk3oL1kktKGktL7hPV8MlSqOBso+aUxUYSGrky/arxuIfTm0LrCGZCjMrzV9w10iNSubSTuY1lEiNds3OE295YddITa9U3l2ex5Vqa1QysdP4FaauNDKwNt+o5v9qaiEydtv/gzwC4sOJODsB8mXncaXbE2Cl0FpKB+P4jaJKotVaW3LflkIVStIGl9132+EeUqI5bc85z2qhCiXRgv/2A1YoiRZgZgsrlEQ9cqtufjPcQ0o0l582sIeS9K76EyuUpJ+03Pmk5VCP2bJTWQv3kBL1mMh4LjuTG+E2pNKcV3camWJjaik8bVL1YfTCndnx/hwelFSqS72pV7PhIinx7TQYH/pCb6dmqdhcf9DtdnpW8+qDAfxGUSWxZcQKJdFmeb2CFUqiZczVnNkcFmmVLXdHkZTYlsEKJbGN2VEhJbZlOuYsJWa782o8XCElbvtoIj6sbXdzb1q537u0PSZinwbt/TbRtsBoH9I+TnuR9nIaQxrj1EZqcyqQCkbtA0A9gdH9SPdzug/pPk77kfZzil7Z3CsbvbK5VzZ6ZXOvbPTK5l7Z6JXNvbLRK5t7JdArwb0S6JXgXgn0SnCvBHoluFcCvRLcK4FeCe6VQK8E90qgV4J7JdArwb0S6JUnhE6wRDKZYC+TU8y5pdkuX6ZD9KK2u0QPETkM5DCRI0COEDkK5CiRY0COETkO5DiRE0BOEDkJ5CSRASADRE4BOUXkNJDTRM4AOUPkLJCzRM4BOUfkPJDzRC4AuUDkIpCLRC4BuUTkMpDLRK4AuULkKpCrRK4BuUbkOpDrRG4AuUHkJpCbRG4BuUVEfHIAmK/wV+DOKPuWzC04lUzH9tefGL/PndFo8p5XHgxRr1Tc8iKjX95LjujPeGnCmUwzOnL3m+GE/wS3e6yYN0SE8mk8mRj4XD9MY6vqPJ/58LuoTwLv9lCvFHRIZcet96H2L28a6bPH3Sz490uN9KHlXVy9yylD/W3bIiZOmzht4vSejtORj5Gn0ymvPpywIE/vmkE/RuLePQt3k8l3S7pdZPJs2YuhzvLP4TakmmT6j5Pph1NlxMRKEytNrDSx0sRKEyv/H7Gy99/GSkiVQdjUB6KMlIGujwaZJwM9ZhKjSYwmMZrEaBLjfzYxRkxkNJHRREYTGS0TGU1kNJFxj0bGPh4ZzVXAXAXMVcBcBcxVwFwFzFVgb10FImPvAclUBV83MwAA',
     filter_def: {
         1: {cateId: '1'},
         2: {cateId: '2'},
         3: {cateId: '3'},
         4: {cateId: '4'},
-        30: {cateId: '30'},
     },
     cate_exclude: '网址|专题|全部影片',
-    play_parse: true,
     searchable: 1,
     filterable: 1,
     quickSearch: 0,
-    headers: { "User-Agent": "PC_UA" },
-  //  class_name: '电影&剧集&动漫&综艺',
-   // class_url: '1&2&4&3',
-
-    预处理: async () => {
-        return []
-    },
-    推荐: async function () {
+   class_name: '电影&剧集&动漫&综艺',
+   class_url: '1&2&3&4',
+     推荐: async function () {
     return this.一级();
     },
-    
-    class_parse: async function () {
-    const { input, pdfa, pdfh, pd, MY_CATE, MY_PAGE } = this; // 解构工具函数
-    const classes = []; // 初始化分类数组
-    // const filters = {}; // 未使用的过滤器变量
-    const html = await request(input, { headers: this.headers }); // 获取页面内容
-    const cate =    MY_CATE;
-    // 提取页面中的分类列表元素
-    let data = pdfa(html, ".grid-box&&ul&&li");
-    // 遍历每个分类项，提取分类 ID 和名称
-    data.forEach((it) => {
-        let type_id = /.*\/(.*?).html/g.exec(pdfh(it, "a&&href"))?.[1]; // 提取分类 ID
-        if (!type_id) return; // 跳过无效分类项
-        let type_name = pdfh(it, "a&&Text"); // 提取分类名称
-        classes.push({ type_id, type_name }); // 存储分类信息
-    });
-
-    return { class: classes }; // 返回解析结果
-},
-
-
-   
-   一级: async function () {
+ 
+    一级: async function () {
     let {input, pdfa, pdfh, pd} = this;
     let html = await request(input);
     let d = [];
@@ -73,8 +52,7 @@ var rule = {
     });
     return setResult(d)
 },
-    
-二级: async function (ids) {
+    二级: async function (ids) {
         let {input} = this;
         let html = (await getHtml(input)).data
         const $ = pq(html)
@@ -114,7 +92,7 @@ var rule = {
             }
 
         }
-        // 去除后缀
+// 去除后缀
     let processedArray = playform.map(str => str.replace(/-[\w]+$/, "")
     .replace(/UC/, "优汐")
     );
@@ -139,7 +117,8 @@ var rule = {
     return VOD
     },
 
-搜索: async function (wd, quick, pg) {
+
+    搜索: async function (wd, quick, pg) {
         let {input, pdfa, pdfh, pd} = this;
         let html = await request(input);
         let d = [];
@@ -155,7 +134,7 @@ var rule = {
         });
         return setResult(d);
     },
-lazy: async function (flag, id, flags) {
+    lazy: async function (flag, id, flags) {
         let {input, mediaProxyUrl} = this;
         const ids = input.split('*');
         const urls = [];
@@ -177,5 +156,7 @@ lazy: async function (flag, id, flags) {
             });
         return {parse: 0, url: urls}
         }
-    },
+
+    }
+    
 }
