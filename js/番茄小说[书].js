@@ -157,7 +157,7 @@ var rule = {
         content_url = `https://fanqienovel.com/reader/${input}?enter_from=reader`;
         log(content_url);
         let html = (await req(content_url, {headers: {Cookie: getFqCookie()}})).content;
-        html = html.match(/window.__INITIAL_STATE__=(.+?});/)[1];
+        html = html.match(/window.__INITIAL_STATE__=(.+?});/)[1].replaceAll(':undefined,', ':"undefined",');
         let json = JSON.parse(html).reader.chapterData;
         title = json.title;
         content = decodeText(json.content, 2);
