@@ -152,7 +152,7 @@ var rule = {
             }
             const downCache = UCDownloadingCache[ids[1]];
            downCache.forEach((t) => {
-                urls.push(t.name === 'low' ? "流畅" : t.name === 'high' ? "高清" : t.name === 'super' ? "超清" : t.name, `http://127.0.0.1:5575/proxy?${threadParam}&chunkSize=256&url=${encodeURIComponent(t.url)}`)
+                urls.push(t.name === 'low' ? "流畅" : t.name === 'high' ? "高清" : t.name === 'super' ? "超清" : t.name, `${t.url}`)
             });
         return {parse: 0, url: urls}
         }

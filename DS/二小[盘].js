@@ -1,6 +1,6 @@
 globalThis.hosts = [
   'https://erxiaofn.click',
-  'http://txfpan.top',
+  'http://2xiaopan.fun',
   'http://mihdr.top',
   'http://www.miqk.cc'
 ];
@@ -257,11 +257,11 @@ lazy: async function (flag, id, flags) {
  //   urls.push("极速原画", `${down.download_url}#isVideo=true#`)
  //5575  5758    9975
 // urls.push("原e本", `http://127.0.0.1:7777/?url=${encodeURIComponent(down.download_url)}`);
-          urls.push("原画", `http://127.0.0.1:5575/proxy?${threadParam}&chunkSize=256&url=${encodeURIComponent(down.download_url)}`)
+urls.push("影视原画", `http://127.0.0.1:7777/?${threadParam}&form=urlcode&randUa=1&url=${encodeURIComponent(down.download_url)}`);
+          urls.push("通用原画", `http://127.0.0.1:5575/proxy?${threadParam}&chunkSize=256&url=${encodeURIComponent(down.download_url)}`)
 
-     urls.push("原代本", `http://127.0.0.1:7777/?${threadParam}&form=urlcode&randUa=1&url=${encodeURIComponent(down.download_url)}`);
             // http://ip:port/?thread=线程数&form=url与header编码格式&url=链接&header=所需header
-         urls.push("原代服", mediaProxyUrl + `?${threadParam}&form=urlcode&randUa=1&url=` + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)))
+        // urls.push("原代服", mediaProxyUrl + `?${threadParam}&form=urlcode&randUa=1&url=` + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)))
             const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
             transcoding.forEach((t) => {
                 urls.push(t.resolution === 'low' ? "流畅" : t.resolution === 'high' ? "高清" : t.resolution === 'super' ? "超清" : t.resolution, t.video_info.url)
@@ -280,7 +280,7 @@ lazy: async function (flag, id, flags) {
             }
             const downCache = UCDownloadingCache[ids[1]];
            downCache.forEach((t) => {
-                urls.push(t.name === 'low' ? "流畅" : t.name === 'high' ? "高清" : t.name === 'super' ? "超清" : t.name, `http://127.0.0.1:5575/proxy?${threadParam}&chunkSize=256&url=${encodeURIComponent(t.url)}`)
+                urls.push(t.name === 'low' ? "流畅" : t.name === 'high' ? "高清" : t.name === 'super' ? "超清" : t.name, `${t.url}`)
             });
         return {parse: 0, url: urls}
         }
