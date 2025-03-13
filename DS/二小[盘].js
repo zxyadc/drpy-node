@@ -42,27 +42,70 @@ var rule = {
     
     
  class_parse: async function () {
-    let { input, pdfa, pdfh, pd } = this;
-    let html = await request(input); // 获取 HTML 内容
-    let classes = [];
-    let data = pdfa(html, '.grid-box&&ul&&li'); // 解析目标元素
-    data.forEach((it, index) => {
-        let typeName = pdfh(it, 'a&&Text'); // 提取文本内容
-        let href = pd(it, 'a&&href'); // 提取 href 属性
-          //  console.log("href 结果:", href); // 打印最终解析结果
-            // 使用正则表达式提取 ID
-            let matchResult = href.match(/.*\/(.*?).html/); 
-            if (!matchResult) {
-                return; 
-            }
-            let typeId = matchResult[1];
+    const { input, pdfa, pdfh, pd, host, timeout, headers } = this;
+    const html = await request(input);
+    const classes = [];
+    const filters = {};
+
+    // 类处理
+    pdfa(html, '.grid-box&&ul&&li').forEach((it) => {
+        const typeName = pdfh(it, 'a&&Text');
+        const href = pd(it, 'a&&href');
+        const matchResult = href.match(/.*\/(.*?).html/);
+        if (matchResult) {
             classes.push({
                 type_name: typeName,
-                type_id: typeId,
+                type_id: matchResult[1]
             });
-    });    
-    return { class: classes };
-  },
+        }
+    });
+
+    // 筛选处理
+    const htmlUrl = classes.map((item) => ({
+        url: `${host}/index.php/vod/show/id/${item.type_id}.html`,
+        options: { timeout, headers }
+    }));
+
+    try {
+        const htmlArr = await batchFetch(htmlUrl);
+        htmlArr.forEach((it, i) => {
+            const type_id = classes[i].type_id;
+            const data = pdfh(it, ".box");
+            console.log('筛选页面提取到的.box元素:', data);
+            const categories = [
+                { key: "class", name: "全部剧情" },
+                { key: "area", name: "全部地区" },
+                { key: "year", name: "全部年代" },
+                { key: "actor", name: "主演" },
+                { key: "director", name: "导演" }
+            ];
+            filters[type_id] = categories.map((category) => {
+                let filteredData;
+                if (category.key === "actor") {
+                    filteredData = data.filter((item) => pdfh(item,'.actor - label&&Text') === category.name)[0] || [];
+                } else if (category.key === "director") {
+                    filteredData = data.filter((item) => pdfh(item,'.director - label&&Text') === category.name)[0] || [];
+                } else {
+                    filteredData = data.filter((item) => pdfh(item,'.library - item - first&&Text') === category.name)[0] || [];
+                }
+                console.log(`筛选出的${category.name}相关数据:`, filteredData);
+                const values = pdfa(filteredData, "div a").map((it) => ({
+                    n: pdfh(it, "a&&Text") || "全部",
+                    v: pdfh(it, "a&&Text") === "全部"? "" : pdfh(it, "a&&Text")
+                }));
+                return { key: category.key, name: category.name, value: values };
+            }).filter((item) => item.value && item.value.length > 0);
+        });
+    } catch (error) {
+        console.error('批量请求筛选页面HTML时出错:', error);
+    }
+
+    console.log('classes:', classes);
+    console.log('filters:', filters);
+    return { class: classes, filters };
+}
+,
+
   
 
    一级: async function () {

@@ -4,8 +4,8 @@
 const { readFileSync } = require('fs');
 const config = JSON.parse(readFileSync('./config/tokenm.json', 'utf-8'));
 
-console.log('线程数量:', config.thread); 
-console.log('线路排序:', config.lineOrder);
+//console.log('线程数量:', config.thread); 
+//console.log('线路排序:', config.lineOrder);
 
 const {getHtml} = $.require('./_lib.request.js')
 const { formatPlayUrl } = misc;
@@ -19,7 +19,6 @@ var rule = {
     host: 'http://pan.tfapi.cn',
     url: '',
     searchUrl: '/api/search?title=**.html',
-   // http://pan.tfapi.cn/s/爱-2.html
     headers: {
         'User-Agent': 'PC_UA',
         'Content-Type': 'application/json'
@@ -32,12 +31,10 @@ var rule = {
     limit: 10,
     class_name: '',
     class_url: '',
-    /*
-    lazy: async function () {
-    },*/
+
     lazy: async function (flag, id, flags) {
         let {input, mediaProxyUrl} = this;
-        console.log('orId的结果:', input);
+    //    console.log('orId的结果:', input);
         
        const ids = input.split('*');
         //const ids = input;
@@ -50,16 +47,10 @@ var rule = {
         const threadCount = config.thread || 10; // 默认值为 10
         const threadParam = `thread=${threadCount}`;
 
-        let downUrl = ''
         if (flag.startsWith('夸克')) {
             console.log("夸克网盘解析开始")
             const down = await Quark.getDownload(ids[0], ids[1], ids[2], ids[3], true);
-            urls.push("原画", `http://127.0.0.1:5575/proxy?${threadParam}&chunkSize=256&url=${encodeURIComponent(down.download_url)}`)
-          //  urls.push("go原画代理",'http://127.0.0.1:7777/?thread=20&url='+down.download_url)
-            urls.push("原代本", `http://127.0.0.1:7777/?${threadParam}&form=urlcode&randUa=1&url=` + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)));
-           // urls.push("原画", `${down.download_url}#fastPlayMode##${threadParam}`)
-            // http://ip:port/?thread=线程数&form=url与header编码格式&url=链接&header=所需header
-         urls.push("原代服", mediaProxyUrl + `?${threadParam}&form=urlcode&randUa=1&url=` + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)))
+          urls.push("通用原画", `http://127.0.0.1:5575/proxy?${threadParam}&chunkSize=256&url=${encodeURIComponent(down.download_url)}`)
             const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
             transcoding.forEach((t) => {
                 urls.push(t.resolution === 'low' ? "流畅" : t.resolution === 'high' ? "高清" : t.resolution === 'super' ? "超清" : t.resolution, t.video_info.url)
@@ -83,7 +74,7 @@ var rule = {
             }
             const downCache = UCDownloadingCache[ids[1]];
            downCache.forEach((t) => {
-                urls.push(t.name === 'low' ? "流畅" : t.name === 'high' ? "高清" : t.name === 'super' ? "超清" : t.name, `http://127.0.0.1:5575/proxy?${threadParam}&chunkSize=256&url=${encodeURIComponent(t.url)}`)
+                urls.push(t.name === 'low' ? "流畅" : t.name === 'high' ? "高清" : t.name === 'super' ? "超清" : t.name, `${t.url}`)
             });
         return {parse: 0, url: urls}
         }
@@ -212,70 +203,45 @@ var rule = {
         uniqueArray.push(item + '#' + count[item]);
     }
 });
-// 确保优汐排在前面
-    uniqueArray.sort((a, b) => {
-        const aIsYouXi = a.startsWith("夸克");
-        const bIsYouXi = b.startsWith("夸克");
-        if (aIsYouXi && !bIsYouXi) return -1;
-        if (!aIsYouXi && bIsYouXi) return 1;
-        return 0;
-    });
+   
       VOD.vod_play_from = uniqueArray.join("$$$")
    VOD.vod_play_url = playurls.join("$$$");
    VOD.vod_play_pan = playPans.join("$$$")
     // console.log('VOD.vod_play_url的结果:', VOD.vod_play_url);
     return VOD;
 },
-    /*
-    二级: async function () {
-        let {orId} = this;
-        // let vod_id = orId;
-        let vod_id = base64Decode(orId);
-        let vod = {vod_id: vod_id.split('$$')[0]};
-        vod.vod_name = vod_id.split('$$')[1];
-        vod.vod_play_from = 'push';
-        vod.vod_play_url = '推送观看$' + vod.vod_id;
-        // log(vod);
-        console.log('VOD.vod_play_url的结果:', vod.vod_play_url);
-        return vod
-    },
-    */
+
     搜索: async function () {
-        let {input, pdfa, pdfh, pd, KEY, MY_PAGE} = this;
-        const postData = {
-            page: MY_PAGE,
-            q: KEY, // 使用用户通过 'wd' 参数传递的搜索文本
-            user: '',
-            // exact: true,
-            exact: false,
-            share_time: '',
-            size: this.limit, // 最多返回10个结果
-            // type: 'QUARK',
-            type: ''
+    let { input, pdfa, pdfh, pd, KEY, MY_PAGE } = this;
+    let html = await post(input);
+    let json = JSON.parse(html);
+    // 获取 "list" 部分的内容
+    let list = json.data.items || [];
+    //console.log('list的结果:', list);
+    list = list.map((item) => {
+        let vod_pic = '默认图片链接';
+        let remarks = '未知网盘'; // 初始化 remarks
+        let vod_name = `${item.title}`;
+        console.log('item.url的结果:', item.url);
+        if (/pan.quark.cn/.test(item.url)) {
+            vod_pic = 'http://pic.uzzf.com/up/2023-7/20237261437483499.png';
+            remarks = '夸克网盘';
+        } else if (/drive.uc.cn/.test(item.url)) {
+            vod_pic = 'https://mpimg.cn/view.php/9d94cc2024939d2f82c9e7dacc36569a.jpg';
+            remarks = 'UC网盘';
+        }
+        return {
+            vod_name: `${item.title}`,
+            vod_content: `上传日期: ${item.update_time}`,
+            vod_remarks: `网盘:${remarks}`,
+            vod_id: `${item.url}`,
+            vod_pic: vod_pic
         };
-        let html = await post(input, {data: postData});
-        let json = JSON.parse(html);
+    });
 
-        // 获取 "list" 部分的内容
-        let list = json.data.items || [];
-       // console.log('list的结果:', list);
-        // 循环遍历 "list"，将 "disk_name" 键名替换为 "vod_name"，将 "shared_time" 键名替换为 "vod_remarks"，将 "link" 键名替换为 "vod_id"，并设置 "disk_type" 替换为 "vod_pic"
-        list = list.map((item) => {
-            let vod_name = `${item.title}`;
-            console.log('vod_name的结果:', vod_name);
-            return {
-                vod_name: `${item.title}`,
-                vod_content: `上传日期: ${item.update_time}`,
-                vod_remarks: `网盘:${item.times}`,
-                vod_id: `${item.url}`,
-              // vod_id: base64Encode(`push://${item.link}$$${vod_name}`),
-                vod_pic: 'http://pic.uzzf.com/up/2023-7/20237261437483499.png'
-            }
-        });
+    // 更新 "list" 部分的内容
+    json.data.list = list;
 
-        // 更新 "list" 部分的内容
-        json.data.list = list;
-
-        return list
-    }
+    return list;
+}
 }

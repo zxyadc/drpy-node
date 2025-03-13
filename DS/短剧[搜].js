@@ -14,15 +14,12 @@ const { formatPlayUrl } = misc;
 
 var rule = {
     类型: '搜索',
-    title: '盘搜Pro',
+    title: '短剧库[搜]',
     alias: '网盘搜索引擎',
     desc: '仅搜索源纯js写法',
-    host: 'https://panso.pro',
+    host: 'https://so.duanjuku.top',
     url: '',
-  //  searchUrl: '/search?q=**&page=fypage',
-    //searchUrl: '/search?q=**&type=QUARK&format=video&exact=true&page=fypage',
-    searchUrl: '/search?q=**&exact=true&format=video&page=fypage',
-    
+    searchUrl: '/search.php?q=**&page=fypage',
     headers: {
         'User-Agent': 'PC_UA',
         'Content-Type': 'application/json'
@@ -131,12 +128,13 @@ var rule = {
     let {input, pdfa, pdfh, pd} = this;
     let html = await post(input);
     let pans = [];
-   //console.log('input的结果:', input);
+    console.log('input的结果:', input);
     //console.log('html的结果:', html);
-    let data = pdfa(html, 'div._resource-actions_1u20h_155'); // 解析目标元素
+   let data = pdfa(html, '.content'); // 解析目标元素
+  // console.log('data的结果:', data);
     data.forEach(function(it) {
         let burl = pdfh(it, 'a&&href');
-        console.log('burl的结果:', burl);
+      //  console.log('burl的结果:', burl);
         if (burl.startsWith("https://www.aliyundrive.com/s/") || burl.startsWith("https://www.alipan.com/s/")){
 	pans.push(burl);
 	}else if (burl.startsWith("https://drive.uc.cn/s/")){
@@ -230,42 +228,30 @@ if (/www.alipan.com|www.aliyundrive.com/.test(pans)) {
 },
 
 
-
-    搜索: async function () {
+搜索: async function () {
     let { input, pdfa, pdfh, pd, KEY, MY_PAGE } = this;
-    
-    const postData = {
-        page: MY_PAGE,
-        q: KEY,
-        user: '',
-        exact: true,
-        share_time: '',
-        size: this.limit
-    };
-    
+
    // let html = await post(input, { data: postData });
     let html = await request(input, { headers: this.headers });
+    //console.log('html的结果:', html);
     let d = [];
-    let data = pdfa(html, 'div._search-item_12qtj_18');
-
+    let data = pdfa(html, '.erx-list .item');
+  //  console.log('data的结果:', data);
     data.forEach((it) => {
-        let content = pdfh(it, 'img&&alt');
-        if (content === "夸克网盘" || content === "UC网盘") {
-            let vod_pic;
-            if (content === "夸克网盘") {
-                vod_pic = 'http://pic.uzzf.com/up/2023-7/20237261437483499.png';
-            } else {
-                vod_pic = 'https://mpimg.cn/view.php/9d94cc2024939d2f82c9e7dacc36569a.jpg';
-            }
-            let desc = pdfh(it, 'body&&Text').match(/(\d{4}-\d{2}-\d{2}|\d+\s*天前)/)?.[0] || '';
+        let title = pdfh(it, 'a&&Text');
+       // console.log('title的结果:', title);
+        let desc = pdfh(it, '.erx-num-font&&Text');
+       // console.log('desc的结果:', desc);
+        let url = pdfh(it, 'a&&href');
+       // console.log('url的结果:', url);
             d.push({
-                title: pd(it, 'a&&title'),
-                img: vod_pic,
+                title: title,
+                img: 'https://so.duanjuku.top/zb_users/theme/erx_Special/images/logo.png',
                 desc: '上传日期:' + desc,
-                content: '上传网盘:' + content,
+                content: '上传日期:' + desc,
                 url: pd(it, 'a&&href')
             });
-        }
+     //   }
     });
     return setResult(d);
 }

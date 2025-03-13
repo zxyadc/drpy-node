@@ -17,12 +17,11 @@ var rule = {
     title: '盘搜Pro',
     alias: '网盘搜索引擎',
     desc: '仅搜索源纯js写法',
-    host: 'https://panso.pro',
-    url: '',
-  //  searchUrl: '/search?q=**&page=fypage',
-    //searchUrl: '/search?q=**&type=QUARK&format=video&exact=true&page=fypage',
-    searchUrl: '/search?q=**&exact=true&format=video&page=fypage',
-    
+    host: 'https://djzyw.com',
+    url: '/duanju',
+    编码:'gb2312',//不填就默认utf-8
+    searchUrl: '/search.php?mod=forum&searchid=207&orderby=lastpost&ascdesc=desc&searchsubmit=yes&kw=**&page=fypage',
+   // https://djzyw.com/search.php?mod=forum&searchid=207&orderby=lastpost&ascdesc=desc&searchsubmit=yes&kw=爱
     headers: {
         'User-Agent': 'PC_UA',
         'Content-Type': 'application/json'
@@ -35,6 +34,8 @@ var rule = {
     limit: 10,
     class_name: '',
     class_url: '',
+    //https://djzyw.com/forum.php?mod=forumdisplay&fid=2&filter=heat&orderby=heats&page=2
+    //https://djzyw.com/duanju/p-2/
     lazy: async function (flag, id, flags) {
         let {input, mediaProxyUrl} = this;
        const ids = input.split('*');
@@ -124,19 +125,21 @@ var rule = {
             vod_tag: 'action'
         }]
     },
-    一级: async function () {
+
+    一级: async function () { 
         return []
     },
     二级: async function () {
     let {input, pdfa, pdfh, pd} = this;
     let html = await post(input);
     let pans = [];
-   //console.log('input的结果:', input);
-    //console.log('html的结果:', html);
-    let data = pdfa(html, 'div._resource-actions_1u20h_155'); // 解析目标元素
+  //  console.log('input的结果:', input);
+   // console.log('html的结果:', html);
+   let data = pdfa(html, '.t_fsz'); // 解析目标元素
+   //console.log('data的结果:', data);
     data.forEach(function(it) {
         let burl = pdfh(it, 'a&&href');
-        console.log('burl的结果:', burl);
+      //  console.log('burl的结果:', burl);
         if (burl.startsWith("https://www.aliyundrive.com/s/") || burl.startsWith("https://www.alipan.com/s/")){
 	pans.push(burl);
 	}else if (burl.startsWith("https://drive.uc.cn/s/")){
@@ -230,42 +233,30 @@ if (/www.alipan.com|www.aliyundrive.com/.test(pans)) {
 },
 
 
-
-    搜索: async function () {
+搜索: async function () {
     let { input, pdfa, pdfh, pd, KEY, MY_PAGE } = this;
-    
-    const postData = {
-        page: MY_PAGE,
-        q: KEY,
-        user: '',
-        exact: true,
-        share_time: '',
-        size: this.limit
-    };
-    
+
    // let html = await post(input, { data: postData });
     let html = await request(input, { headers: this.headers });
+    //console.log('html的结果:', html);
     let d = [];
-    let data = pdfa(html, 'div._search-item_12qtj_18');
-
+    let data = pdfa(html, '.v2_box .v2_cont-title');
+  // console.log('data的结果:', data);
     data.forEach((it) => {
-        let content = pdfh(it, 'img&&alt');
-        if (content === "夸克网盘" || content === "UC网盘") {
-            let vod_pic;
-            if (content === "夸克网盘") {
-                vod_pic = 'http://pic.uzzf.com/up/2023-7/20237261437483499.png';
-            } else {
-                vod_pic = 'https://mpimg.cn/view.php/9d94cc2024939d2f82c9e7dacc36569a.jpg';
-            }
-            let desc = pdfh(it, 'body&&Text').match(/(\d{4}-\d{2}-\d{2}|\d+\s*天前)/)?.[0] || '';
+        let title = pdfh(it, 'a&&Text');
+      // console.log('title的结果:', title);
+        let desc = pdfh(it, '.erx-num-font&&Text');
+       // console.log('desc的结果:', desc);
+        let url = pdfh(it, 'a&&href');
+       console.log('url的结果:', url);
             d.push({
-                title: pd(it, 'a&&title'),
-                img: vod_pic,
+                title: title,
+                img: 'https://djzyw.com/template/djzyw_com/yangshi/logo.svg',
                 desc: '上传日期:' + desc,
-                content: '上传网盘:' + content,
+                content: '上传日期:' + desc,
                 url: pd(it, 'a&&href')
             });
-        }
+     //   }
     });
     return setResult(d);
 }
