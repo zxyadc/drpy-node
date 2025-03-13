@@ -19,7 +19,6 @@ var rule = {
     desc: '仅搜索源纯js写法',
     host: 'https://djzyw.com',
     url: '/duanju',
-    编码:'gb2312',//不填就默认utf-8
     searchUrl: '/search.php?mod=forum&searchid=207&orderby=lastpost&ascdesc=desc&searchsubmit=yes&kw=**&page=fypage',
    // https://djzyw.com/search.php?mod=forum&searchid=207&orderby=lastpost&ascdesc=desc&searchsubmit=yes&kw=爱
     headers: {
@@ -129,6 +128,7 @@ var rule = {
     一级: async function () { 
         return []
     },
+    
     二级: async function () {
     let {input, pdfa, pdfh, pd} = this;
     let html = await post(input);
@@ -235,13 +235,13 @@ if (/www.alipan.com|www.aliyundrive.com/.test(pans)) {
 
 搜索: async function () {
     let { input, pdfa, pdfh, pd, KEY, MY_PAGE } = this;
-
+    console.log('input的结果:', input);
    // let html = await post(input, { data: postData });
     let html = await request(input, { headers: this.headers });
-    //console.log('html的结果:', html);
+    console.log('html的结果:', html);
     let d = [];
     let data = pdfa(html, '.v2_box .v2_cont-title');
-  // console.log('data的结果:', data);
+   console.log('data的结果:', data);
     data.forEach((it) => {
         let title = pdfh(it, 'a&&Text');
       // console.log('title的结果:', title);
