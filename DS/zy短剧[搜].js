@@ -251,7 +251,7 @@ if (/www.alipan.com|www.aliyundrive.com/.test(pans)) {
        console.log('url的结果:', url);
             d.push({
                 title: title,
-                img: 'https://djzyw.com/template/djzyw_com/yangshi/logo.svg',
+                img: 'https://cnb.cool/zhyadc/YsBox/-/git/raw/main/img/短剧资源.jpg',
                 desc: '上传日期:' + desc,
                 content: '上传日期:' + desc,
                 url: pd(it, 'a&&href')
