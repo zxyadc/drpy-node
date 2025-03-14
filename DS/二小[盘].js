@@ -42,24 +42,24 @@ var rule = {
     
     
  class_parse: async function () {
-    const { input, pdfa, pdfh, pd, host, timeout, headers } = this;
-    const html = await request(input);
-    const classes = [];
-    const filters = {};
-
-    // 类处理
-    pdfa(html, '.grid-box&&ul&&li').forEach((it) => {
-        const typeName = pdfh(it, 'a&&Text');
-        const href = pd(it, 'a&&href');
-        const matchResult = href.match(/.*\/(.*?).html/);
-        if (matchResult) {
-            classes.push({
-                type_name: typeName,
-                type_id: matchResult[1]
-            });
-        }
+    const { input, pdfa, pdfh, pd, MY_CATE, MY_PAGE } = this; // 解构工具函数
+    const classes = []; // 初始化分类数组
+    const filters = {}; // 未使用的过滤器变量
+    const html = await request(input, { headers: this.headers }); // 获取页面内容
+    // 提取页面中的分类列表元素
+    let data = pdfa(html, ".grid-box&&ul&&li");
+   // console.log('data的结果:', data);
+    // 遍历每个分类项，提取分类 ID 和名称
+    data.forEach((it) => {
+        let type_id = /.*\/(.*?).html/g.exec(pdfh(it, "a&&href"))?.[1]; // 提取分类 ID
+        if (!type_id) return; // 跳过无效分类项
+        let type_name = pdfh(it, "a&&Text"); // 提取分类名称
+        classes.push({ type_id, type_name }); // 存储分类信息
     });
 
+    return { class: classes }; // 返回解析结果
+},
+/*
     // 筛选处理
     const htmlUrl = classes.map((item) => ({
         url: `${host}/index.php/vod/show/id/${item.type_id}.html`,
@@ -68,6 +68,9 @@ var rule = {
 
     try {
         const htmlArr = await batchFetch(htmlUrl);
+       // const lists = JSON.parse(htmlArr);
+       //console.log('htmlArr的结果:', htmlArr);
+      //  console.log('lists的结果:', lists);
         htmlArr.forEach((it, i) => {
             const type_id = classes[i].type_id;
             const data = pdfh(it, ".box");
@@ -102,10 +105,11 @@ var rule = {
 
     console.log('classes:', classes);
     console.log('filters:', filters);
-    return { class: classes, filters };
+    
+    return { class: classes };
 }
 ,
-
+*/
   
 
    一级: async function () {

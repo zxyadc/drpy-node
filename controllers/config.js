@@ -60,8 +60,8 @@ async function generateSiteJSON(options, requestHost, sub, pwd) {
         return {
             func: async ({file, jsDir, requestHost, pwd, drpy, SitesMap, jsEncoder}) => {
                 const baseName = path.basename(file, '.js'); // 去掉文件扩展名
-        let api = `${requestHost}/api/${baseName}`;  // 使用请求的 host 地址，避免硬编码端口
-   //   let api = `https://zhxy.eu.org/api/${baseName}`;  // 使用请求的 host 地址，避免硬编码端口
+     let api = `${requestHost}/api/${baseName}`;  // 使用请求的 host 地址，避免硬编码端口
+  // let api = `https://zhxy.eu.org/api/${baseName}`;  // 使用请求的 host 地址，避免硬编码端口
                 if (pwd) {
                     api += `?pwd=${pwd}`;
                 }
@@ -142,8 +142,8 @@ async function generateSiteJSON(options, requestHost, sub, pwd) {
             return {
                 func: async ({file, dr2Dir, requestHost, pwd, drpy, SitesMap}) => {
                     const baseName = path.basename(file, '.js'); // 去掉文件扩展名
-                let api = `https://gitee.com/zhxyad/YsBox/raw/master/drpy_libs/drpy2.min.js`;  // 使用内置drpy2
-              //   let api = `https://cnb.cool/zhyadc/YsBox/-/git/raw/main/drpy_libs/drpy2.min.js`;  // 使用内置drpy2
+               // let api = `https://gitee.com/zhxyad/YsBox/raw/master/drpy_libs/drpy2.min.js`;  // 使用内置drpy2
+                let api = `https://cnb.cool/zhyadc/YsBox/-/git/raw/main/drpy_libs/drpy2.min.js`;  // 使用内置drpy2
                     let ext = `${requestHost}/js/${file}`;
                     if (pwd) {
                         ext += `?pwd=${pwd}`;
@@ -271,6 +271,7 @@ sites.forEach(site => {
   .replace(/(雷鲸小站|资源汇)\[盘\]/g, '$1[天翼]')
   .replace(/(盘它)\[盘\]/g, '$1[移动]')
   .replace(/(AList)\[盘\]/g, '$1[存储]')
+  .replace(/(直播)\[官\]/g, '$1[直播]')
   .replace(/(夸克分享)\[盘\]/g, '$1[分享]')
   .replace(/设置中心/g, '设置[中心]')
   .replace(/动作交互/g, '动作[交互]')
@@ -343,11 +344,11 @@ if (newName.includes('[听]')) {
     "[球]": "⚽",
 
     "[合]": "🎁",
-    "[短]": "📲",
+    "[短]": "📱",
     "[直]": "📡",
     "[戏]": "🎭",
-    "博": "📻",
-    "相声": "📻",
+    "[知识]": "📻",
+  //  "相声": "📻",
     "[磁]": "🧲",
     "[慢]": "🐢",
     "[画]": "🖼️",
@@ -440,9 +441,14 @@ if (match) {
 
 function customSort(a, b) {
     // 定义排序顺序
+    /*
     let order = ['[APP]'  ,'[优汐]', '[夸克]' ,'[云盘]',  '[天翼]',  '[移动]' ,'[阿里]','🗂️' ,'[优质]',  
     '⚙️', '[合集]', '[官源]', '[直播]', '[知识]', '[听书]', '[音乐]',   
-    '[动漫]', '短剧', '🅱️',  '[爬虫]', '🔎' ,'👶'  ,'⚽'  , '🎭'  , '📚'];
+    '[动漫]', '[短剧]', '🅱️',  '[爬虫]', '🔎' ,'👶'  ,'⚽'  , '🎭'  , '📚'];
+    */
+    let order = ['🔶'  ,'🔴', '🟣' ,'🔵',  '🟠',  '🟡' ,'🟢','🗂️' ,'❤️',  
+    '⚙️', '🎁', '🏠', '🚀', '📻', '🎧️', '🎻',   
+    '💮', '📱', '🅱️',  '🐞', '🔎' ,'👶'  ,'⚽'  , '🎭'  , '📚'];
    // let js_order = ['🏆瓜子┃[APP]', '🏆人人┃[APP]','🐿️闪电┃[优汐]'];
     let js_order = ['KKK'];
     // 先按照 js_order 排序
@@ -495,7 +501,7 @@ function shouldExclude(site) {
     'hvd', '瓜子┃[优质]', '虎牙直播[官](DR)', '擦', '皮皮',   '📺','小熊','资源',
   '豆瓣', 'ACG', 'Omo', 'NO', '好乐','非凡','文采','人人','4K-A','点歌','耐看',
 //  '多多','虎斑','低端','欧哥','ggg','六趣',
-  //  '玩偶',
+   '玩偶',
   '团长', '奥秘'
     ];
     //,'虎斑', '六趣' '木偶','下饭'
@@ -603,11 +609,12 @@ async function generateParseJSON(jxDir, requestHost) {
         param: {}, // 外部参数可以在这里传入
     };
     await batchExecute(tasks, listener);
-   // let filtered_parses = parses.filter(item => item.name === '车姐4K' ||item.name === '柒豪4K' || item.name === '虎斑4K');
-    let filtered_parses = parses.filter(item => ['车姐4K', '柒豪4K' ].includes(item.name));
+   // let filtered_parses = parses.filter(item => ['车姐4K', '柒豪4K' ].includes(item.name));
+   let filtered_parses = parses.filter(item => item.name.includes('4K') && item.name !== '虎斑4K');
 parses = filtered_parses;
 //return { parses };
     let sorted_parses = naturalSort(parses, 'name', ['JSON并发', 'JSON合集', '柒豪4K', '虎斑4K']);
+    
     //parses = sorted_parses;
    return {parses};
     /*

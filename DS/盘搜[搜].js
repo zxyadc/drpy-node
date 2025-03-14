@@ -32,10 +32,7 @@ lazy: async function (flag, id, flags) {
             console.log("夸克网盘解析开始")
             const down = await Quark.getDownload(ids[0], ids[1], ids[2], ids[3], true);
             // urls.push("go原画代理",'http://127.0.0.1:7777/?thread=20&url='+down.download_url)
-                urls.push("原画", `http://127.0.0.1:5575/proxy?${threadParam}&chunkSize=256&url=${encodeURIComponent(down.download_url)}`)
-                urls.push("原代本", `http://127.0.0.1:7777/?${threadParam}&form=urlcode&randUa=1&url=` + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)));
-            // http://ip:port/?thread=线程数&form=url与header编码格式&url=链接&header=所需header
-         urls.push("原代服", mediaProxyUrl + `?${threadParam}&form=urlcode&randUa=1&url=` + encodeURIComponent(down.download_url) + '&header=' + encodeURIComponent(JSON.stringify(headers)))
+                urls.push("通用原画", `http://127.0.0.1:5575/proxy?${threadParam}&chunkSize=256&url=${encodeURIComponent(down.download_url)}`)
             const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
             transcoding.forEach((t) => {
                 urls.push(t.resolution === 'low' ? "流畅" : t.resolution === 'high' ? "高清" : t.resolution === 'super' ? "超清" : t.resolution, t.video_info.url)
@@ -140,7 +137,10 @@ lazy: async function (flag, id, flags) {
     }
 }
 // 去除后缀
-    let processedArray = playform.map(str => str.replace(/-[\w]+$/, "").replace(/UC/, "优汐").replace(/Quark/, "夸克").replace(/Ali/, "阿里"));
+    let processedArray = playform.map(str => str.replace(/-[\w]+$/, "")
+    .replace(/UC/, "优汐")
+    .replace(/Quark/, "夸克")
+    .replace(/Ali/, "阿里"));
     // 处理重复元素
     let uniqueArray = [];
     let count = {};
@@ -154,15 +154,7 @@ lazy: async function (flag, id, flags) {
         uniqueArray.push(item + '#' + count[item]);
     }
 });
-// 修改排序逻辑为：
-    const lineOrder = config.lineOrder || ['夸克', '优汐', '阿里'];
-    uniqueArray.sort((a, b) => {
-        // 提取前缀（去掉#数字部分）
-        const aPrefix = a.split('#')[0].replace(/\d+$/, ""); // 示例："优汐#1" → "优汐"
-        const bPrefix = b.split('#')[0].replace(/\d+$/, ""); 
-        // 按配置顺序排序
-        return lineOrder.indexOf(aPrefix) - lineOrder.indexOf(bPrefix);
-    });
+
  //  VOD.vod_play_url = playurls
       VOD.vod_play_from = uniqueArray.join("$$$");
      VOD.vod_play_url = playurls.join("$$$");
