@@ -271,8 +271,8 @@ lazy: async function (flag, id, flags) {
                 'referer': 'https://pan.quark.cn/',
                 'Cookie': Quark.cookie
             };
-            urls.push("影视原画", `http://127.0.0.1:7777/?${threadParam}&form=urlcode&randUa=1&url=${encodeURIComponent(down.download_url)}`);
-            
+           // urls.push("影视原画", `http://127.0.0.1:7777/?${threadParam}&form=urlcode&randUa=1&url=${encodeURIComponent(down.download_url)}`);
+            urls.push("通用原画", `http://127.0.0.1:5575/proxy?${threadParam}&chunkSize=256&url=${encodeURIComponent(down.download_url)}`);
            // urls.push("原画", down.download_url + '#fastPlayMode##threads=10#')
             // http://ip:port/?thread=线程数&form=url与header编码格式&url=链接&header=所需header
             

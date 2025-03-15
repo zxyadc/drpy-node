@@ -48,8 +48,7 @@ var rule = {
             console.log("夸克网盘解析开始")
             const down = await Quark.getDownload(ids[0], ids[1], ids[2], ids[3], true);
           //  urls.push("go原画代理",'http://127.0.0.1:7777/?thread=20&url='+down.download_url)
-            
-            
+            urls.push("通用原画", `http://127.0.0.1:5575/proxy?${threadParam}&chunkSize=256&url=${encodeURIComponent(down.download_url)}`);
 
             const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
             transcoding.forEach((t) => {
@@ -218,15 +217,7 @@ var rule = {
                 uniqueArray.push(item + '#' + count[item]);
             }
         });
-// 修改排序逻辑为：
-    const lineOrder = config.lineOrder || ['夸克', '优汐', '阿里'];
-    uniqueArray.sort((a, b) => {
-        // 提取前缀（去掉#数字部分）
-        const aPrefix = a.split('#')[0].replace(/\d+$/, ""); // 示例："优汐#1" → "优汐"
-        const bPrefix = b.split('#')[0].replace(/\d+$/, ""); 
-        // 按配置顺序排序
-        return lineOrder.indexOf(aPrefix) - lineOrder.indexOf(bPrefix);
-    });
+
         //  VOD.vod_play_url = playurls
         VOD.vod_play_from = uniqueArray.join("$$$")
         VOD.vod_play_url = playurls.join("$$$");
