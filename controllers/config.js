@@ -610,15 +610,15 @@ async function generateParseJSON(jxDir, requestHost) {
     };
     await batchExecute(tasks, listener);
    // let filtered_parses = parses.filter(item => ['车姐4K', '柒豪4K' ].includes(item.name));
-   let filtered_parses = parses.filter(item => item.name.includes('4K') && item.name !== '虎斑4K');
-parses = filtered_parses;
+   let filtered_parses = parses.filter(item => item.name.includes('巧') && item.name !== '虎斑4K');
 //return { parses };
     let sorted_parses = naturalSort(parses, 'name', ['JSON并发', 'JSON合集', '柒豪4K', '虎斑4K']);
-    
+    let sorted_jx_dict = naturalSort(jx_dict, 'name', ['J', 'W']);
     //parses = sorted_parses;
+    parses = filtered_parses;
+    // parses = filtered_parses.concat(sorted_jx_dict);
    return {parses};
     /*
-    let sorted_jx_dict = naturalSort(jx_dict, 'name', ['J', 'W']);
     parses = sorted_parses.concat(sorted_jx_dict);
     return {parses};
     */
