@@ -50,7 +50,7 @@ var rule = {
         if (flag.startsWith('夸克')) {
             console.log("夸克网盘解析开始")
             const down = await Quark.getDownload(ids[0], ids[1], ids[2], ids[3], true);
-            urls.push("通用原画", `http://127.0.0.1:5575/proxy?${threadParam}&chunkSize=256&url=${encodeURIComponent(down.download_url)}`)
+            
             // http://ip:port/?thread=线程数&form=url与header编码格式&url=链接&header=所需header
 
             const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);

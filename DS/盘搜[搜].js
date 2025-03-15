@@ -2,7 +2,7 @@ const { readFileSync } = require('fs');
 const config = JSON.parse(readFileSync('./config/tokenm.json', 'utf-8'));
 
 console.log('线程数量:', config.thread); 
-console.log('线路排序:', config.lineOrder);
+//console.log('线路排序:', config.lineOrder);
 
 const {getHtml} = $.require('./_lib.request.js')
 const { formatPlayUrl } = misc;
@@ -32,7 +32,7 @@ lazy: async function (flag, id, flags) {
             console.log("夸克网盘解析开始")
             const down = await Quark.getDownload(ids[0], ids[1], ids[2], ids[3], true);
             // urls.push("go原画代理",'http://127.0.0.1:7777/?thread=20&url='+down.download_url)
-                urls.push("通用原画", `http://127.0.0.1:5575/proxy?${threadParam}&chunkSize=256&url=${encodeURIComponent(down.download_url)}`)
+                
             const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
             transcoding.forEach((t) => {
                 urls.push(t.resolution === 'low' ? "流畅" : t.resolution === 'high' ? "高清" : t.resolution === 'super' ? "超清" : t.resolution, t.video_info.url)

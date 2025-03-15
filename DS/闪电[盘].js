@@ -2,7 +2,7 @@ const { readFileSync } = require('fs');
 const config = JSON.parse(readFileSync('./config/tokenm.json', 'utf-8'));
 
 console.log('线程数量:', config.thread); 
-console.log('线路排序:', config.lineOrder);
+//console.log('线路排序:', config.lineOrder);
 
 const {getHtml} = $.require('./_lib.request.js')
 const { formatPlayUrl } = misc;
@@ -165,27 +165,27 @@ lazy: async function (flag, id, flags) {
     const threadCount = config.thread || 10; // 默认值为 10
     const threadParam = `thread=${threadCount}`;
 
-    console.log("开始执行 lazy 函数，输入的 input: ", input); // 打印输入的 input
-    console.log("开始执行 lazy 函数，输入的 flag: ", flag); // 打印输入的 flag
+    //console.log("开始执行 lazy 函数，输入的 input: ", input); // 打印输入的 input
+  //  console.log("开始执行 lazy 函数，输入的 flag: ", flag); // 打印输入的 flag
 
     if (flag.startsWith('优汐')) {
         console.log("UC网盘解析开始");
         if (!UCDownloadingCache[ids[1]]) {
-            console.log("开始获取下载信息，ids: ", ids); // 打印当前处理的 ids
+           // console.log("开始获取下载信息，ids: ", ids); // 打印当前处理的 ids
             const down = await UC.getDownload(ids[0], ids[1], ids[2], ids[3], true);
-            console.log("获取下载信息的结果: ", down); // 打印获取下载信息的结果
+            //console.log("获取下载信息的结果: ", down); // 打印获取下载信息的结果
             if (down) UCDownloadingCache[ids[1]] = down;
         }
         const downCache = UCDownloadingCache[ids[1]];
-        console.log("下载缓存内容: ", downCache); // 打印下载缓存内容
+       // console.log("下载缓存内容: ", downCache); // 打印下载缓存内容
 
         downCache.forEach((t) => {
             const quality = t.name === 'low'? "流畅" : t.name === 'high'? "高清" : t.name ==='super'? "超清" : t.name;
-            console.log("正在处理的视频质量: ", quality); // 打印正在处理的视频质量
-            console.log("正在处理的视频 url: ", t.url); // 打印正在处理的视频 url
+           // console.log("正在处理的视频质量: ", quality); // 打印正在处理的视频质量
+            //console.log("正在处理的视频 url: ", t.url); // 打印正在处理的视频 url
             urls.push(quality, `${t.url}`);
         });
-        console.log("最终生成的 urls: ", urls); // 打印最终生成的 urls
+      //  console.log("最终生成的 urls: ", urls); // 打印最终生成的 urls
         return {parse: 0, url: urls};
     }
 },
