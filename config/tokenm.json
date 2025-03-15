@@ -11,7 +11,7 @@
     "API_AUTH_CODE": "drpys",
     "API_PWD": "",
     "play_proxy": 1,
-    "thread": 60,
+    "thread": 10,
     "lineOrder": [
         "夸克",
         "移动",
