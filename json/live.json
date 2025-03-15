@@ -1,0 +1,14 @@
+{
+    "live_urls": [
+        "https://raw.dgithub.xyz/jadehh/iptv-api/master/output/IPTV.m3u",
+        "https://gh.tryxd.cn/raw.githubusercontent.com/suxuang/myIPTV/main/ipv6.m3u",
+        "https://mirror.ghproxy.com/https://raw.githubusercontent.com/YueChan/Live/main/Radio.m3u"
+    ],
+    "epg_url": "https://epg.mxdyeah.top/api/diyp/?ch={name}&date={date}",
+    "logo_url": "https://live.mxdyeah.top/logo/{name}.png",
+    "names": [
+        "IPTV",
+        "myIPTV",
+        "广播"
+    ]
+}
