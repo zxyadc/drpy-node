@@ -12,7 +12,12 @@ const {
 const AI_Cache = {};
 
 let gitPublicUrl = 'https://github.catvod.com/https://raw.githubusercontent.com/hjdhnx/drpy-node/refs/heads/main/public/';
-let liveImgUrl = urljoin(gitPublicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/lives.jpg');
+// 改为本地地址
+//let gitPublicUrl = 'file:///storage/emulated/0/drpy-node-z/public/';
+// 或使用标准文件路径
+// let gitPublicUrl = '/storage/emulated/0/drpy-node-z/';
+let liveImgUrl = urljoin(gitPublicUrl, './images/lives.jpg');
+//console.log('liveImgUrl的结果:', liveImgUrl);
 let quick_data = {
     腾讯: 'https://v.qq.com/x/cover/mzc00200vkqr54u/u4100l66fas.html',
     爱奇艺: 'http://www.iqiyi.com/v_1b0tk1b8tl8.html',
@@ -23,6 +28,7 @@ let quick_data = {
     移动1: 'https://yun.139.com/shareweb/#/w/i/0i5CLQ7BpV7Ai',
     移动2: 'https://caiyun.139.com/m/i?2jexC1gcjeN7q',
     移动3: 'https://yun.139.com/shareweb/#/w/i/2i2MoE9ZHn9p1',
+    123: 'https://www.123684.com/s/oec7Vv-DggWh?ZY4K',
     直链1: 'https://vdse.bdstatic.com//628ca08719cef5987ea2ae3c6f0d2386.mp4',
     嗅探1: 'https://www.6080kk.cc/haokanplay/178120-1-1.html',
     嗅探2: 'https://www.hahads.com/play/537106-3-1.html',
@@ -48,6 +54,7 @@ let quick_data2 = {
     'UC': 'uc',
     '阿里': 'ali',
     '天翼': 'cloud',
+    '123': '123',
     '哔哩': 'bili',
     '系统配置': 'system',
     '测试': 'test',
@@ -77,10 +84,10 @@ var rule = {
     title: '设置中心',
     推荐: async function () {
         let {publicUrl} = this;
-        // log('publicUrl:', publicUrl);
-        let setIcon = urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/设置.png');
-        let searchIcon = urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/搜索.jpg');
-        let chatIcon = urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/chat.webp');
+     //   log('publicUrl:', publicUrl);
+        let setIcon = urljoin(publicUrl, './images/icon_cookie/设置.png');
+        let searchIcon = urljoin(publicUrl, './images/icon_cookie/搜索.jpg');
+        let chatIcon = urljoin(publicUrl, './images/icon_cookie/chat.webp');
         const data = deepCopy(action_data);
         data.push({
             vod_id: JSON.stringify({
@@ -183,8 +190,8 @@ var rule = {
     aliScanCheck: null,
     biliScanCheck: null,
     host: 'http://empty',
-    class_name: '推送&夸克&UC&阿里&天翼&哔哩&系统配置&测试&接口挂载&视频解析',
-    class_url: 'push&quark&uc&ali&cloud&bili&system&test&apiLink&videoParse',
+    class_name: '推送&夸克&UC&阿里&天翼&123&哔哩&系统配置&测试&接口挂载&视频解析',
+    class_url: 'push&quark&uc&ali&cloud&123&bili&system&test&apiLink&videoParse',
     url: '/fyclass',
 
     预处理: async function (env) {
@@ -198,17 +205,26 @@ var rule = {
             return []
         }
         let images = {
-            'quark': urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/夸克.webp'),
-            'uc': urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/UC.png'),
-            'ali': urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/阿里.png'),
-            'bili': urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/哔哩.png'),
-            'cloud': urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/天翼.png'),
-            'adult': urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/chat.webp'),
-            'test': urljoin(publicUrl, './icon.svg'),
-            'lives': urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/lives.jpg'),
-            'settings': urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/设置.png'),
-            'read': urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/阅读.png'),
-        };
+    'quark': urljoin(publicUrl, './images/icon_cookie/夸克.webp'),
+    'uc': urljoin(publicUrl, './images/icon_cookie/UC.png'),
+    'ali': urljoin(publicUrl, './images/icon_cookie/阿里.png'),
+    'bili': urljoin(publicUrl, './images/icon_cookie/哔哩.png'),
+    'cloud': urljoin(publicUrl, './images/icon_cookie/天翼.png'),     
+    '123': urljoin(publicUrl, './images/icon_cookie/123.png'),
+    'adult': urljoin(publicUrl, './images/icon_cookie/chat.webp'),
+    'test': urljoin(publicUrl, './icon.svg'),
+    'lives': urljoin(publicUrl, './images/lives.jpg'),
+    'settings': urljoin(publicUrl, './images/icon_cookie/设置.png'),
+    'read': urljoin(publicUrl, './images/icon_cookie/阅读.png'),
+};
+/*
+// 打印 images 对象
+    log('images的结果:', images);
+  // 新增打印语句
+    log('===== images 对象内容 =====');
+    log(JSON.stringify(images, null, 2)); // 格式化输出
+    log('==========================');
+   */ 
         let d = [];
         switch (MY_CATE) {
             case 'push':
@@ -296,6 +312,14 @@ var rule = {
                 d.push(getInput('get_cloud_account', '查看天翼 账号', images.cloud));
                 d.push(getInput('get_cloud_password', '查看天翼 密码', images.cloud));
                 d.push(getInput('get_cloud_cookie', '查看天翼 cookie', images.cloud));
+                break;
+                case '123':
+                d.push(genMultiInput('pan_passport', '设置123 账号', null, images['123']));
+                d.push(genMultiInput('pan_password', '设置123 密码', null, images['123']));
+                d.push(getInput('get_pan_passport', '查看123 账号', images['123']));
+                d.push(getInput('get_pan_password', '查看123 密码', images['123']));
+                d.push(getInput('get_pan_auth', '查看123 cookie', images['123']));
+                
                 break;
             case 'bili':
                 d.push(genMultiInput('bili_cookie', '设置哔哩 cookie', null, images.bili));
@@ -989,6 +1013,9 @@ var rule = {
             'cloud_account',
             'cloud_password',
             'cloud_cookie',
+            'pan_passport',
+            'pan_password',
+            'pan_auth',
             'bili_cookie',
             'hide_adult',
             'thread',
@@ -1015,6 +1042,9 @@ var rule = {
             'get_cloud_account',
             'get_cloud_password',
             'get_cloud_cookie',
+            'get_pan_passport',
+            'get_pan_password',
+            'get_pan_auth',
             'get_bili_cookie',
             'get_hide_adult',
             'get_thread',
@@ -1042,7 +1072,7 @@ var rule = {
                 if (!auth_code || !cookie) {
                     return '入库授权码或cookie值不允许为空!'
                 }
-                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'zhxy';
+                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'drpys';
                 if (auth_code !== COOKIE_AUTH_CODE) {
                     return `您输入的入库授权码【${auth_code}】不正确`
                 }
@@ -1068,7 +1098,7 @@ var rule = {
                 if (!auth_code) {
                     return '入库授权码不允许为空!'
                 }
-                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'zhxy';
+                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'drpys';
                 if (auth_code !== COOKIE_AUTH_CODE) {
                     return `您输入的入库授权码【${auth_code}】不正确`
                 }
@@ -1096,7 +1126,7 @@ var rule = {
                 if (!auth_code) {
                     return '入库授权码不允许为空!'
                 }
-                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'zhxy';
+                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'drpys';
                 if (auth_code !== COOKIE_AUTH_CODE) {
                     return `您输入的入库授权码【${auth_code}】不正确`
                 }
@@ -1115,7 +1145,7 @@ var rule = {
                 if (!auth_code) {
                     return '入库授权码不允许为空!'
                 }
-                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'zhxy';
+                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'drpys';
                 if (auth_code !== COOKIE_AUTH_CODE) {
                     return `您输入的入库授权码【${auth_code}】不正确`
                 }
@@ -1146,7 +1176,7 @@ var rule = {
             }
         }
         if (action === '查看夸克cookie') {
-            return {action: getInput('get_quark_cookie', '查看夸克 cookie', urljoin(publicUrl, 'https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/main/public/images/icon_cookie/夸克.webp')).vod_id};
+            return {action: getInput('get_quark_cookie', '查看夸克 cookie', urljoin(publicUrl, './images/icon_cookie/夸克.webp')).vod_id};
         }
         if (action === '设置夸克cookie') {
             return {action: genMultiInput('quark_cookie', '设置夸克 cookie', null).vod_id};
