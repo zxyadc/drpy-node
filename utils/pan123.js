@@ -1,128 +1,122 @@
 import axios from "axios";
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'url';  // 新增模块导入
 import { base64Decode } from "../libs_drpy/crypto-util.js";
-import CryptoJS from "crypto-js";
-
-// 获取当前模块的目录路径
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-// 读取 tokenm.json 文件
-function getConfig() {
-    const filePath = path.join(__dirname, '../config/tokenm.json');
-    try {
-        const data = fs.readFileSync(filePath, 'utf8');
-        const jsonData = JSON.parse(data);
-        if (!jsonData.hasOwnProperty('pan_passport') || !jsonData.hasOwnProperty('pan_password')) {
-            console.log('tokenm.json中缺少必要的用户名或密码字段');
-        }
-        if (jsonData.hasOwnProperty('pan_auth')) {
-            return {
-                passport: jsonData.pan_passport,
-                password: jsonData.pan_password,
-                cookie: jsonData.pan_auth
-            };
-        } else {
-            return {
-                passport: jsonData.pan_passport,
-                password: jsonData.pan_password
-            };
-        }
-    } catch (err) {
-        if (err.code === 'ENOENT') {
-            throw new Error('文件不存在');
-        } else if (err instanceof SyntaxError) {
-            throw new Error('tokenm.json文件格式错误');
-        } else {
-            throw new Error('获取配置时出现未知错误:' + err.message);
-        }
-    }
-}
 
 class Pan123 {
     constructor() {
         this.regex = /https:\/\/(www.123684.com|www.123865.com|www.123912.com|www.123pan.com|www.123pan.cn|www.123592.com)\/s\/([^\\/]+)/;
         this.api = 'https://www.123684.com/b/api/share/';
         this.loginUrl = 'https://login.123pan.com/api/user/sign_in';
-        this.cate = '';
-        this.SharePwd = '';
-        this.config = getConfig();
+        
+        // 获取当前模块路径
+        const __filename = fileURLToPath(import.meta.url);  // 替代__dirname
+        const __dirname = path.dirname(__filename);
+        this.configPath = path.resolve(__dirname, '../config/tokenm.json');  // 修正路径
+        
+        this.config = this.loadConfig();
+    }
+
+    loadConfig() {
+        try {
+            const data = fs.readFileSync(this.configPath, 'utf8');
+            const jsonData = JSON.parse(data);
+            
+            // 字段验证
+            if (!('pan_passport' in jsonData) || !('pan_password' in jsonData)) {
+                console.log('tokenm.json中缺少必要的用户名或密码字段');
+            }
+
+            // 构建配置对象
+            return {
+                passport: jsonData.pan_passport,
+                password: jsonData.pan_password,
+                cookie: jsonData.pan_auth || null  // 允许空值
+            };
+        } catch (err) {
+            // 增强错误处理
+            if (err.code === 'ENOENT') {
+                throw new Error(`配置文件不存在: ${this.configPath}`);
+            } else if (err instanceof SyntaxError) {
+                throw new Error('JSON解析失败，请检查文件格式');
+            } else {
+                throw new Error(`配置加载错误: ${err.message}`);
+            }
+        }
     }
 
     async init() {
-        if (this.passport) {
-            console.log("获取盘123账号成功");
+        if (this.config.passport) {
+            console.log("账号加载成功");
         }
-        if (this.password) {
-            console.log("获取盘123密码成功");
+        if (this.config.password) {
+            console.log("密码加载成功");
         }
-        if (this.auth) {
-            let info = JSON.parse(CryptoJS.enc.Base64.parse(this.auth.split('.')[1]).toString(CryptoJS.enc.Utf8));
-            if (info.exp > Math.floor(Date.now() / 1000)) {
-                console.log("登录成功");
-            } else {
-                console.log("登录过期，重新登录");
-                await this.login();
+        
+        if (this.config.cookie) {
+            try {
+                const [_, payload] = this.config.cookie.split('.');
+                const decoded = base64Decode(payload);
+                const { exp } = JSON.parse(decoded);
+                
+                if (exp > Date.now() / 1000) {
+                    console.log("认证有效");
+                    return;
+                }
+                console.log("认证过期");
+            } catch (e) {
+                console.error("Token解析失败:", e.message);
             }
-        } else {
-            console.log("尚未登录，开始登录");
-            await this.login();
         }
+        await this.login();  // 触发重新登录
     }
 
-    get passport() {
-        return this.config.passport;
-    }
-
-    get password() {
-        return this.config.password;
-    }
-
-    get auth() {
-        return this.config.cookie || '';
-    }
+    get passport() { return this.config.passport; }
+    get password() { return this.config.password; }
+    get auth() { return this.config.cookie; }
 
     async login() {
-        let data = JSON.stringify({
-            "passport": this.passport,
-            "password": this.password,
-            "remember": true
-        });
-        let config = {
-            method: 'POST',
-            url: this.loginUrl,
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
-                'Content-Type': 'application/json',
-                'App-Version': '43',
-                'Referer': 'https://login.123pan.com/centerlogin?redirect_url=https%3A%2F%2Fwww.123684.com&source_page=website',
-            },
-            data: data
-        };
-
         try {
-            let response = await axios.request(config);
-            this.config.cookie = response.data.data.token; // 假设返回结构正确
-            console.log("登录成功，更新auth");
+            const response = await axios.post(this.loginUrl, {
+                passport: this.passport,
+                password: this.password,
+                remember: true
+            }, {
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
+                    'Content-Type': 'application/json',
+                    'App-Version': '43',
+                    'Referer': 'https://login.123pan.com/centerlogin?redirect_url=https%3A%2F%2Fwww.123684.com&source_page=website',
+                }
+            });
+
+            // 仅更新内存中的认证信息
+            this.config.cookie = response.data.data.token;
+            console.log("登录成功，内存Token已更新");
         } catch (error) {
-            console.error("登录失败:", error);
+            const message = error.response?.data?.message || error.message;
+            throw new Error(`登录失败: ${message}`);
         }
     }
 
-    getShareData(url) {
+
+
+    getShareData(url){
         url = decodeURIComponent(url);
         const matches = this.regex.exec(url);
-        if (url.indexOf('?') > 0) {
+        console.log('matches的结果:', matches);
+        if(url.indexOf('?') > 0){
             this.SharePwd = url.split('?')[1].match(/[A-Za-z0-9]+/)[0];
-            console.log(this.SharePwd);
+            console.log(this.SharePwd)
         }
         if (matches) {
-            if (matches[2].indexOf('?') > 0) {
-                return matches[2].split('?')[0];
-            } else {
-                return matches[2].match(/www/g) ? matches[1] : matches[2];
+            if(matches[2].indexOf('?') > 0){
+                return matches[2].split('?')[0]
+            }else {
+                return  matches[2].match(/www/g)?matches[1]:matches[2];
             }
+
         }
         return null;
     }
