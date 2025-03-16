@@ -4,7 +4,7 @@ const {
 } = misc;
 var rule = {
     title: '雷鲸小站[盘]',
-    host: 'https://www.leijing.xyz',
+    host: 'https://leijing.xyz',
     url: '/?tagId=fyclass&page=fypage',
     detailUrl: '/fyid',
     searchUrl: '/search?keyword=**&page=fypage',
