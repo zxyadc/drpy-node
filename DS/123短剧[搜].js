@@ -20,7 +20,6 @@ var rule = {
     host: 'https://123dju.com',
     url: '',
     searchUrl: '/api.php?action=search_xx&text=**&page=fypage',
-    //https://123dju.com/api.php?action=search_xx&text=%E7%88%B1%E6%83%85
     headers: {
         'User-Agent': 'PC_UA',
         'Content-Type': 'application/json'
@@ -152,11 +151,11 @@ var rule = {
         for (const link of link1) {
         if(/www.123684.com|www.123865.com|www.123912.com|www.123pan.com|www.123pan.cn|www.123592.com/.test(link)) {
                 playPans.push(link);
-                console.log('link的结果:', link);
+                //console.log('link的结果:', link);
                 let shareData = await Pan.getShareData(link)
-                console.log('shareData的结果:', shareData);
+              //  console.log('shareData的结果:', shareData);
                 let videos = await Pan.getFilesByShareUrl(shareData)
-                console.log('videos的结果:', videos);
+                //console.log('videos的结果:', videos);
                 Object.keys(videos).forEach(it => {
                     playform.push('Pan123-' + it)
                     const urls = videos[it].map(v => {
@@ -181,7 +180,6 @@ var rule = {
     processedArray.forEach((item) => {
     if (!count[item]) {
         count[item] = 1;
-      //  uniqueArray.push(item);
         uniqueArray.push(item + '#' + count[item]);
     } else {
         count[item]++;
@@ -190,22 +188,18 @@ var rule = {
     });
 
       VOD.vod_play_from = uniqueArray.join("$$$");
-      console.log('VOD.vod_play_from的结果:', VOD.vod_play_from);
+     // console.log('VOD.vod_play_from的结果:', VOD.vod_play_from);
      VOD.vod_play_url = playurls.join("$$$");
     // console.log('VOD.vod_play_url的结果:', VOD.vod_play_url);
      VOD.vod_play_pan = playPans.join("$$$");
-     console.log('VOD.vod_play_pan的结果:', VOD.vod_play_pan);
+     //console.log('VOD.vod_play_pan的结果:', VOD.vod_play_pan);
     return VOD;
 },
 
 
 搜索: async function () {
-  //  let { input } = this;
-  //  let html = await request(input, { headers: this.headers });
-    let {input, pdfa, pdfh, pd, KEY, MY_PAGE} = this;
-         let html = await request(input, { headers: this.headers });
-       // let json = JSON.parse(html);
-  //  console.log('html的结果:', html);
+  let { input } = this;
+  let html = await request(input, { headers: this.headers });
     let d = [];
     const data = JSON.parse(html).data;
  // console.log('data的结果:', data);
