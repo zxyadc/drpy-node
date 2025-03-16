@@ -1,50 +1,89 @@
 import axios from "axios";
-import {ENV} from "./env.js";
-import {base64Decode} from "../libs_drpy/crypto-util.js";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import { base64Decode } from "../libs_drpy/crypto-util.js";
+import CryptoJS from "crypto-js";
 
+// 获取当前模块的目录路径
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// 读取 tokenm.json 文件
+function getConfig() {
+    const filePath = path.join(__dirname, '../config/tokenm.json');
+    try {
+        const data = fs.readFileSync(filePath, 'utf8');
+        const jsonData = JSON.parse(data);
+        if (!jsonData.hasOwnProperty('pan_passport') || !jsonData.hasOwnProperty('pan_password')) {
+            console.log('tokenm.json中缺少必要的用户名或密码字段');
+        }
+        if (jsonData.hasOwnProperty('pan_auth')) {
+            return {
+                passport: jsonData.pan_passport,
+                password: jsonData.pan_password,
+                cookie: jsonData.pan_auth
+            };
+        } else {
+            return {
+                passport: jsonData.pan_passport,
+                password: jsonData.pan_password
+            };
+        }
+    } catch (err) {
+        if (err.code === 'ENOENT') {
+            throw new Error('文件不存在');
+        } else if (err instanceof SyntaxError) {
+            throw new Error('tokenm.json文件格式错误');
+        } else {
+            throw new Error('获取配置时出现未知错误:' + err.message);
+        }
+    }
+}
 
 class Pan123 {
     constructor() {
-        this.regex = /https:\/\/(www.123684.com|www.123865.com|www.123912.com|www.123pan.com|www.123pan.cn|www.123592.com)\/s\/([^\\/]+)/
+        this.regex = /https:\/\/(www.123684.com|www.123865.com|www.123912.com|www.123pan.com|www.123pan.cn|www.123592.com)\/s\/([^\\/]+)/;
         this.api = 'https://www.123684.com/b/api/share/';
         this.loginUrl = 'https://login.123pan.com/api/user/sign_in';
-        this.cate = ''
+        this.cate = '';
+        this.SharePwd = '';
+        this.config = getConfig();
     }
 
     async init() {
-        if(this.passport){
-            console.log("获取盘123账号成功")
+        if (this.passport) {
+            console.log("获取盘123账号成功");
         }
-        if(this.password){
-            console.log("获取盘123密码成功")
+        if (this.password) {
+            console.log("获取盘123密码成功");
         }
-        if(this.auth){
-            let info = JSON.parse(CryptoJS.enc.Base64.parse(this.auth.split('.')[1]).toString(CryptoJS.enc.Utf8))
-            if(info.exp > Math.floor(Date.now() / 1000)){
-                console.log("登录成功")
-            }else {
-                console.log("登录过期，重新登录")
-                await this.loin()
+        if (this.auth) {
+            let info = JSON.parse(CryptoJS.enc.Base64.parse(this.auth.split('.')[1]).toString(CryptoJS.enc.Utf8));
+            if (info.exp > Math.floor(Date.now() / 1000)) {
+                console.log("登录成功");
+            } else {
+                console.log("登录过期，重新登录");
+                await this.login();
             }
-        }else {
-            console.log("尚未登录，开始登录")
-            await this.loin()
+        } else {
+            console.log("尚未登录，开始登录");
+            await this.login();
         }
     }
 
-    get passport(){
-        return ENV.get('pan_passport')
+    get passport() {
+        return this.config.passport;
     }
 
-    get password(){
-        return ENV.get('pan_password')
+    get password() {
+        return this.config.password;
     }
 
-    get auth(){
-        return ENV.get('pan_auth')
+    get auth() {
+        return this.config.cookie || '';
     }
 
-    async loin(){
+    async login() {
         let data = JSON.stringify({
             "passport": this.passport,
             "password": this.password,
@@ -62,24 +101,28 @@ class Pan123 {
             data: data
         };
 
-        let auth = (await axios.request(config)).data
-        ENV.set('pan_auth',auth.data.token)
+        try {
+            let response = await axios.request(config);
+            this.config.cookie = response.data.data.token; // 假设返回结构正确
+            console.log("登录成功，更新auth");
+        } catch (error) {
+            console.error("登录失败:", error);
+        }
     }
 
-    getShareData(url){
+    getShareData(url) {
         url = decodeURIComponent(url);
         const matches = this.regex.exec(url);
-        if(url.indexOf('?') > 0){
+        if (url.indexOf('?') > 0) {
             this.SharePwd = url.split('?')[1].match(/[A-Za-z0-9]+/)[0];
-            console.log(this.SharePwd)
+            console.log(this.SharePwd);
         }
         if (matches) {
-            if(matches[2].indexOf('?') > 0){
-                return matches[2].split('?')[0]
-            }else {
-                return  matches[2].match(/www/g)?matches[1]:matches[2];
+            if (matches[2].indexOf('?') > 0) {
+                return matches[2].split('?')[0];
+            } else {
+                return matches[2].match(/www/g) ? matches[1] : matches[2];
             }
-
         }
         return null;
     }
