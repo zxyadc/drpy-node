@@ -11,12 +11,12 @@ const {
 // 访问测试 http://127.0.0.1:5757/api/设置中心?ac=action&action=quarkCookieConfig&value={"cookie":"我是cookie"}
 const AI_Cache = {};
 
-let gitPublicUrl = 'https://github.catvod.com/https://raw.githubusercontent.com/hjdhnx/drpy-node/refs/heads/main/public/';
+let gitPublicUrl = 'https://github.catvod.com/https://raw.githubusercontent.com/zxyadc/drpy-node/refs/heads/main/public/';
 // 改为本地地址
 //let gitPublicUrl = 'file:///storage/emulated/0/drpy-node-z/public/';
 // 或使用标准文件路径
 // let gitPublicUrl = '/storage/emulated/0/drpy-node-z/';
-let liveImgUrl = urljoin(gitPublicUrl, './images/lives.jpg');
+let liveImgUrl = urljoin(gitPublicUrl, 'https://raw.dgithub.xyz/zxyadc/drpy-node/main/public/images/lives.jpg');
 //console.log('liveImgUrl的结果:', liveImgUrl);
 let quick_data = {
     腾讯: 'https://v.qq.com/x/cover/mzc00200vkqr54u/u4100l66fas.html',
@@ -85,9 +85,9 @@ var rule = {
     推荐: async function () {
         let {publicUrl} = this;
      //   log('publicUrl:', publicUrl);
-        let setIcon = urljoin(publicUrl, './images/icon_cookie/设置.png');
-        let searchIcon = urljoin(publicUrl, './images/icon_cookie/搜索.jpg');
-        let chatIcon = urljoin(publicUrl, './images/icon_cookie/chat.webp');
+        let setIcon = urljoin(publicUrl, 'https://raw.dgithub.xyz/zxyadc/drpy-node/main/public/images/icon_cookie/设置.png');
+        let searchIcon = urljoin(publicUrl, 'https://raw.dgithub.xyz/zxyadc/drpy-node/main/public/images/icon_cookie/搜索.jpg');
+        let chatIcon = urljoin(publicUrl, 'https://raw.dgithub.xyz/zxyadc/drpy-node/main/public/images/icon_cookie/chat.webp');
         const data = deepCopy(action_data);
         data.push({
             vod_id: JSON.stringify({
@@ -205,17 +205,17 @@ var rule = {
             return []
         }
         let images = {
-    'quark': urljoin(publicUrl, './images/icon_cookie/夸克.webp'),
-    'uc': urljoin(publicUrl, './images/icon_cookie/UC.png'),
-    'ali': urljoin(publicUrl, './images/icon_cookie/阿里.png'),
-    'bili': urljoin(publicUrl, './images/icon_cookie/哔哩.png'),
-    'cloud': urljoin(publicUrl, './images/icon_cookie/天翼.png'),     
-    '123': urljoin(publicUrl, './images/icon_cookie/123.png'),
-    'adult': urljoin(publicUrl, './images/icon_cookie/chat.webp'),
+    'quark': urljoin(publicUrl, 'https://raw.dgithub.xyz/zxyadc/drpy-node/main/public/images/icon_cookie/夸克.webp'),
+    'uc': urljoin(publicUrl, 'https://raw.dgithub.xyz/zxyadc/drpy-node/main/public/images/icon_cookie/UC.png'),
+    'ali': urljoin(publicUrl, 'https://raw.dgithub.xyz/zxyadc/drpy-node/main/public/images/icon_cookie/阿里.png'),
+    'bili': urljoin(publicUrl, 'https://raw.dgithub.xyz/zxyadc/drpy-node/main/public/images/icon_cookie/哔哩.png'),
+    'cloud': urljoin(publicUrl, 'https://raw.dgithub.xyz/zxyadc/drpy-node/main/public/images/icon_cookie/天翼.png'),     
+    '123': urljoin(publicUrl, 'https://raw.dgithub.xyz/zxyadc/drpy-node/main/public/images/icon_cookie/123.png'),
+    'adult': urljoin(publicUrl, 'https://raw.dgithub.xyz/zxyadc/drpy-node/main/public/images/icon_cookie/chat.webp'),
     'test': urljoin(publicUrl, './icon.svg'),
-    'lives': urljoin(publicUrl, './images/lives.jpg'),
-    'settings': urljoin(publicUrl, './images/icon_cookie/设置.png'),
-    'read': urljoin(publicUrl, './images/icon_cookie/阅读.png'),
+    'lives': urljoin(publicUrl, 'https://raw.dgithub.xyz/zxyadc/drpy-node/main/public/images/lives.jpg'),
+    'settings': urljoin(publicUrl, 'https://raw.dgithub.xyz/zxyadc/drpy-node/main/public/images/icon_cookie/设置.png'),
+    'read': urljoin(publicUrl, 'https://raw.dgithub.xyz/zxyadc/drpy-node/main/public/images/icon_cookie/阅读.png'),
 };
 /*
 // 打印 images 对象
@@ -1072,7 +1072,7 @@ var rule = {
                 if (!auth_code || !cookie) {
                     return '入库授权码或cookie值不允许为空!'
                 }
-                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'drpys';
+                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'zhxy';
                 if (auth_code !== COOKIE_AUTH_CODE) {
                     return `您输入的入库授权码【${auth_code}】不正确`
                 }
@@ -1098,7 +1098,7 @@ var rule = {
                 if (!auth_code) {
                     return '入库授权码不允许为空!'
                 }
-                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'drpys';
+                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'zhxy';
                 if (auth_code !== COOKIE_AUTH_CODE) {
                     return `您输入的入库授权码【${auth_code}】不正确`
                 }
@@ -1126,7 +1126,7 @@ var rule = {
                 if (!auth_code) {
                     return '入库授权码不允许为空!'
                 }
-                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'drpys';
+                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'zhxy';
                 if (auth_code !== COOKIE_AUTH_CODE) {
                     return `您输入的入库授权码【${auth_code}】不正确`
                 }
@@ -1145,7 +1145,7 @@ var rule = {
                 if (!auth_code) {
                     return '入库授权码不允许为空!'
                 }
-                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'drpys';
+                const COOKIE_AUTH_CODE = _ENV.COOKIE_AUTH_CODE || 'zhxy';
                 if (auth_code !== COOKIE_AUTH_CODE) {
                     return `您输入的入库授权码【${auth_code}】不正确`
                 }
@@ -1176,7 +1176,7 @@ var rule = {
             }
         }
         if (action === '查看夸克cookie') {
-            return {action: getInput('get_quark_cookie', '查看夸克 cookie', urljoin(publicUrl, './images/icon_cookie/夸克.webp')).vod_id};
+            return {action: getInput('get_quark_cookie', '查看夸克 cookie', urljoin(publicUrl, 'https://raw.dgithub.xyz/zxyadc/drpy-node/main/public/images/icon_cookie/夸克.webp')).vod_id};
         }
         if (action === '设置夸克cookie') {
             return {action: genMultiInput('quark_cookie', '设置夸克 cookie', null).vod_id};
