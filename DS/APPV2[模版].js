@@ -113,11 +113,14 @@ return { class: classes, filter }
 
     lazy: async function () {
     let { input } = this;
-    if (!(input.includes('m3u8') || input.includes('mp4'))) {
-        return rule.parseUrl + input;
+  //  console.log('input的结果:', input);
+    const keywords = ['m3u8', 'mp4', 'mp'];
+    const isMatch = keywords.some(keyword => input.includes(keyword));
+    if (!isMatch) {
+        return input;
     } else {
         return {
-            url: input,
+            url: rule.parseUrl + input,
             parse: 0,
             header: rule.headers
         };
@@ -170,7 +173,7 @@ return { class: classes, filter }
         VOD.vod_play_from = playform.join("$$$");
         VOD.vod_play_url = playurls.join("$$$");
    // console.log('VOD的结果:', VOD);
-    console.log('VOD.vod_play_url的结果:', VOD.vod_play_url);
+    //console.log('VOD.vod_play_url的结果:', VOD.vod_play_url);
     return VOD;
 },
 搜索: async function () {
