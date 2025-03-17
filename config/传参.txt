@@ -7,4 +7,4 @@
 采集之王[合]@?type=url&params=../json/采集2024静态.json$1$@采王2024
 点歌欢唱[B]@?type=url&params=../json/十六万歌曲.txt
 夸克分享[盘]@?type=url&params=../json/夸克分享.json@夸克分享[盘]
-1APPV2[模版]@?type=url&params=http://cmsyt.lyyytv.cn$http://154.64.231.151:886/4K.json@影探[V2]
+APPV2[模版]@?type=url&params=http://cmsyt123.lyyytv.cn@影探[V2]
