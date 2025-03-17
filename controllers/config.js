@@ -448,7 +448,7 @@ function customSort(a, b) {
     */
     let order = ['🔶'  ,'🔴', '🟣' ,'🔵',  '🟠',  '🟡' ,'🟢','🗂️' ,'❤️',  
     '⚙️', '🎁', '🏠', '🚀', '📻', '🎧️', '🎻',   
-    '💮', '📱', '🅱️',  '🐞', '🔎' ,'👶'  ,'⚽'  , '🎭'  , '📚'];
+    '💮', '📱', '🅱️',  '🐞', '🔎' ,'👶'  ,'⚽'  , '🎭' , '🔱' , '📚'];
    // let js_order = ['🏆瓜子┃[APP]', '🏆人人┃[APP]','🐿️闪电┃[优汐]'];
     let js_order = ['KKK'];
     // 先按照 js_order 排序
@@ -502,7 +502,7 @@ function shouldExclude(site) {
   '豆瓣', 'ACG', 'Omo', 'NO', '好乐','非凡','文采','人人','4K-A','点歌','耐看',
 //  '多多','虎斑','低端','欧哥','ggg','六趣',
    '玩偶',
-  '团长', '奥秘'
+  '团长', '奥秘','闪电'
     ];
     //,'虎斑', '六趣' '木偶','下饭'
     // 判断 site.name 是否包含任何一个排除关键词
@@ -610,13 +610,15 @@ async function generateParseJSON(jxDir, requestHost) {
     };
     await batchExecute(tasks, listener);
    // let filtered_parses = parses.filter(item => ['车姐4K', '柒豪4K' ].includes(item.name));
-   let filtered_parses = parses.filter(item => item.name.includes('巧') && item.name !== '虎斑4K');
+  
+    let filtered_parses = parses.filter(item => 
+    /(巧|4K)/.test(item.name) && !/(虎斑|车姐)/.test(item.name)
+);
 //return { parses };
-    let sorted_parses = naturalSort(parses, 'name', ['JSON并发', 'JSON合集', '柒豪4K', '虎斑4K']);
-    let sorted_jx_dict = naturalSort(jx_dict, 'name', ['J', 'W']);
-    //parses = sorted_parses;
-    parses = filtered_parses;
-    // parses = filtered_parses.concat(sorted_jx_dict);
+    let sorted_parses = naturalSort(filtered_parses, 'name', ['柒豪4K']);
+    parses = sorted_parses;
+
+  //  parses = filtered_parses;
    return {parses};
     /*
     parses = sorted_parses.concat(sorted_jx_dict);
