@@ -142,8 +142,9 @@ async function generateSiteJSON(options, requestHost, sub, pwd) {
             return {
                 func: async ({file, dr2Dir, requestHost, pwd, drpy, SitesMap}) => {
                     const baseName = path.basename(file, '.js'); // 去掉文件扩展名
+                    
                // let api = `https://gitee.com/zhxyad/YsBox/raw/master/drpy_libs/drpy2.min.js`;  // 使用内置drpy2
-                let api = `https://cnb.cool/zhyadc/YsBox/-/git/raw/main/drpy_libs/drpy2.min.js`;  // 使用内置drpy2
+              let api = `https://cnb.cool/zhyadc/YsBox/-/git/raw/main/drpy_libs/drpy2.min.js`;  // 使用内置drpy2
                     let ext = `${requestHost}/js/${file}`;
                     if (pwd) {
                         ext += `?pwd=${pwd}`;
@@ -446,7 +447,7 @@ function customSort(a, b) {
     '⚙️', '[合集]', '[官源]', '[直播]', '[知识]', '[听书]', '[音乐]',   
     '[动漫]', '[短剧]', '🅱️',  '[爬虫]', '🔎' ,'👶'  ,'⚽'  , '🎭'  , '📚'];
     */
-    let order = ['🔶'  ,'🔴', '🟣' ,'🔵',  '🟠',  '🟡' ,'🟢','🗂️' ,'❤️',  
+    let order = ['🔶'  ,'🟣', '🔴' ,'🔵',  '🟠',  '🟡' ,'🟢','🗂️' ,'❤️',  
     '⚙️', '🎁', '🏠', '🚀', '📻', '🎧️', '🎻',   
     '💮', '📱', '🅱️',  '🐞', '🔎' ,'👶'  ,'⚽'  , '🎭' , '🔱' , '📚'];
    // let js_order = ['🏆瓜子┃[APP]', '🏆人人┃[APP]','🐿️闪电┃[优汐]'];
@@ -498,11 +499,11 @@ function customSort(a, b) {
 
 function shouldExclude(site) {
     const excludeKeywords = ['短剧库','PTT', '密', '莫离', 
-    'hvd', '瓜子┃[优质]', '虎牙直播[官](DR)', '擦', '皮皮',   '📺','小熊','资源',
+    '影ggdd', '瓜子┃[优质]', '虎牙直播[官](DR)', '擦', '皮皮',   '📺','小熊','资源',
   '豆瓣', 'ACG', 'Omo', 'NO', '好乐','非凡','文采','人人','4K-A','点歌','耐看',
 //  '多多','虎斑','低端','欧哥','ggg','六趣',
    '玩偶',
-  '团长', '奥秘','闪电'
+  '团长', '奥秘','kkm'
     ];
     //,'虎斑', '六趣' '木偶','下饭'
     // 判断 site.name 是否包含任何一个排除关键词
@@ -612,10 +613,10 @@ async function generateParseJSON(jxDir, requestHost) {
    // let filtered_parses = parses.filter(item => ['车姐4K', '柒豪4K' ].includes(item.name));
   
     let filtered_parses = parses.filter(item => 
-    /(巧|4K)/.test(item.name) && !/(虎斑|车姐)/.test(item.name)
+    /(巧|K)/.test(item.name) && !/(4K|车姐)/.test(item.name)
 );
 //return { parses };
-    let sorted_parses = naturalSort(filtered_parses, 'name', ['柒豪4K']);
+    let sorted_parses = naturalSort(filtered_parses, 'name', ['OK']);
     parses = sorted_parses;
 
   //  parses = filtered_parses;
