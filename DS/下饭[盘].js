@@ -26,21 +26,39 @@ var rule = {
         2: {cateId: '2'},
         3: {cateId: '3'},
         4: {cateId: '4'},
+        28: {cateId: '28'},
     },
     cate_exclude: '网址|专题|全部影片',
-    tab_rename: {'KUAKE1': '夸克1', 'KUAKE11': '夸克2', 'YOUSEE1': 'UC1', 'YOUSEE11': 'UC2',},
     play_parse: true,
     searchable: 1,
     filterable: 1,
     quickSearch: 0,
-    headers: { "User-Agent": "PC_UA" },
-    class_name: '电影&剧集&动漫&综艺',
-  class_url: '1&2&3&4',
-推荐: async function () {
+   // class_name: '电影&剧集&动漫&综艺&短剧&音乐&臻彩视觉',
+   // class_url: '1&2&3&4&5&24&26',
+    class_parse: async function () {
+    let { input, pdfa, pdfh, pd } = this;
+    let html = this.cachedHtml || (await getHtml(input)).data;
+    this.cachedHtml = html;
+    let d = [], seen = new Set();
+    pdfa(html, '.grid-box&&ul&&li').forEach(it => {
+        let typeName = pdfh(it, 'a&&Text');
+        let href = pd(it, 'a&&href');
+        let match = href.match(/.*\/([^/]+)\.html/);
+        if (match && !seen.has(typeName)) {
+            seen.add(typeName);
+            d.push({ type_name: typeName, type_id: match[1] });
+        }
+    });
+
+    console.log('d的结果:', d);
+    return { class: d };
+},
+
+
+
+    推荐: async function () {
     return this.一级();
     },
-    
- 
    
    一级: async function () {
     let {input, pdfa, pdfh, pd} = this;
@@ -57,6 +75,7 @@ var rule = {
     });
     return setResult(d)
 },
+
 二级: async function (ids) {
         let {input} = this;
         let html = (await getHtml(input)).data
@@ -77,40 +96,39 @@ var rule = {
         for (const item of $('.module-row-title')) {
             const a = $(item).find('p:first')[0];
             let link = a.children[0].data.trim()
-            if (/pan.quark.cn/.test(link)) {
-            playPans.push(link);
-                const shareData = Quark.getShareData(link);
-                if (shareData) {
-                    const videos = await Quark.getFilesByShareUrl(shareData);
-                    if (videos.length > 0) {
-                        playform.push('Quark-' + shareData.shareId);
-                        playurls.push(videos.map((v) => {
-                            const list = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle ? v.subtitle.fid : '', v.subtitle ? v.subtitle.share_fid_token : ''];
-                            return v.file_name + '$' + list.join('*');
-                        }).join('#'))
-                    } else {
-                        playform.push('Quark-' + shareData.shareId);
-                        playurls.push("资源已经失效，请访问其他资源")
-                    }
-                }
-            } 
-             if (/drive.uc.cn/.test(link)) {
-             playPans.push(link);
-                const shareData = UC.getShareData(link);
-                if (shareData) {
-                    const videos = await UC.getFilesByShareUrl(shareData);
-                    if (videos.length > 0) {
-                        playform.push('UC-' + shareData.shareId);
-                        playurls.push(videos.map((v) => {
-                            const list = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle ? v.subtitle.fid : '', v.subtitle ? v.subtitle.share_fid_token : ''];
-                            return v.file_name + '$' + list.join('*');
-                        }).join('#'))
-                    } else {
-                        playform.push('UC-' + shareData.shareId);
-                        playurls.push("资源已经失效，请访问其他资源")
-                    }
-                }
-            }
+          //  console.log('link的结果:', link);
+    if (/pan.quark.cn/.test(link)) {     
+    const shareData = await Quark.getShareData(link);
+    playPans.push(link);
+    if (shareData) {
+        const videos = await Quark.getFilesByShareUrl(shareData);
+        if (videos.length > 0) {
+            playform.push('Quark-' + shareData.shareId);
+           // console.log('playform的结果:', playform);
+            const urls = videos.map((v) => {
+                const list = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle ? v.subtitle.fid : '', v.subtitle ? v.subtitle.share_fid_token : ''];
+                return v.file_name + '$' + list.join('*');
+            }).join('#');
+            playurls.push(urls); 
+        } 
+    }
+}
+if (/drive.uc.cn/.test(link)) {
+    playPans.push(link);
+    const shareData = await UC.getShareData(link);
+    if (shareData) {
+        const videos = await UC.getFilesByShareUrl(shareData);
+        if (videos.length > 0) {
+            playform.push('UC-' + shareData.shareId);
+            const urls = videos.map((v) => {
+                const list = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle ? v.subtitle.fid : '', v.subtitle ? v.subtitle.share_fid_token : ''];
+                return v.file_name + '$' + list.join('*');
+            }).join('#');
+            playurls.push(urls); 
+        }
+    }
+}
+
 if (/www.alipan.com|www.aliyundrive.com/.test(link)) {
             playPans.push(link);
             const shareData = Ali.getShareData(link);
@@ -118,82 +136,108 @@ if (/www.alipan.com|www.aliyundrive.com/.test(link)) {
                 const videos = await Ali.getFilesByShareUrl(shareData);
                 if (videos.length > 0) {
                     playform.push('Ali-' + shareData.shareId);
-                    playurls.push(videos.map((v) => {
+                    const urls = videos.map((v) => {
                         const ids = [v.share_id, v.file_id, v.subtitle ? v.subtitle.file_id : ''];
                         return formatPlayUrl('', v.name) + '$' + ids.join('*');
-                    }).join('#'));
-                } else {
-                    playform.push('Ali-' + shareData.shareId);
-                    playurls.push("资源已经失效，请访问其他资源");
-                }
+                    }).join('#');
+        playurls.push(urls);
             }
         }
-        if (/caiyun.139.com/.test(link)) {
-            playPans.push(link);
-          //  console.log('link的结果:', link);
-            let data = await Yun.getShareData(link);
-            Object.keys(data).forEach(it => {
-                playform.push('Yun-' + it);
-                const urls = data[it].map(item => item.name + "$" + [item.contentId, item.linkID].join('*')).join('#');
-                playurls.push(urls);
-            });
         }
-        if (/cloud.189.cn/.test(link)) {
-            playPans.push(link);
-            let data = await Cloud.getShareData(link);
-            Object.keys(data).forEach(it => {
-                playform.push('Cloud-' + it);
-                const urls = data[it].map(item => item.name + "$" + [item.fileId, item.shareId].join('*')).join('#');
-                playurls.push(urls);
-            });
-        }
-    }
-      // 定义线路类型到显示名称的映射
-const nameMapping = {
-    'Quark': '夸克',
-    'UC': '优汐',
-    'Ali': '阿里',
-    'Yun': '移动',
-    'Cloud': '天翼'
-};
-const lineOrder = config.lineOrder || ['移动', '夸克', '优汐', '阿里', '天翼'];
+        
+if (/caiyun.139.com/.test(link)) {
+                    playPans.push(link);
+                    let data = await Yun.getShareData(link);
+                    Object.keys(data).forEach(it => {
+                        playform.push('Yun-' + it);
+                        const urls = data[it].map(item => item.name + "$" + [item.contentId, item.linkID].join('*')).join('#');
+                        playurls.push(urls);
+                    });
+                }
+                
+                if (/cloud.189.cn/.test(link)) {
+                    playPans.push(link);
+                    let data = await Cloud.getShareData(link);
+                    Object.keys(data).forEach(it => {
+                        playform.push('Cloud-' + it);
+                        const urls = data[it].map(item => item.name + "$" + [item.fileId, item.shareId].join('*')).join('#');
+                        playurls.push(urls);
+                    });
+                }
+                
+                if (/www.123684.com|www.123865.com|www.123912.com|www.123pan.com|www.123pan.cn|www.123592.com/.test(link)) {
+                    playPans.push(link);
+                    let shareData = await Pan.getShareData(link);
+                    let videos = await Pan.getFilesByShareUrl(shareData);
+                    Object.keys(videos).forEach(it => {
+                        playform.push('Pan123-' + it);
+                        const urls = videos[it].map(v => {
+                            const list = [v.ShareKey, v.FileId, v.S3KeyFlag, v.Size, v.Etag];
+                            return v.FileName + '$' + list.join('*');
+                        }).join('#');
+                        playurls.push(urls);
+                    });
+                }
 
-let processedLines = playform.map((line, index) => {
+}
+
+const lineOrder = config.lineOrder || [];
+        
+            
+        const nameMapping = {
+            'Quark': '夸克',
+            'UC': '优汐',
+            'Ali': '阿里',
+            'Yun': '移动',
+            'Pan123': '123',
+            'Cloud': '天翼'
+        };
+        
+        let processedLines = playform
+  .map((line, index) => {
     const [originalPrefix, it] = line.split('-');
+    // 跳过阿里线路
+    if (originalPrefix === 'Ali') return null; 
     const displayPrefix = nameMapping[originalPrefix] || originalPrefix;
     return { 
-        raw: `${displayPrefix}-${it}`, 
-        sortKey: originalPrefix,
-        index
+      raw: `${displayPrefix}-${it}`, 
+      sortKey: originalPrefix,
+      index
     };
-});
-
-const countMap = {};
+  })
+  .filter(item => item !== null); // 过滤掉 null 值
+       // console.log('processedLines的结果:', processedLines);
+        processedLines.sort((a, b) => {
+            const aMapped = nameMapping[a.sortKey] || a.sortKey;
+            const bMapped = nameMapping[b.sortKey] || b.sortKey;
+            const aIndex = lineOrder.indexOf(aMapped);
+            const bIndex = lineOrder.indexOf(bMapped);
+            return (
+                (aIndex === -1 ? 9999 : aIndex) - 
+                (bIndex === -1 ? 9999 : bIndex)
+            );
+        });
+        
+        const countMap = {};
 processedLines = processedLines.map(item => {
-    if (['Yun', 'Cloud'].includes(item.sortKey)) {
-        return item;
-    }
-    countMap[item.sortKey] = (countMap[item.sortKey] || 0) + 1;
-    item.raw = `${item.raw.split('-')[0]}#${countMap[item.sortKey]}`;
-    return item;
-});
+       // 明确跳过 Pan123 类型的计数
 
-processedLines.sort((a, b) => {
-    const aMapped = nameMapping[a.sortKey] || a.sortKey;
-    const bMapped = nameMapping[b.sortKey] || b.sortKey;
-    const aIndex = lineOrder.indexOf(aMapped);
-    const bIndex = lineOrder.indexOf(bMapped);
-    return (aIndex === -1? Infinity : aIndex) - (bIndex === -1? Infinity : bIndex);
-});
+       if (['Yun', 'Cloud','Pan123'].includes(item.sortKey) && item.raw !== '天翼-root') {
+           return item;
+       }
+       // 其他类型执行计数逻辑
+       countMap[item.sortKey] = (countMap[item.sortKey] || 0) + 1;
+       item.raw = `${item.raw.split('-')[0]}#${countMap[item.sortKey]}`;
+       return item;
+   });
 
-VOD.vod_play_from = processedLines.map(item => item.raw).join("$$$");
-VOD.vod_play_url = processedLines.map(item => playurls[item.index]).join("$$$");
-VOD.vod_play_pan = playPans.join("$$$");
-
-
-return VOD;
+        VOD.vod_play_from = processedLines.map(item => item.raw).join("$$$");
+        VOD.vod_play_url = processedLines.map(item => playurls[item.index]).join("$$$");
+     VOD.vod_play_pan = playPans.join("$$$");
+    return VOD;
 
 },
+
 
 搜索: async function (wd, quick, pg) {
         let {input, pdfa, pdfh, pd} = this;
@@ -230,7 +274,7 @@ lazy: async function (flag, id, flags) {
                 'referer': 'https://pan.quark.cn/',
                 'Cookie': Quark.cookie
             };
-          //  urls.push("影视原画", `http://127.0.0.1:7777/?${threadParam}&form=urlcode&randUa=1&url=${encodeURIComponent(down.download_url)}`);
+         //   urls.push("影视原画", `http://127.0.0.1:7777/?${threadParam}&form=urlcode&randUa=1&url=${encodeURIComponent(down.download_url)}`);
             urls.push("通用原画", `http://127.0.0.1:5575/proxy?${threadParam}&chunkSize=256&url=${encodeURIComponent(down.download_url)}`);
            // urls.push("原画", down.download_url + '#fastPlayMode##threads=10#')
             // http://ip:port/?thread=线程数&form=url与header编码格式&url=链接&header=所需header
@@ -244,7 +288,7 @@ lazy: async function (flag, id, flags) {
                 url: urls,
                 header: headers
             }
-        }
+        } 
          if (flag.startsWith('优汐')) {
             console.log("UC网盘解析开始");
             if (!UCDownloadingCache[ids[1]]) {
@@ -257,6 +301,8 @@ lazy: async function (flag, id, flags) {
             });
         return {parse: 0, url: urls}
         }
+        
+        
 if (flag.startsWith('阿里')) {
             const transcoding_flag = {
                 UHD: "4K 超清",
@@ -287,20 +333,35 @@ if (flag.startsWith('阿里')) {
 
         }
         
-        if (flag.startsWith('移动')) { // 原为 'Yun-'
+        if (flag.startsWith('移动')) { 
      log('移动云盘解析开始')
-     const url = await Yun.getSharePlay(ids[0], ids[1]); // 假设参数需要调整
+     const url = await Yun.getSharePlay(ids[0], ids[1]); 
      return {
        url: url
      }
    }
-   if (flag.startsWith('天翼')) { // 原为 'Cloud-'
+   if (flag.startsWith('天翼')) { 
      log("天翼云盘解析开始")
      const url = await Cloud.getShareUrl(ids[0], ids[1]);
      return {
        url: url + "#isVideo=true#",
      }
    }
+   
+   if(flag.startsWith('123')) {
+                log('盘123解析开始')
+                const url = await Pan.getDownload(ids[0],ids[1],ids[2],ids[3],ids[4])
+                console.log('url的结果:', url);
+                urls.push("原画",url)
+                let data = await Pan.getLiveTranscoding(ids[0],ids[1],ids[2],ids[3],ids[4])
+                data.forEach((item) => {
+                    urls.push(item.name,item.url)
+                })
+                return {
+                    parse: 0,
+                    url: urls
+                }
+            }
     },
     
 }

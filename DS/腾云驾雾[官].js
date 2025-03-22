@@ -1,5 +1,4 @@
-
-
+const {requestJson} = $.require('./_lib.request.js')
 var rule = {
     title: '腾云驾雾[官]',
     host: 'https://v.%71%71.com',
@@ -64,9 +63,6 @@ var rule = {
         let sourceId = /get_playsource/.test(input) ? input.match(/id=(\d*?)&/)[1] : input.split("cid=")[1];
         let cid = sourceId;
         let detailUrl = "https://v.%71%71.com/detail/m/" + cid + ".html";
-      //  const vodName = pdfh(html, 'h1&&Text');
-    globalThis.vdetailUrl = detailUrl; // 更新全局变量
-    console.log('当前视频名称（二级函数中）:', globalThis.vdetailUrl); // 确认更新成功
         log("详情页:" + detailUrl);
         try {
             let json = JSON.parse(html);
@@ -199,152 +195,27 @@ var rule = {
         }
         return setResult(d);
     },
-    //http://60.211.124.23:10101/tvbox/json/json.php/?key=3692581732&url=
-  //  http://103.45.162.207:25252/hbdm.php?key=7894561232&id=https://v.qq.com/x/cover/m441e3rjq9kwpsc/h0025x3mn7z.html
-  /*
+    
+    
     lazy: async function () {
         let {input} = this;
-        return {
-        parse: 1, 
-        jx: 1, 
-        url: input
-        }
-    }
-    */
-    /*
-lazy: async function () {
-    let { input } = this;
-    console.log('input的地址:', input);
-
-    // 修正正则表达式提取 videoCode
-    const videoCodeMatch = input.match(/\/cover\/([^/]+)\/([^/]+)\.html/) || input.match(/\/([^/]+)\.html$/);
-    if (!videoCodeMatch) {
-        console.error("无法从 URL 中提取 videoCode");
-        return { parse: 1, jx: 1, url: input };
-    }
-    const videoCode = videoCodeMatch[2] || videoCodeMatch[1];
-    console.log("提取到的 videoCode:", videoCode);
-
-    // 调用弹幕爬取函数
-    const danmuList = await getTencentVideoDanmu(videoCode, 3, 30000);
-
-    // 转换为 XML 格式弹幕
-    let danmakuXml = '<i>';
-    danmuList.forEach(danmu => {
-        danmakuXml += `<d p="${danmu.time},1,25,16777215,0,0,0,0">${danmu.content}</d>`;
-    });
-    danmakuXml += '</i>';
-
-    return {
-        parse: 1,
-        jx: 1,
-        url: input,
-        danmaku: danmakuXml,
-        danmakuType: 'xml'
-    };
-}
-*/
-lazy: async function () {
-    let { input } = this;
-    console.log('input地址:', input);
-
-    // 增强videoCode提取
-    const videoCodeMatch = input.match(/\/cover\/[^\/]+\/([^\/]+)\.html/) || input.match(/\/cover\/([^\/]+)\.html/);
-    if (!videoCodeMatch) {
-        console.error("无法提取videoCode");
-        return { parse: 1, jx: 1, url: input };
-    }
-    const videoCode = videoCodeMatch[1];
-    console.log("videoCode:", videoCode);
-
-    try {
-        // 获取弹幕数据
-        const danmuList = await getTencentVideoDanmu(videoCode, 3, 30000);
         
-        if (!Array.isArray(danmuList)) {
-            throw new Error('弹幕数据格式异常');
-        }
-
-        // XML转义函数
-        function escapeXml(unsafe) {
-            return unsafe.replace(/[<>&'"]/g, function (c) {
-                switch (c) {
-                    case '<': return '&lt;';
-                    case '>': return '&gt;';
-                    case '&': return '&amp;';
-                    case '\'': return '&apos;';
-                    case '"': return '&quot;';
-                    default: return c;
-                }
-            });
-        }
-
-        // 构建完整XML结构
-        let danmakuXml = `<?xml version="1.0" encoding="UTF-8"?>
-<html>
-  <head></head>
-  <body>
-    <i>
-      <chatserver>chat.bilibili.com</chatserver>
-      <chatid>${videoCode}</chatid>
-      <mission>0</mission>
-      <maxlimit>1000</maxlimit>
-      <state>0</state>
-      <real_name>0</real_name>
-      <source>k-v</source>\n`;
-
-        danmuList.forEach(danmu => {
-            danmakuXml += `      <d p="1,25,16777215,0,0,0,0">${escapeXml(danmu.content)}</d>\n`;
+    
+    // 构建 URLEncoded 请求体
+    const params = new URLSearchParams();
+    params.append('url', input); // 参数名根据接口要求可能需要修改
+   
+        const obj = await requestJson('https://www.lreeok.vip/okplay/api_config.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: params
         });
+      //  console.log('response的结果:', obj.url);
 
-        danmakuXml += `   </d></i> 
- </body>
-</html>`;
-
-        return {
-            parse: 1,
-            jx: 1,
-            url: input,
-          //  danmaku: danmakuXml,
-          //  danmakuType: 'xml'
-        };
-    } catch (error) {
-        console.error('弹幕获取失败:', error);
-        return { parse: 1, jx: 1, url: input };
-    }
+    return {parse: 1, jx: 1, url: obj.url}
 }
-}
-async function getTencentVideoDanmu(videoCode, num = 3, step = 30000) {
-    let allDanmu = [];
-    for (let i = 0; i < num; i++) {
-        const start = i * step;
-        const end = start + step;
-        const url = `https://dm.video.qq.com/barrage/segment/${videoCode}/t/v1/${start}/${end}`;
-        try {
-            // 添加完整请求头
-            const response = await request(url, {
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
-                    'Referer': 'https://v.qq.com/',
-                    'Origin': 'https://v.qq.com'
-                }
-            });
+        
 
-            // 随机延迟 1~3 秒，避免触发反爬
-            await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
-
-            let data = JSON.parse(response);
-            if (data.barrage_list?.length > 0) {
-                allDanmu.push(...data.barrage_list);
-                console.log(`第${i + 1}次请求弹幕，获取到${data.barrage_list.length}条弹幕，累计${allDanmu.length}条`);
-            } else {
-                console.log(`第${i + 1}次请求弹幕，未获取到更多弹幕，结束爬取`);
-                break;
-            }
-        } catch (error) {
-            console.error(`第${i + 1}次请求弹幕失败：`, error);
-            break;
-        }
-    }
-    return allDanmu;
 }

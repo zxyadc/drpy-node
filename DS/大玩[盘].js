@@ -1,9 +1,10 @@
 globalThis.hosts = [
-  'https://erxiaofn.click',
-  'http://2xiaopan.fun',
-  'http://mihdr.top',
-  'http://www.miqk.cc'
+  'http://149.88.87.18:6688',
+
+  'https://mo.91muou.icu'
 ];
+
+
 
 const { readFileSync } = require('fs');
 const config = JSON.parse(readFileSync('./config/tokenm.json', 'utf-8'));
@@ -15,61 +16,58 @@ const {getHtml} = $.require('./_lib.request.js')
 const { formatPlayUrl } = misc;
 
 var rule = {
-    title: '二小[盘]',
-   host: hosts[0],
+    title: '大玩[盘]',
+    host: hosts[0],
     url: '/index.php/vod/show/id/fyfilter.html',
     filter_url: '{{fl.cateId}}{{fl.area}}{{fl.by}}{{fl.class}}{{fl.lang}}{{fl.letter}}/page/fypage{{fl.year}}',
     searchUrl: '/index.php/vod/search/page/fypage/wd/**.html',
-    filter: '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',
+    filter: 'H4sIAAAAAAAAA+2XW08bVxDH3/0x9pnKZw25vuV+v99T5cGJrDYqpRLQSihCSgN2gAQcELVDY9pU5ZrGsUnbNLFl+DLeXftbZNfneHb276q4VV4K8+j/bzxnz/+c3Zl5YNnWwc8fWF+lRqyD1r3+5NCQ1WMNJL9O+T+dyVV3LO3//i7Z/22qFTcQyOm15thaIPs/rNEeo+YKfrxR461McaO1Q7yJDZMvDDFaO8T9/pn7MBcNMRotNLVWrxVgIa3RQquzzocqLKQ1ykJ7Y1m0Rs8y8bxemYRn0Vo7pFFccZ6+ioYYjZ5lquTVIMRobEfefLVjR4FGIcuPO3ZkNHrc4kp98yU8rtYoS2auubAOWbRGWX565e8RsmjtX5yR++i1l5uFEK1RyNiU++hHCNEaWVfNOun3YJ3W2iHNxTn3+XI0xGi0UO5xY7ICC2mNfNl8483/6dQ2wBqSKTC71PgVb43WKGQm42TfQojW6NZsPfOPF26N1sKTKriLs3hSLY1Cxre832DrRiMDa7NetfB3W4uQ0TvBH/QnIDmYSrIvQKHsPK10+wVYWm0uZNrrBIniRqLTWllw35ciEUYKDS67HzajObREe9qccV7UIhFGogP//QeMMBIdwJMNjDAS5cgvu4XX0Rxaor38vI45jBTeqr8wwkjhk5Y7n7QcyTFddior0RxaohzjWd9lZ2I9moZU2vPylpctepML0W2TGn6MXrpPtvw/RxclleLS7+rVXDRIS/w69ScHvgivU6NUbKw97PY6vaj58e0FgkRxI7FjxAgj0WV5u4QRRqJjzNec6TwGhSo77o4gLbErgxFGYhezI0JL7Mp07FlLzHbnzVg0Qkvc9pFUcjC03c2/a+b/6NL2hErsaacP0sRbAqN9SPs47UXay2kCaYJTG6nNqUKqGLUPAPUFRvcj3c/pPqT7ON2LdC+n6JXNvbLRK5t7ZaNXNvfKRq9s7pWNXtncKxu9srlXCr1S3CuFXinulUKvFPdKoVeKe6XQK8W9UuiV4l4p9EpxrxR6pbhXCr1S3CuFXvlC5AuWGh5OsZfJKebd0nSXL9MhelFbWeKHiBwGcpjIESBHiBwFcpTIMSDHiBwHcpzICSAniJwEcpLIKSCniJwGcprIGSBniJwFcpbIOSDniJwHcp7IBSAXiFwEcpHIJSCXiFwGcpnIFSBXiFwFcpXINSDXiFwHcp3IDSA3iNwEcpPILSC3iNwGcpuI+uwAsEDhr8DdEVZLZuacSrbj+oclJshzdyQ+fN8Pby9Rr1Tc8jyjX94fHgrLeGncmcgwOnTvm8FU8AR3eqyEv0RM5lOZT2U+3dXzaexTDKiZtB//jwPqtkPdpxhhtx8uuxlytxsduxhyc2V/rnMWf4mmIVVGvf886smYJmOajGkypsmYJmPabhjTevmYJp1A151ATFoBaQWkFZBWQFoBaQV2RCsQs/qkF5BeQHoB6QWkF5BeQHqBXdwLWHt4KyBlTcqalDUpa1LWpKz9r8tazH9DpbBJYZPCJoVNCpsUth1T2KyELXVN6prUNalrUtekru2YuuYPbAkpbFLYpLBJYZPCJoVtpxS22OhH3Toxv8BHAAA=',
     filter_def: {
         1: {cateId: '1'},
         2: {cateId: '2'},
         3: {cateId: '3'},
         4: {cateId: '4'},
+        5: {cateId: '5'},
+        20: {cateId: '20'},
+        21: {cateId: '21'},
+        22: {cateId: '22'},
     },
     cate_exclude: '网址|专题|全部影片',
     play_parse: true,
     searchable: 1,
     filterable: 1,
     quickSearch: 0,
-   // class_name: '电影&剧集&动漫&综艺&短剧&音乐&臻彩视觉',
-   // class_url: '1&2&3&4&5&24&26',
-    class_parse: async function () {
-    let { input, pdfa, pdfh, pd } = this;
-    // 考虑缓存机制，这里简单示例，实际需要更完善的缓存逻辑
-    let html;
-    if (!this.cachedHtml) {
-        console.log('正在请求新数据');
-        html = await request(input);
-        this.cachedHtml = html;
-    } else {
-        console.log('使用缓存数据');
-        html = this.cachedHtml;
-    }
-   // console.log('html的结果:', html);
-
+ //  class_name: '电影&剧集&动漫&综艺&短剧&音乐&臻彩视觉',
+   //class_url: '1&2&3&4&5&24&26',
+   class_parse: async function () {
     let d = [];
-    let data = pdfa(html, '.grid-box&&ul&&li'); // 解析目标元素
-    data.forEach((it, index) => {
-        let typeName = pdfh(it, 'a&&Text'); // 提取文本内容
-        let href = pd(it, 'a&&href'); // 提取 href 属性
-
-        // 优化正则表达式
-        let match = href.match(/.*\/([^/]+)\.html/); 
-        if (!match) {
-            return; 
+    const classMap = {
+        '电影': 1,
+        '剧集': 2,
+        '动漫': 3,
+        '综艺': 4,
+        '短剧': 20,
+        '音乐': 5, 
+        '纪录片': 21,
+        '4K高码': 22
+    };
+    
+    // 遍历 classMap 中的每个键值对
+    for (const key in classMap) {
+        if (classMap.hasOwnProperty(key)) {
+            d.push({
+                type_name: key,
+                type_id: classMap[key]
+            });
         }
-        let typeId = match[1];
-        d.push({
-            type_name: typeName,
-            type_id: typeId,
-        });
-    });
-
+    }
+    
     return {
         class: d
-    }
+    };
 },
+
+   
     推荐: async function () {
     return this.一级();
     },

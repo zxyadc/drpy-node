@@ -1,7 +1,7 @@
 const { readFileSync } = require('fs');
 const config = JSON.parse(readFileSync('./config/tokenm.json', 'utf-8'));
 
-console.log('线程数量:', config.thread); 
+//console.log('线程数量:', config.thread); 
 //console.log('线路排序:', config.lineOrder);
 
 const {getHtml} = $.require('./_lib.request.js')
@@ -116,28 +116,25 @@ var rule = {
     let playPans = [];
     let link = input;
     if (/pan.quark.cn/.test(link)) {     
-        const shareData = Quark.getShareData(link);
-        playPans.push(link);
-        if (shareData) {
-            const videos = await Quark.getFilesByShareUrl(shareData);
-            if (videos.length > 0) {
-                playform.push('Quark-' + shareData.shareId);
-                console.log('playform的结果:', playform);
-             //   playurls = videos.map((v) => {
-             
-                playurls.push(videos.map((v) => {
-                    const list = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle? v.subtitle.fid : '', v.subtitle? v.subtitle.share_fid_token : ''];
-                    return v.file_name + '$' + list.join('*');
-                }).join('#'));
-                
-            } 
-            else {
-                playform.push('Quark-' + shareData.shareId);
-                playurls.push("资源已经失效，请访问其他资源");
-            }
+    const shareData = Quark.getShareData(link);
+    playPans.push(link);
+    if (shareData) {
+        const videos = await Quark.getFilesByShareUrl(shareData);
+        if (videos.length > 0) {
+            playform.push('Quark-' + shareData.shareId);
+            const urls = videos.map((v) => {
+                const list = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle ? v.subtitle.fid : '', v.subtitle ? v.subtitle.share_fid_token : ''];
+                return v.file_name + '$' + list.join('*');
+            }).join('#');
+            playurls.push(urls); // 将生成的urls推入playurls数组
+        } 
+        else {
+            playform.push('Quark-' + shareData.shareId);
+            playurls.push("资源已经失效，请访问其他资源");
         }
-        
     }
+}
+
 
 // 去除后缀
     let processedArray = playform.map(str => str.replace(/-[\w]+$/, "")
@@ -160,9 +157,10 @@ var rule = {
       VOD.vod_play_from = uniqueArray.join("$$$");
      VOD.vod_play_url = playurls.join("$$$");
      VOD.vod_play_pan = playPans.join("$$$");
-    //console.log('VOD.vod_play_url的结果:', VOD.vod_play_url); 
     return VOD;
 }
+
+
     
 
 }

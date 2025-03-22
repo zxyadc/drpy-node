@@ -82,7 +82,7 @@ var rule = {
     if (/caiyun.139.com/.test(link)) {
       playPans.push(link);
       let data = await Yun.getShareData(link)
-      console.log('data的结果:', data);
+     // console.log('data的结果:', data);
       Object.keys(data).forEach(it => {
         playform.push('Yun-' + it)
         const urls = data[it].map(item => item.name + "$" + [item.contentId, item.linkID].join('*')).join('#');

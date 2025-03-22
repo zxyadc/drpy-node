@@ -41,28 +41,8 @@ var rule = {
 	limit:6,
 	
 	推荐: async function () {
-    let {input, pdfa, pdfh, pd} = this;
-    let html = await request(input);
-    let d = [];
-    let data = pdfa(html, 'div.container div.row a:has(>img)');
-    //console.log('data的结果:', data);
-    data.forEach((it) => {
-    let title = pdfh(it, 'img&&alt');
-    let desc = pdfh(it, 'h2&&Text');
-  //console.log('desc的结果:', desc);
-  let matchResult = desc.match(/\[更\d+\]/);
-    let result = matchResult?.[0]?? '完结';
-    if (!title.includes('置顶')) {
-        d.push({
-            title: title,
-            img: pd(it, 'img&&src'),
-           desc: result,
-            url: pd(it, 'a&&href')
-        });
-        }
-    });
-    return setResult(d);
-},
+    return this.一级();
+    },
 
 	一级: async function () {
     let {input, pdfa, pdfh, pd} = this;
@@ -97,76 +77,54 @@ var rule = {
         VOD.vod_pic = pd(html, 'img&&src');
        VOD.vod_content = pdfh(html, '#article_content&&Text');
         VOD.vod_remarks = pdfh(html, 'div.article-infobox&&Text');       
-        let list = pdfa(html, 'div.container div.row a');
-        let pans = [];
+      //  let list = pdfa(html, 'div.container div.row a');
+        let list = pdfa(html, 'div.tc-box');
+       // console.log('list的结果:', list);
+        let link = [];
         list.forEach(function(it) {
-        let burl = pdfh(it, 'a&&href');
+        let burl = pdfh(it, 'button&&data-pan');
+        console.log('burl的结果:', burl);
         if (burl.startsWith("https://www.aliyundrive.com/s/") || burl.startsWith("https://www.alipan.com/s/")){
-	pans.push(burl);
+	link.push(burl);
 	}else if (burl.startsWith("https://pan.quark.cn/s/")){
-    pans.push(burl);
+    link.push(burl);
 	}
         });
         let playform = [];
      let playurls = [];
      let playPans = [];
-    if (/pan.quark.cn/.test(pans)) {     
-    playPans.push(pans);
-       const shareData = Quark.getShareData(pans);
-        //console.log('shareData的结果:', shareData);
-        if (shareData) {
-            const videos = await Quark.getFilesByShareUrl(shareData);
-            if (videos.length > 0) {
-                playform.push('Quark-' + shareData.shareId);
-                playurls.push(videos.map((v) => {
-                    const list = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle? v.subtitle.fid : '', v.subtitle? v.subtitle.share_fid_token : ''];
-                    return v.file_name + '$' + list.join('*');
-                }).join('#'));
-                
-            } 
-            else {
-                playform.push('Quark-' + shareData.shareId);
-                playurls.push("资源已经失效，请访问其他资源");
-            }
-        }
-        
-    }
-    if (/drive.uc.cn/.test(pans)) {
-        const shareData = UC.getShareData(pans);
-        playPans.push(pans);
-        //  console.log('shareData的结果:', shareData);
-        if (shareData) {
-            const videos = await UC.getFilesByShareUrl(shareData);
-            if (videos.length > 0) {
-                playform.push('UC-' + shareData.shareId);
-                playurls.push(videos.map((v) => {
-                    const list = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle? v.subtitle.fid : '', v.subtitle? v.subtitle.share_fid_token : ''];
-                    return v.file_name + '$' + list.join('*');
-                }).join('#'));
-            } else {
-                playform.push('UC-' + shareData.shareId);
-                playurls.push("资源已经失效，请访问其他资源");
-            }
-        }
-    }
-    if (/www.alipan.com|www.aliyundrive.com/.test(pans)) {
-    const shareData = Ali.getShareData(input);
-    playPans.push(pans);
+    if (/pan.quark.cn/.test(link)) {     
+    const shareData = await Quark.getShareData(link);
+    playPans.push(link);
     if (shareData) {
-        const videos = await Ali.getFilesByShareUrl(shareData);
+        const videos = await Quark.getFilesByShareUrl(shareData);
         if (videos.length > 0) {
-            playform.push('Ali-' + shareData.shareId);
-            playurls.push(videos.map((v) => {
-                const list = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle? v.subtitle.fid : '', v.subtitle? v.subtitle.share_fid_token : ''];
+            playform.push('Quark-' + shareData.shareId);
+           // console.log('playform的结果:', playform);
+            const urls = videos.map((v) => {
+                const list = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle ? v.subtitle.fid : '', v.subtitle ? v.subtitle.share_fid_token : ''];
                 return v.file_name + '$' + list.join('*');
-            }).join('#'));
-        } else {
-            playform.push('Ali-' + shareData.shareId);
-            playurls.push("资源已经失效，请访问其他资源");
+            }).join('#');
+            playurls.push(urls); 
+        } 
+    }
+}
+if (/drive.uc.cn/.test(link)) {
+    playPans.push(link);
+    const shareData = await UC.getShareData(link);
+    if (shareData) {
+        const videos = await UC.getFilesByShareUrl(shareData);
+        if (videos.length > 0) {
+            playform.push('UC-' + shareData.shareId);
+            const urls = videos.map((v) => {
+                const list = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle ? v.subtitle.fid : '', v.subtitle ? v.subtitle.share_fid_token : ''];
+                return v.file_name + '$' + list.join('*');
+            }).join('#');
+            playurls.push(urls); 
         }
     }
 }
-
+    
 // 去除后缀
     let processedArray = playform.map(str => str.replace(/-[\w]+$/, "").replace(/UC/, "优汐").replace(/Quark/, "夸克").replace(/Ali/, "阿里"));
     // 处理重复元素
