@@ -1,7 +1,22 @@
 [
     {
-        "name": "📱短剧库",
-        "server": "https://duanjuzy.com/",
+        "name": "魔都云",
+        "server": "https://cdn.modupan.com",
+        "startPage": "/",
+        "showAll": false,
+        "search": true,
+        "params": {
+            "/abc": {
+                "password": "123"
+            },
+            "/abc/abc": {
+                "password": "123"
+            }
+        }
+    },
+    {
+        "name": "七米蓝",
+        "server": "https://al.chirmyram.com",
         "startPage": "/",
         "showAll": false,
         "search": true,
