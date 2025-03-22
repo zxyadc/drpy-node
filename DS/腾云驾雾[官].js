@@ -198,24 +198,32 @@ var rule = {
     
     
     lazy: async function () {
-        let {input} = this;
-        
-    
-    // 构建 URLEncoded 请求体
+        let {input} = this;       
     const params = new URLSearchParams();
     params.append('url', input); // 参数名根据接口要求可能需要修改
-   
-        const obj = await requestJson('https://www.lreeok.vip/okplay/api_config.php', {
+        const html = await request('https://www.lreeok.vip/okplay/api_config.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: params
         });
-      //  console.log('response的结果:', obj.url);
-
-    return {parse: 1, jx: 1, url: obj.url}
-}
+        let obj = JSON.parse(html);
+    //  console.log('obj.url的结果:', obj.url);
+    const keywords = ['m3u8', 'mp4', 'mp'];
+  //  console.log('input的结果:', input);
+        const isMatch = keywords.some(keyword => input.includes(keyword));
+        if (!isMatch) {
+          return {parse: 0, jx: 0, url: obj.url};
+        } else {
+            return {
+                url: rule.parseUrl + input,
+                parse: 0,
+                jx: 0,
+                header: rule.headers
+            };
+        }     
+},
         
 
 }
